@@ -18,6 +18,8 @@ namespace ZMachine
             gameMemory.Read(Bytes, 0, Bytes.Length);
 
             Header = new ZHeader(Bytes);
+
+            ZStringBuilder.AbbreviationTable = TextAbbreviations;
         }
 
         public ZHeader Header { get; }
@@ -100,7 +102,7 @@ namespace ZMachine
         public string ReadString(int address, bool useAbbreviations = true)
         {
             // load all the fragments until reaching the end of the string
-            ZStringBuilder fragment = new ZStringBuilder(useAbbreviations ? TextAbbreviations : null);
+            ZStringBuilder fragment = new ZStringBuilder();
             do
             {
                 ushort data = Bytes.GetWord(address);

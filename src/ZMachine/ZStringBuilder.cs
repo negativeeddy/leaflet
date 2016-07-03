@@ -8,11 +8,10 @@ namespace ZMachine
 {
     public class ZStringBuilder
     {
-        private static IEnumerable<string> _abbrevTable;
+        public static IEnumerable<string> AbbreviationTable;
 
-        public ZStringBuilder(IEnumerable<string> abbreviationTable)
+        public ZStringBuilder()
         {
-            _abbrevTable = abbreviationTable;
         }
 
         /// <summary>
@@ -177,13 +176,13 @@ namespace ZMachine
         {
             Debug.Assert(abbrevAddr < 96);
 
-            if (_abbrevTable == null)
+            if (AbbreviationTable == null)
             {
                 return "ABBREV_UKNOWN";
             }
             else
             {
-                return _abbrevTable.Skip(abbrevAddr).First();
+                return AbbreviationTable.Skip(abbrevAddr).First();
             }
         }
     }

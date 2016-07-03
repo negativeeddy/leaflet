@@ -53,6 +53,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AddressHelperTests.cs" />
+    <Compile Include="ObjectTableTests.cs" />
     <Compile Include="DictionaryTests.cs" />
     <Compile Include="FileHeaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

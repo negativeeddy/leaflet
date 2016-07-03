@@ -13,7 +13,7 @@ namespace ZMachine.Tests
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
 
-            var zb = new ZStringBuilder(zm.MainMemory.TextAbbreviations);
+            var zb = new ZStringBuilder();
             string actual = zm.MainMemory.ReadString(0xb106);
 
             // expected isn't the entire string but just the first portion long enough to encounter an abbreviation

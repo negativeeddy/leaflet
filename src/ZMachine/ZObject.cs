@@ -11,6 +11,7 @@ namespace ZMachine
     {
         private readonly byte[] _bytes;
 
+        public const string UNNAMED_OBJECT_NAME = "<unnamed>";
         public const int INVALID_ID = 0;
         public static ZObject InvalidObject = new ZObject(null, 0, ZObject.INVALID_ID);
 
@@ -38,7 +39,7 @@ namespace ZMachine
                 }
                 else
                 {
-                    return "<unnamed>";
+                    return UNNAMED_OBJECT_NAME;
                 }
             }
         }

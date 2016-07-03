@@ -72,7 +72,7 @@ namespace ZMachine
 
             for(int i=0; i<count; i++)
             {
-                ZStringBuilder zb = new ZStringBuilder(null);
+                ZStringBuilder zb = new ZStringBuilder();
                 zb.AddWord(bytes.GetWord(i*length));
                 zb.AddWord(bytes.GetWord((i*length)+2));
                 Words[i] = zb.ToString();
