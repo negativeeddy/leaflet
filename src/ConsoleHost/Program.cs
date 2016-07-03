@@ -21,7 +21,7 @@ namespace ConsoleHost
             }
             Console.WriteLine($"Version {zm.MainMemory.Header.Version}");
 
-            var zb = new ZStringBuilder();
+            var zb = new ZStringBuilder(zm.MainMemory.TextAbbreviations);
             var test = zm.MainMemory.ReadString(0xb106);
             Console.WriteLine(test);
         }

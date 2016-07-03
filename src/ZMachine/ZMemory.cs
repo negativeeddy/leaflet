@@ -37,10 +37,29 @@ namespace ZMachine
             }
         }
 
-        public string ReadString(int address)
+        public string GetTextAbbreviation(int index)
+        {
+
+            int address = AbbreviationTable().Skip(index).First();
+            return ReadString(address);
+        }
+
+        string[] _textAbbreviations = null;
+        public string [] TextAbbreviations
+        {
+            get
+            {
+                if (_textAbbreviations == null)
+                {
+                    _textAbbreviations = AbbreviationTable().Select(addr => ReadString(addr, false)).ToArray();
+                }
+                return _textAbbreviations;
+            }
+        }
+        public string ReadString(int address, bool useAbbreviations = true)
         {
             // load all the fragments until reaching the end of the string
-            ZStringBuilder fragment = new ZStringBuilder();
+            ZStringBuilder fragment = new ZStringBuilder(useAbbreviations ? TextAbbreviations: null);
             do
             {
                 ushort data = _data.GetWord(address);
