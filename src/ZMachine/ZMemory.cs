@@ -10,32 +10,31 @@ namespace ZMachine
 {
     public class ZMemory
     {
-        private byte[] _data;
+        public byte[] Bytes { get; }
 
         public ZMemory(Stream gameMemory)
         {
-            _data = new byte[gameMemory.Length];
-            gameMemory.Read(_data, 0, _data.Length);
+            Bytes = new byte[gameMemory.Length];
+            gameMemory.Read(Bytes, 0, Bytes.Length);
 
-            Header = new ZHeader(_data);
+            Header = new ZHeader(Bytes);
         }
 
         public ZHeader Header { get; }
-        public object ObjectTree { get; set; }
 
         public ArraySegment<byte> StaticMemory
         {
-            get { return new ArraySegment<byte>(_data, Header.StaticMemoryAddress, _data.Length - Header.StaticMemoryAddress); }
+            get { return new ArraySegment<byte>(Bytes, Header.StaticMemoryAddress, Bytes.Length - Header.StaticMemoryAddress); }
         }
 
         public ArraySegment<byte> DynamicMemory
         {
-            get { return new ArraySegment<byte>(_data, 0, Header.StaticMemoryAddress); }
+            get { return new ArraySegment<byte>(Bytes, 0, Header.StaticMemoryAddress); }
         }
 
         public ArraySegment<byte> HighMemory
         {
-            get { return new ArraySegment<byte>(_data, Header.HighMemoryAddress, _data.Length - Header.HighMemoryAddress); }
+            get { return new ArraySegment<byte>(Bytes, Header.HighMemoryAddress, Bytes.Length - Header.HighMemoryAddress); }
         }
 
         private ZDictionary _dictionary;
@@ -46,19 +45,32 @@ namespace ZMachine
             {
                 if (_dictionary == null)
                 {
-                    _dictionary = new ZDictionary(_data, Header.DictionaryAddress);
+                    _dictionary = new ZDictionary(Bytes, Header.DictionaryAddress);
                 }
                 return _dictionary;
             }
-            set { _dictionary = value; }
         }
+
+        private ZObjectTable _objectTree;
+        public ZObjectTable ObjectTree
+        {
+            get
+            {
+                if (_objectTree == null)
+                {
+                    _objectTree = new ZObjectTable(Bytes, Header.ObjectTableAddress);
+                }
+                return _objectTree;
+            }
+        }
+
 
         public IEnumerable<int> AbbreviationTable()
         {
             ushort address = Header.AbbreviationsTableAddress;
             for (int i = 0; i < 96; i++)
             {
-                ushort abbrev = _data.GetWord(address);
+                ushort abbrev = Bytes.GetWord(address);
                 int final = abbrev.ToWordZStringAddress();
                 yield return final;
 
@@ -91,7 +103,7 @@ namespace ZMachine
             ZStringBuilder fragment = new ZStringBuilder(useAbbreviations ? TextAbbreviations : null);
             do
             {
-                ushort data = _data.GetWord(address);
+                ushort data = Bytes.GetWord(address);
                 fragment.AddWord(data);
                 address += 2;
             }

@@ -8,11 +8,42 @@ namespace ZMachine
 {
     public class ZStringBuilder
     {
-        IEnumerable<string> _abbrevTable;
+        private static IEnumerable<string> _abbrevTable;
 
         public ZStringBuilder(IEnumerable<string> abbreviationTable)
         {
             _abbrevTable = abbreviationTable;
+        }
+
+        /// <summary>
+        /// Reads a ZString from an arbitrary location within a byte array
+        /// </summary>
+        /// <param name="data">the byte array</param>
+        /// <param name="index">the position of the beginning of the ZString</param>
+        public ZStringBuilder(IList<byte> data, int index)
+        {
+            do
+            {
+                ushort word = data.GetWord(index);
+                AddWord(word);
+                index += 2;
+            }
+            while (!EOS);
+        }
+
+        /// <summary>
+        /// Reads a ZString from an arbitrary location within a byte array
+        /// </summary>
+        /// <param name="data">the byte array</param>
+        /// <param name="index">the position of the beginning of the ZString</param>
+        /// <param name="count">the length of the ZString in words to read from the byte data (not length in bytes)</param>
+        public ZStringBuilder(IList<byte> data, int index, int count)
+        {
+            for(int i=0; i<count*2; i+=2)
+            {
+                ushort word = data.GetWord(index+i);
+                AddWord(word);
+            }
         }
 
         private List<ushort> _allBits;

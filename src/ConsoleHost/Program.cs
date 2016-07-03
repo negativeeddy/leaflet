@@ -21,17 +21,23 @@ namespace ConsoleHost
             }
             Console.WriteLine($"Gamefile Version {zm.MainMemory.Header.Version}");
 
-            var dictionary = zm.MainMemory.Dictionary;
+            var objTree = zm.MainMemory.ObjectTree;
 
             // mini zork's Entrys are (in order) a full stop, a comma and a double-quote
-            var expectedEntrys = new string[0];
-            var actualEntrys = zm.MainMemory.Dictionary.Words;
+            int expectedEntrysCount = 1152;
+            int actualEntrysCount = zm.MainMemory.ObjectTree.Objects.Count();
 
-            foreach(var item in actualEntrys)
+            Console.WriteLine(actualEntrysCount);
+
+            foreach(var o in zm.MainMemory.ObjectTree.Objects)
             {
-                Console.Write(item);
-                Console.Write(" ");
+                Console.WriteLine($"{o.ID} (0x{o.BaseAddress:X4}) => {o.ShortName}\n   Prop:0x{o.PropertyAddress:X4}");
             }
+            //foreach(var item in actualEntrys)
+            //{
+            //    Console.Write(item);
+            //    Console.Write(" ");
+            //}
 
         }
     }

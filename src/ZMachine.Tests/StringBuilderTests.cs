@@ -15,9 +15,40 @@ namespace ZMachine.Tests
 
             var zb = new ZStringBuilder(zm.MainMemory.TextAbbreviations);
             string actual = zm.MainMemory.ReadString(0xb106);
-            
+
             // expected isn't the entire string but just the first portion long enough to encounter an abbreviation
             actual = actual.Substring(0, expected.Length);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void LoadStringDirectlyWithoutLengthTest()
+        {
+            string expected = "\"Flood Control Dam ";
+
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            var zb = new ZStringBuilder(zm.MainMemory.Bytes, 0xb106);
+            string actual = zb.ToString();
+
+            // expected isn't the entire string but just the first portion long enough to encounter an abbreviation
+            actual = actual.Substring(0, expected.Length);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void LoadStringDirectlyWithLengthTest()
+        {
+            string expected = "\"Flood Control ";
+
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            var zb = new ZStringBuilder(zm.MainMemory.Bytes, 0xb106, 6);
+            string actual = zb.ToString();
 
             Assert.AreEqual(expected, actual);
         }

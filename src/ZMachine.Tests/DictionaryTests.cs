@@ -36,7 +36,13 @@ namespace ZMachine.Tests
 
             var dictionary = zm.MainMemory.Dictionary;
 
-            // mini zork's dictionary items are are (in order) 
+            // mini zork has 536 Separators
+            int expectedEntryCount = 536;
+            int actualEntryCount = dictionary.Words.Count();
+
+            Assert.AreEqual(expectedEntryCount, actualEntryCount);
+
+            // mini zork's dictionary first 14 items are are (in order) 
             var expectedEntrys = new string[] { "$ve", ".", ",", "#comm", "#rand", "#reco", "#unre", "\"", "a", "about", "across", "activa", "advent", "again" };
             var actualEntrys = zm.MainMemory.Dictionary.Words.Take(14).ToArray();
 
