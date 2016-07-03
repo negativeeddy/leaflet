@@ -8,7 +8,7 @@ namespace ZMachine.Memory
 {
     public static class AddressHelper
     {
-        public static ushort GetWord(this byte[] data, int address)
+        public static ushort GetWord(this IList<byte> data, int address)
         {
             int upper = data[address] << 8;
             int lower = data[address + 1];
@@ -17,7 +17,7 @@ namespace ZMachine.Memory
             return (ushort)(uppershort + lowershort);
         }
 
-        public static uint GetDWord(this byte[] data, int address)
+        public static uint GetDWord(this IList<byte> data, int address)
         {
             return (uint)(data[address] << 24) +
                    (uint)(data[address + 1] << 16) +

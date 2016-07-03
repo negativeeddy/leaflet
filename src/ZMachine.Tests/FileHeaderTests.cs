@@ -11,13 +11,8 @@ namespace ZMachine.Tests
         [TestMethod]
         public void VerifyMiniZorkHeader()
         {
-            ZMachine zm = new ZMachine();
-
             string filename = @"GameFiles\minizork.z3";
-            using (var stream = File.OpenRead(filename))
-            {
-                zm.LoadStory(stream);
-            }
+            var zm = ZMachineLoader.Load(filename);
 
             Assert.AreEqual(3, zm.MainMemory.Header.Version);
             //Assert.AreEqual(53248, zm.MainMemory.Header.Filelength);
@@ -30,13 +25,8 @@ namespace ZMachine.Tests
         [TestMethod]
         public void VerifyAbbreviationTable()
         {
-            ZMachine zm = new ZMachine();
-
             string filename = @"GameFiles\minizork.z3";
-            using (var stream = File.OpenRead(filename))
-            {
-                zm.LoadStory(stream);
-            }
+            var zm = ZMachineLoader.Load(filename);
 
             var abbreviations = zm.MainMemory.AbbreviationTable().ToArray();
             foreach (ushort addr in abbreviations)

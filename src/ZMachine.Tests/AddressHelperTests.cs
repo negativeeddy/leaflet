@@ -1,10 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ZMachine.Memory;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ZMachine.Memory.Tests
 {
@@ -29,7 +25,7 @@ namespace ZMachine.Memory.Tests
                 new Tuple<byte[], int, ushort>(new byte[] { 0x00, 0x77, 0x77 }, 1, 0x7777),
                 new Tuple<byte[], int, ushort>(new byte[] { 0x00, 0x89, 0x89 }, 1, 0x8989),
                 new Tuple<byte[], int, ushort>(new byte[] { 0x00, 0x89, 0x98 }, 1, 0x8998),
-};
+            };
 
             foreach (var input in inputs)
             {
@@ -45,7 +41,23 @@ namespace ZMachine.Memory.Tests
         [TestMethod()]
         public void GetDWordTest()
         {
-            Assert.Inconclusive();
+            var inputs = new List<Tuple<byte[], int, uint>>()
+            {
+                // data, test index, expected result
+                new Tuple<byte[], int, uint>(new byte[] { 0x01, 0x23, 0x34, 0x56, 0x87, 0x9F }, 0, 0x01233456),
+                new Tuple<byte[], int, uint>(new byte[] { 0x01, 0x23, 0x34, 0x56, 0x87, 0x9F }, 1, 0x23345687),
+                new Tuple<byte[], int, uint>(new byte[] { 0x01, 0x23, 0x34, 0x56, 0x87, 0x9F }, 2, 0x3456879F),
+            };
+
+            foreach (var input in inputs)
+            {
+                byte[] data = input.Item1;
+                int address = input.Item2;
+
+                uint expected = input.Item3;
+                uint actual = data.GetDWord(address);
+                Assert.AreEqual(expected, actual, input.ToString());
+            }
         }
 
         [TestMethod()]

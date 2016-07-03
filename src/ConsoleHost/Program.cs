@@ -19,11 +19,20 @@ namespace ConsoleHost
             {
                 zm.LoadStory(stream);
             }
-            Console.WriteLine($"Version {zm.MainMemory.Header.Version}");
+            Console.WriteLine($"Gamefile Version {zm.MainMemory.Header.Version}");
 
-            var zb = new ZStringBuilder(zm.MainMemory.TextAbbreviations);
-            var test = zm.MainMemory.ReadString(0xb106);
-            Console.WriteLine(test);
+            var dictionary = zm.MainMemory.Dictionary;
+
+            // mini zork's Entrys are (in order) a full stop, a comma and a double-quote
+            var expectedEntrys = new string[0];
+            var actualEntrys = zm.MainMemory.Dictionary.Words;
+
+            foreach(var item in actualEntrys)
+            {
+                Console.Write(item);
+                Console.Write(" ");
+            }
+
         }
     }
 }

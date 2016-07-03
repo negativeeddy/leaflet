@@ -41,7 +41,7 @@ namespace ZMachine
             }
         }
 
-        private static char[][] alphabet_tables = new char[][] {
+        public static char[][] ZSCIIAlphabetTables = new char[][] {
             new char [] {
             ' ', '?', '?', '?', '?', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
             'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'  },
@@ -69,7 +69,9 @@ namespace ZMachine
             int currentAlphabet = 0;
             int? abbrevAddrZ = null;
             int? abbrevAddrX = null;
-
+            bool nextIsZscii = false;
+            byte? firstZscii = null;
+            byte? secondZscii = null;
             foreach (byte b in BytesFromBits())
             {
                 if (abbrevAddrZ != null)
@@ -77,9 +79,31 @@ namespace ZMachine
                     abbrevAddrX = b;
                     int abbrevAddr = 32 * (abbrevAddrZ.Value - 1) + abbrevAddrX.Value;
                     string abbrev = GetAbbreviation(abbrevAddr);
+                    sb.Append(abbrev);
+
+                    // reset the state
                     abbrevAddrZ = null;
                     abbrevAddrX = null;
-                    sb.Append(abbrev);
+                }
+                else if (nextIsZscii) // we previously got a 6 while in alphabet 2
+                {
+                    if (firstZscii == null)
+                    {
+                        firstZscii = b;
+                    } else
+                    {
+                        secondZscii = b;
+
+                        int z= ((byte)firstZscii << 5) | (byte)secondZscii;
+                        byte tmp = (byte)z;
+                        char tmpc = (char)tmp;
+                        sb.Append(tmpc);
+
+                        // reset the state
+                        firstZscii = null;
+                        secondZscii = null;
+                        nextIsZscii = false;
+                    }
                 }
                 else
                 {
@@ -101,16 +125,17 @@ namespace ZMachine
                             if (currentAlphabet == 2)
                             {
                                 // 6 is not a special case unless on alphabet 2
-                                throw new NotImplementedException("ASCII string encoding not implemented yet. See z-spec 3.4");
+                                nextIsZscii = true;
+                                currentAlphabet = 0;
                             }
                             else
                             { 
-                                sb.Append(alphabet_tables[currentAlphabet][b]);
+                                sb.Append(ZSCIIAlphabetTables[currentAlphabet][b]);
                                 currentAlphabet = 0;
                             }
                             break;
                         default:
-                            sb.Append(alphabet_tables[currentAlphabet][b]);
+                            sb.Append(ZSCIIAlphabetTables[currentAlphabet][b]);
                             currentAlphabet = 0;
                             break;
                     }

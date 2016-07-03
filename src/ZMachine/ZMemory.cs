@@ -21,8 +21,37 @@ namespace ZMachine
         }
 
         public ZHeader Header { get; }
-        public object Dictionary { get; set; }
         public object ObjectTree { get; set; }
+
+        public ArraySegment<byte> StaticMemory
+        {
+            get { return new ArraySegment<byte>(_data, Header.StaticMemoryAddress, _data.Length - Header.StaticMemoryAddress); }
+        }
+
+        public ArraySegment<byte> DynamicMemory
+        {
+            get { return new ArraySegment<byte>(_data, 0, Header.StaticMemoryAddress); }
+        }
+
+        public ArraySegment<byte> HighMemory
+        {
+            get { return new ArraySegment<byte>(_data, Header.HighMemoryAddress, _data.Length - Header.HighMemoryAddress); }
+        }
+
+        private ZDictionary _dictionary;
+
+        public ZDictionary Dictionary
+        {
+            get
+            {
+                if (_dictionary == null)
+                {
+                    _dictionary = new ZDictionary(_data, Header.DictionaryAddress);
+                }
+                return _dictionary;
+            }
+            set { _dictionary = value; }
+        }
 
         public IEnumerable<int> AbbreviationTable()
         {
@@ -45,7 +74,7 @@ namespace ZMachine
         }
 
         string[] _textAbbreviations = null;
-        public string [] TextAbbreviations
+        public string[] TextAbbreviations
         {
             get
             {
@@ -59,7 +88,7 @@ namespace ZMachine
         public string ReadString(int address, bool useAbbreviations = true)
         {
             // load all the fragments until reaching the end of the string
-            ZStringBuilder fragment = new ZStringBuilder(useAbbreviations ? TextAbbreviations: null);
+            ZStringBuilder fragment = new ZStringBuilder(useAbbreviations ? TextAbbreviations : null);
             do
             {
                 ushort data = _data.GetWord(address);
