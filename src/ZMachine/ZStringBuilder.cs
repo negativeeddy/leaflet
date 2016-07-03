@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using ZMachine.Memory;
 
 namespace ZMachine
@@ -124,7 +122,7 @@ namespace ZMachine
                         case 6:
                             if (currentAlphabet == 2)
                             {
-                                // 6 is not a special case unless on alphabet 2
+                                // 6 is a special case on alphabet 2
                                 nextIsZscii = true;
                                 currentAlphabet = 0;
                             }

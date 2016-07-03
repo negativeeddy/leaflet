@@ -42,7 +42,6 @@
   <ItemGroup>
     <Compile Include="AddressHelper.cs" />
     <Compile Include="ZDictionary.cs" />
-    <Compile Include="IntType.cs" />
     <Compile Include="ZStringBuilder.cs" />
     <Compile Include="ZHeader.cs" />
     <Compile Include="ZMachine.cs" />

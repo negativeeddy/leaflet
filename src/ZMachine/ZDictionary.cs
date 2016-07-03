@@ -12,8 +12,6 @@ namespace ZMachine
     /// </summary>
     public class ZDictionary
     {
-        private byte[] _data;
-        private int _baseAddress;
         private int _entryBaseAddress;
         private byte _entryLength;
 
@@ -35,33 +33,36 @@ namespace ZMachine
 
         public ZDictionary(byte[] memory, int address)
         {
-            _data = memory;
-            _baseAddress = address;
 
-            Load();
+            Load(memory, address);
         }
 
         public ZDictionary() : base()
         {
         }
 
-        private void Load()
+        /// <summary>
+        /// Loads the dictionary from the byte array at the specified byte address
+        /// </summary>
+        /// <param name="data">an array of bytes</param>
+        /// <param name="baseAddress">the index of the beginning of the dictionary in the data array</param>
+        private void Load(byte[] data, int baseAddress)
         {
-            int currentAddress = _baseAddress;
-            byte numberOfSeparators = _data[currentAddress];
+            int currentAddress = baseAddress;
+            byte numberOfSeparators = data[currentAddress];
             currentAddress++;
 
-            LoadWordSeparators(_data, numberOfSeparators, currentAddress);
+            LoadWordSeparators(data, numberOfSeparators, currentAddress);
             currentAddress += numberOfSeparators;
 
-            int _entryLength = _data[currentAddress];
+            int _entryLength = data[currentAddress];
             currentAddress++;
 
-            int _entryCount = _data.GetWord(currentAddress);
+            int _entryCount = data.GetWord(currentAddress);
             currentAddress += 2;
 
             int _entryBaseAddress = currentAddress;
-            ArraySegment<byte> entryBytes = new ArraySegment<byte>(_data, _entryBaseAddress, _entryLength * _entryCount);
+            ArraySegment<byte> entryBytes = new ArraySegment<byte>(data, _entryBaseAddress, _entryLength * _entryCount);
             LoadEntries(entryBytes, _entryCount, _entryLength);
         }
 
@@ -86,20 +87,6 @@ namespace ZMachine
             {
                 Separators[i] = (char)data[address + i];
             }
-        }
-    }
-
-    public class DictionaryEntry
-    {
-        public DictionaryEntry(IList<byte> bytes, int textSize = 4)
-        {
-            ZStringBuilder zb = new ZStringBuilder(null);
-            for (int i = 0; i < textSize/2; i++) 
-            {
-                var b = bytes.GetWord(i);
-                zb.AddWord(b);
-            }
-            string text = zb.ToString();
         }
     }
 }

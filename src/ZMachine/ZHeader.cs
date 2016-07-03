@@ -59,6 +59,7 @@ namespace ZMachine.Files
         public ushort GlobalVariablesTableAddress { get { return _data.GetWord(HeaderOffset_LocationOfGlobalVariablesTable); } }
         public ushort StaticMemoryAddress { get { return _data.GetWord(HeaderOffset_BaseOfStaticMemory); } }
         public uint Flags2 { get { return _data.GetDWord(HeaderOffset_Flags2); } }
+
         public string SerialCode
         {
             get
@@ -82,8 +83,6 @@ namespace ZMachine.Files
         public byte ScreenWidthChars { get { return _data[HeaderOffset_ScreenwidthInChars]; } }
         public ushort ScreenHeightUnits { get { return _data.GetWord(HeaderOffset_ScreenheightInUnits); } }
         public ushort ScreenWidthUnits { get { return _data.GetWord(HeaderOffset_ScreenwidthInUnits); } }
-
-
 
         public byte StandardRevisionNumber { get { return _data[HeaderOffset_Standardrevisionnumber]; } }
 
