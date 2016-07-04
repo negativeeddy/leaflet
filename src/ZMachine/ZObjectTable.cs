@@ -42,6 +42,31 @@ namespace ZMachine
 
         public List<ZObject> Objects { get; } = new List<ZObject>(256);
 
-        public int Count { get; }
+        public string DumpObjectTree()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var obj in Objects.Where(zo => zo.ParentID == 0))
+            {
+                PrintObject(obj, 0, sb);
+            }
+            return sb.ToString();
+        }
+
+        private void PrintObject(ZObject current, int level, StringBuilder sb)
+        {
+            for (int i = 0; i < level; i++) { sb.Append("-----"); }    // do the indention
+
+            sb.AppendLine(current.ToString());
+
+            if (current.ChildID != 0)
+            {
+                PrintObject(Objects[current.ChildID - 1], level + 1, sb);
+            }
+
+            if (current.SiblingID != 0)
+            {
+                PrintObject(Objects[current.SiblingID - 1], level, sb);
+            }
+        }
     }
 }

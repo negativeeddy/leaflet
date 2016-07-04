@@ -21,29 +21,9 @@ namespace ConsoleHost
             }
             Console.WriteLine($"Gamefile Version {zm.MainMemory.Header.Version}");
 
-            var objTree = zm.MainMemory.ObjectTree.Objects;
-
-            foreach (var obj in objTree.Where(zo => zo.ParentID == 0))
-            {
-                PrintObject(obj, objTree, 0);
-            }
-        }
-
-        private static void PrintObject(ZObject current, List<ZObject> objects, int level)
-        {
-            for (int i = 0; i < level; i++) { Console.Write("-----"); }    // do the indention
-
-            Console.WriteLine(current);
-
-            if (current.ChildID != 0)
-            {
-                PrintObject(objects[current.ChildID - 1], objects, level + 1);
-            }
-
-            if (current.SiblingID != 0)
-            {
-                PrintObject(objects[current.SiblingID - 1], objects, level);
-            }
+            string output = zm.MainMemory.ObjectTree.DumpObjectTree();
+            Console.WriteLine(output);
+            Console.WriteLine(output.Length);
         }
     }
 }
