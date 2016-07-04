@@ -25,6 +25,11 @@ namespace ZMachine
         public int ChildID { get { return _bytes[BaseAddress + 6]; } }
         public int PropertyAddress { get { return (int)_bytes.GetWord(BaseAddress + 7); } }
 
+        public override string ToString()
+        {
+            return $"[{ID:D3}] {ShortName}";
+        }
+
         public string ShortName
         {
             get

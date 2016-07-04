@@ -21,24 +21,29 @@ namespace ConsoleHost
             }
             Console.WriteLine($"Gamefile Version {zm.MainMemory.Header.Version}");
 
-            var objTree = zm.MainMemory.ObjectTree;
+            var objTree = zm.MainMemory.ObjectTree.Objects;
 
-            // mini zork's Entrys are (in order) a full stop, a comma and a double-quote
-            int expectedEntrysCount = 1152;
-            int actualEntrysCount = zm.MainMemory.ObjectTree.Objects.Count();
-
-            Console.WriteLine(actualEntrysCount);
-
-            foreach(var o in zm.MainMemory.ObjectTree.Objects)
+            foreach (var obj in objTree.Where(zo => zo.ParentID == 0))
             {
-                Console.WriteLine($"{o.ID} (0x{o.BaseAddress:X4}) => {o.ShortName}\n   Prop:0x{o.PropertyAddress:X4}");
+                PrintObject(obj, objTree, 0);
             }
-            //foreach(var item in actualEntrys)
-            //{
-            //    Console.Write(item);
-            //    Console.Write(" ");
-            //}
+        }
 
+        private static void PrintObject(ZObject current, List<ZObject> objects, int level)
+        {
+            for (int i = 0; i < level; i++) { Console.Write("-----"); }    // do the indention
+
+            Console.WriteLine(current);
+
+            if (current.ChildID != 0)
+            {
+                PrintObject(objects[current.ChildID - 1], objects, level + 1);
+            }
+
+            if (current.SiblingID != 0)
+            {
+                PrintObject(objects[current.SiblingID - 1], objects, level);
+            }
         }
     }
 }
