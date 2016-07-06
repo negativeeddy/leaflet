@@ -52,14 +52,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="ZOpcodeDefinitionTests.cs" />
-    <Compile Include="ZOpcodeTests.cs" />
+    <Compile Include="InstructionTests\ZOpcodeDefinitionTests.cs" />
+    <Compile Include="InstructionTests\ZOpcodeTests.cs" />
     <Compile Include="AddressHelperTests.cs" />
     <Compile Include="ObjectTableTests.cs" />
     <Compile Include="DictionaryTests.cs" />
     <Compile Include="FileHeaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StringBuilderTests.cs" />
+    <Compile Include="ZStringBuilderTests.cs" />
     <Compile Include="ZorkMiniData.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +73,7 @@
       <Name>ZMachine</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

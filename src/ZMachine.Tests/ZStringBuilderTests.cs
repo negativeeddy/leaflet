@@ -3,7 +3,7 @@
 namespace ZMachine.Tests
 {
     [TestClass]
-    public class StringBuilderTests
+    public class ZStringBuilderTests
     {
         [TestMethod]
         public void AbbreviationExpansionTest()
