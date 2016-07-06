@@ -41,9 +41,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddressHelper.cs" />
+    <Compile Include="Instructions\OpcodeDefinition.cs" />
+    <Compile Include="Instructions\OpcodeForm.cs" />
+    <Compile Include="Instructions\OperandCountType.cs" />
+    <Compile Include="Instructions\OperandTypes.cs" />
+    <Compile Include="Instructions\ZOperand.cs" />
+    <Compile Include="Instructions\ZVariable.cs" />
     <Compile Include="ZDictionary.cs" />
     <Compile Include="ZObject.cs" />
     <Compile Include="ZObjectTable.cs" />
+    <Compile Include="Instructions\ZOpcode.cs" />
     <Compile Include="ZStringBuilder.cs" />
     <Compile Include="ZHeader.cs" />
     <Compile Include="ZMachine.cs" />

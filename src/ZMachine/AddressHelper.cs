@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,11 +26,33 @@ namespace ZMachine.Memory
                    (uint)(data[address + 3]);
         }
 
+        /// <summary>
+        /// Retrieves a subset of the bits in an 16-bit word
+        /// </summary>
+        /// <param name="word">the original 16-bit word</param>
+        /// <param name="high">the highest bit to retrieve (LSB is 0, MSB is 15)</param>
+        /// <param name="length">how many bits to retrieve</param>
+        /// <returns></returns>
         public static ushort FetchBits(this ushort word, BitNumber high, int length)
         {
             var mask = ~(-1 << length);
             var result = (word >> ((int)high - length + 1)) & mask;
             return (ushort)result;
+        }
+
+        /// <summary>
+        /// Retrieves a subset of the bits in an 8-bit byte
+        /// </summary>
+        /// <param name="word">the original 8-bit byte</param>
+        /// <param name="high">the highest bit to retrieve (LSB is 0, MSB is 7)</param>
+        /// <param name="length">how many bits to retrieve</param>
+        /// <returns></returns>
+        public static byte FetchBits(this byte theByte, BitNumber high, int length)
+        {
+
+            var mask = ~(-1 << length);
+            var result = (theByte >> ((int)high - length + 1)) & mask;
+            return (byte)result;
         }
 
         public static int ToWordZStringAddress(this ushort value)
@@ -38,7 +61,11 @@ namespace ZMachine.Memory
         } 
     }
 
-    [Flags]
+    /// <summary>
+    /// The bit number used to retrieve bits via FetchBits(). This is not
+    /// a bitflag, it is the ordinal position of the bit with the least 
+    /// significant bit being 0
+    /// </summary>
     public enum BitNumber : int
     {
         Bit_0 = 0,

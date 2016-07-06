@@ -61,31 +61,61 @@ namespace ZMachine.Memory.Tests
         }
 
         [TestMethod()]
-        public void TestFetchBits()
+        public void TestWordFetchBits()
         {
-            ushort i = Convert.ToUInt16("01101100", 2);
+            ushort i = Convert.ToUInt16("1011111101101100", 2);
 
             ushort expected = Convert.ToUInt16("101", 2);
             ushort actual = i.FetchBits(BitNumber.Bit_5, 3);
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected, actual, "item 1");
 
-            expected = Convert.ToUInt16("00", 2);
-            actual = i.FetchBits(BitNumber.Bit_0, 2);
-            Assert.AreEqual(expected, actual);
+            expected = Convert.ToUInt16("10", 2);
+            actual = i.FetchBits(BitNumber.Bit_2, 2);
+            Assert.AreEqual(expected, actual, "item 2");
 
             expected = Convert.ToUInt16("11", 2);
             actual = i.FetchBits(BitNumber.Bit_3, 2);
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected, actual, "item 3");
 
             // MSB
-            expected = Convert.ToUInt16("0110", 2);
-            actual = i.FetchBits(BitNumber.Bit_7, 4);
-            Assert.AreEqual(expected, actual);
+            expected = Convert.ToUInt16("1011", 2);
+            actual = i.FetchBits(BitNumber.Bit_15, 4);
+            Assert.AreEqual(expected, actual, "MSB");
 
             // LSB
             expected = Convert.ToUInt16("1100", 2);
             actual = i.FetchBits(BitNumber.Bit_3, 4);
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected, actual, "LSB");
+
+        }
+
+        [TestMethod()]
+        public void TestByteFetchBits()
+        {
+
+            byte b = Convert.ToByte("10110111", 2);
+
+            byte expected = Convert.ToByte("110", 2);
+            ushort actual = b.FetchBits(BitNumber.Bit_5, 3);
+            Assert.AreEqual(expected, actual, "item 1");
+
+            expected = Convert.ToByte("11", 2);
+            actual = b.FetchBits(BitNumber.Bit_2, 2);
+            Assert.AreEqual(expected, actual, "item 1");
+
+            expected = Convert.ToByte("01", 2);
+            actual = b.FetchBits(BitNumber.Bit_3, 2);
+            Assert.AreEqual(expected, actual, "item 1");
+
+            // MSB
+            expected = Convert.ToByte("1011", 2);
+            actual = b.FetchBits(BitNumber.Bit_7, 4);
+            Assert.AreEqual(expected, actual, "MSB");
+
+            // LSB
+            expected = Convert.ToByte("0111", 2);
+            actual = b.FetchBits(BitNumber.Bit_3, 4);
+            Assert.AreEqual(expected, actual, "LSB");
         }
     }
 }

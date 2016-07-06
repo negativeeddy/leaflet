@@ -1,0 +1,5 @@
+Zmachine standards
+http://inform-fiction.org/zmachine/standards/
+
+Summary of zmachine differences
+http://hansprestige.com/inform/zmachine_versions.html

@@ -52,6 +52,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ZOpcodeDefinitionTests.cs" />
+    <Compile Include="ZOpcodeTests.cs" />
     <Compile Include="AddressHelperTests.cs" />
     <Compile Include="ObjectTableTests.cs" />
     <Compile Include="DictionaryTests.cs" />
