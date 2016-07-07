@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,9 +12,29 @@ namespace ZMachine.Instructions
     /// </summary>
     public class ZOperand
     {
-        public OperandTypes Type { get; set; }
-        public ZVariable Variable { get; set; }
+        public OperandTypes Type { get; }
+
+        ZVariable _variable;
+        public ZVariable Variable
+        {
+            get
+            {
+                Debug.Assert(Type == OperandTypes.Variable);
+                return _variable;
+            }
+            set
+            {
+                Debug.Assert(Type == OperandTypes.Variable);
+                 _variable = value;
+            }
+        }
+
         public uint Constant { get; set; }
+
+        public ZOperand(OperandTypes type)
+        {
+            Type = type;
+        }
 
         public int LengthInBytes
         {

@@ -183,7 +183,12 @@ namespace ZMachine.Instructions
         {
             get
             {
-                return (TextAddr + TextSection.LengthInBytes) - _baseAddress;
+                if (Definition.HasText) return (TextAddr + TextSection.LengthInBytes) - _baseAddress;
+                if (Definition.HasBranch) return (BranchOffsetAddr + BranchOffset.LengthInBytes) - _baseAddress;
+                if (Definition.HasStore) return (StoreOffsetAddr + 1) - _baseAddress;
+                // if none of the optional items exist, then the the StoreOffsetAddr is actually the next opcode in memory
+                return StoreOffsetAddr - _baseAddress; 
+
             }
         }
 
@@ -210,9 +215,10 @@ namespace ZMachine.Instructions
 
                     for (int i = 0; i < OperandType.Count; i++)
                     {
-                        var operand = new ZOperand()
+                        var operandType = OperandType[i];
+
+                        var operand = new ZOperand(operandType)
                         {
-                            Type = OperandType[i],
                             Variable = new ZVariable()
                             {
                                 ID = _bytes.GetWord(operandAddr),
@@ -254,6 +260,7 @@ namespace ZMachine.Instructions
         {
             get { return StoreOffsetAddr + (Definition.HasStore ? 1 : 0); }
         }
+
         public BranchOffset BranchOffset
         {
             get
@@ -315,7 +322,7 @@ namespace ZMachine.Instructions
             }
 
 
-            if (this.Definition.HasStore)
+            if (this.Definition.HasBranch)
             {
                 sb.Append($" br {BranchOffset}");
             }

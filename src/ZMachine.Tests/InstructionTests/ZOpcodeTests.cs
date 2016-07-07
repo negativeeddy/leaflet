@@ -51,12 +51,22 @@ namespace ZMachine.Memory.Tests
             var zm = ZMachineLoader.Load(filename);
 
             // zork mini has at 0x37d9 should be "call 1d9b 3e88 ffff ->sp"
-            ZOpcode oc = new ZOpcode(zm.MainMemory.Bytes, 0x37d9);
+            int startAddress = 0x37d9;
+            int endAddress = 0x3816;
+            int instructionPointer = startAddress;
+                
+            ZOpcode oc = new ZOpcode(zm.MainMemory.Bytes, instructionPointer);
             Console.WriteLine(oc);
-            Assert.AreEqual("call", oc.Definition.Name );
+            //Assert.AreEqual("call", oc.Definition.Name );
 
-            Assert.AreEqual("37D9: call 1D9B 3E88 FFFF ->sp", oc.ToString());
+            //Assert.AreEqual("37D9: call 1D9B 3E88 FFFF ->sp", oc.ToString());
 
+            while(instructionPointer < endAddress)
+            {
+                instructionPointer += oc.LengthInBytes;
+                oc = new ZOpcode(zm.MainMemory.Bytes, instructionPointer);
+                Console.WriteLine(oc);
+            }
         }
 
         [TestMethod]
