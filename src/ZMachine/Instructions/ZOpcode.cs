@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,9 +48,9 @@ namespace ZMachine.Instructions
 
     public class ZOpcode
     {
-        public OpcodeIdentifier Identifier { get { return new OpcodeIdentifier { OperandCount = this.OperandCount, OpcodeNumber = Opcode }; } }
+        public OpcodeIdentifier Identifier { get { return new OpcodeIdentifier(OperandCount, Opcode); } }
 
-        public OpcodeDefinition Definition {  get { return OpcodeDefinition.GetKnownOpcode(Identifier); } }
+        public OpcodeDefinition Definition { get { return OpcodeDefinition.GetKnownOpcode(Identifier); } }
 
         byte[] _bytes;
         int _baseAddress;
@@ -67,12 +68,12 @@ namespace ZMachine.Instructions
                 switch (Form)
                 {
                     case OpcodeForm.Short:
-                        return _bytes[0].FetchBits(BitNumber.Bit_4, 4);
+                        return _bytes[_baseAddress].FetchBits(BitNumber.Bit_3, 4);
                     case OpcodeForm.Long:
                     case OpcodeForm.Variable:
-                        return _bytes[0].FetchBits(BitNumber.Bit_5, 5);
+                        return _bytes[_baseAddress].FetchBits(BitNumber.Bit_4, 5);
                     case OpcodeForm.Extended:
-                        return _bytes[1];
+                        return _bytes[_baseAddress + 1];
                     default:
                         throw new InvalidOperationException();
                 }
@@ -84,11 +85,11 @@ namespace ZMachine.Instructions
             get
             {
                 // From the spec section 4.3
-                byte opcodeType = _bytes[0].FetchBits(BitNumber.Bit_7, 2);
+                byte opcodeType = _bytes[_baseAddress].FetchBits(BitNumber.Bit_7, 2);
                 switch (opcodeType)
                 {
                     case 0x02:
-                        return _bytes[0] == 0xBE ? OpcodeForm.Extended : OpcodeForm.Short;
+                        return _bytes[_baseAddress] == 0xBE ? OpcodeForm.Extended : OpcodeForm.Short;
                     case 0x03:
                         return OpcodeForm.Variable;
                     default:
@@ -104,12 +105,12 @@ namespace ZMachine.Instructions
                 switch (Form)
                 {
                     case OpcodeForm.Short:
-                        byte bits = _bytes[0].FetchBits(BitNumber.Bit_5, 2);
+                        byte bits = _bytes[_baseAddress].FetchBits(BitNumber.Bit_5, 2);
                         return (bits == 0x03) ? OperandCountType.OP0 : OperandCountType.OP1;
                     case OpcodeForm.Long:
                         return OperandCountType.OP2;
                     case OpcodeForm.Variable:
-                        byte bits2 = _bytes[0].FetchBits(BitNumber.Bit_5, 1);
+                        byte bits2 = _bytes[_baseAddress].FetchBits(BitNumber.Bit_5, 1);
                         return (bits2 == 0x00) ? OperandCountType.OP2 : OperandCountType.VAR;
                     case OpcodeForm.Extended:
                         return OperandCountType.VAR;
@@ -119,6 +120,14 @@ namespace ZMachine.Instructions
             }
         }
 
+        private int OperandTypeAddress
+        {
+            get
+            {
+                // Operands succeed the opcode. Extended opcodes are 2 bytes, others are 1 (spec 4.3.4)
+                return Form == OpcodeForm.Extended || Form == OpcodeForm.Variable ? _baseAddress + 1 : _baseAddress;
+            }
+        }
         public IList<OperandTypes> OperandType
         {
             get
@@ -128,65 +137,64 @@ namespace ZMachine.Instructions
                     case OperandCountType.OP0:
                         return new OperandTypes[] { OperandTypes.Omitted };
                     case OperandCountType.OP1:
-                        var opType = (OperandTypes)_bytes[1].FetchBits(BitNumber.Bit_6, 2);
+                        var opType = (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_6, 2);
                         return new OperandTypes[] { opType };
                     case OperandCountType.OP2:
                         return new OperandTypes[]
                         {
-                             _bytes[1].FetchBits(BitNumber.Bit_6, 1) == 0 ? OperandTypes.SmallConstant : OperandTypes.Variable,
-                             _bytes[1].FetchBits(BitNumber.Bit_5, 1) == 0 ? OperandTypes.SmallConstant : OperandTypes.Variable,
+                             _bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_6, 1) == 0 ? OperandTypes.SmallConstant : OperandTypes.Variable,
+                             _bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 1) == 0 ? OperandTypes.SmallConstant : OperandTypes.Variable,
                         };
                     case OperandCountType.VAR:
-                        return new OperandTypes[]
+                    case OperandCountType.EXT:
+                        List<OperandTypes> list = new List<OperandTypes>(4);
+                        OperandTypes oprType = (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_7, 2);
+                        if (oprType == OperandTypes.Omitted)
                         {
-                            (OperandTypes)_bytes[1].FetchBits(BitNumber.Bit_4, 2),
-                            (OperandTypes)_bytes[1].FetchBits(BitNumber.Bit_2, 2),
-                        };
+                            return list.ToArray();
+                        }
+                        list.Add(oprType);
+                        oprType = (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 2);
+                        if (oprType == OperandTypes.Omitted)
+                        {
+                            return list.ToArray();
+                        }
+                        list.Add(oprType);
+                        oprType = (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_3, 2);
+                        if (oprType == OperandTypes.Omitted)
+                        {
+                            return list.ToArray();
+                        }
+                        list.Add(oprType);
+                        oprType = (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_1, 2);
+                        if (oprType == OperandTypes.Omitted)
+                        {
+                            return list.ToArray();
+                        }
+                        list.Add(oprType);
+                        return list.ToArray();
                     default:
                         throw new NotImplementedException();
                 }
             }
         }
 
-        public int Length
+        public int LengthInBytes
         {
             get
             {
-                int length = (Form == OpcodeForm.Extended ? 2 : 1);   // extended OpCodes use 2 bytes for the opcode, all others use 1
-
-                // add byte count for operand type bytes, if any
-                switch (Form)
-                {
-                    case OpcodeForm.Short:
-                    case OpcodeForm.Long:
-                        // no extra byte
-                        break;
-                    case OpcodeForm.Extended:
-                    case OpcodeForm.Variable:
-                        length++;
-                        break;
-                }
-
-                // add length of operands
-                length += Operands.Sum(o => o.LengthInBytes);
-
-                if (Definition.HasStore)
-                {
-                    length++;
-                }
-
-                if (Definition.HasBranch)
-                {
-                    length += 2;
-                }
-
-                return length;
+                return (TextAddr + TextSection.LengthInBytes) - _baseAddress;
             }
         }
 
-        private int OperandBaseAddress
+        private int OperandAddress
         {
-            get { return Form == OpcodeForm.Extended ? _baseAddress + 1 : _baseAddress; }
+            get
+            {
+                // in double VAR operand types are 2 bytes, others are 1 (spec 4.4.3.1)
+                int sizeofOperandType = (Opcode == (ushort)12 || Opcode == (ushort)26) ? 2 : 1;
+                return OperandTypeAddress + sizeofOperandType;
+            }
         }
 
         private IList<ZOperand> _operands = null;
@@ -198,7 +206,7 @@ namespace ZMachine.Instructions
                 {
                     _operands = new List<ZOperand>();
 
-                    int operandAddr = OperandBaseAddress;
+                    int operandAddr = OperandAddress;
 
                     for (int i = 0; i < OperandType.Count; i++)
                     {
@@ -207,7 +215,7 @@ namespace ZMachine.Instructions
                             Type = OperandType[i],
                             Variable = new ZVariable()
                             {
-                                Data = _bytes.GetWord(operandAddr),
+                                ID = _bytes.GetWord(operandAddr),
                             }
                         };
 
@@ -216,30 +224,103 @@ namespace ZMachine.Instructions
                         operandAddr += operand.LengthInBytes;
                     }
                 }
+                Debug.Assert(_operands.Count <= 4 ||
+                            ((Definition.Name == "call_vs2" || Definition.Name == "call_vn2") && _operands.Count <= 8)); // spec 4.5.1
                 return _operands;
             }
         }
 
-        public ushort BranchOffset { get; set; }
+        private int StoreOffsetAddr
+        {
+            get { return OperandAddress + _operands.Sum(opr => opr.LengthInBytes); }
+        }
+        public ZVariable Store
+        {
+            get
+            {
+                Debug.Assert(Definition.HasStore, "instruction does not have a store variable");
+                if (Definition.HasStore)
+                {
+                    return new ZVariable { ID = _bytes[StoreOffsetAddr] };
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
-        public byte Store { get; set; }
+        private int BranchOffsetAddr
+        {
+            get { return StoreOffsetAddr + (Definition.HasStore ? 1 : 0); }
+        }
+        public BranchOffset BranchOffset
+        {
+            get
+            {
+                if (Definition.HasBranch)
+                {
+                    IList<byte> branchData = new ArraySegment<byte>(_bytes, BranchOffsetAddr, 2);
+                    return new BranchOffset(branchData);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
-        string Text { get; set; }
+        private int TextAddr
+        {
+            get
+            {
+                return BranchOffsetAddr + BranchOffset.LengthInBytes;
+            }
+        }
+
+        private ZStringBuilder _textSection;
+        private ZStringBuilder TextSection
+        {
+            get
+            {
+                if (_textSection == null && Definition.HasText)
+                {
+                    _textSection = new ZStringBuilder(_bytes, TextAddr);
+
+                }
+                return _textSection;
+            }
+        }
+
+        public string Text
+        {
+            get
+            {
+                return TextSection?.ToString();
+            }
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"0x{_baseAddress:X}: {Definition.Name}");
+            foreach (var opr in Operands)
+            {
+                sb.Append($" {opr.Variable.ID:X4}");
+            }
+
+            if (this.Definition.HasStore)
+            {
+                sb.Append($" ->{Store}");
+            }
 
 
-    
-    }
+            if (this.Definition.HasStore)
+            {
+                sb.Append($" br {BranchOffset}");
+            }
 
-    public struct BranchInstruction
-    {
-        public BranchType Type;
-        public ushort Address;
-    }
-
-    public enum BranchType
-    {
-        ReturnTrue,
-        ReturnFalse,
-        BranchAddress
+            return sb.ToString();
+        }
     }
 }

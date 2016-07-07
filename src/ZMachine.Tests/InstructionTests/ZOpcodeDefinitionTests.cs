@@ -14,11 +14,11 @@ namespace ZMachine.Memory.Tests
             var data = new Tuple<string, OperandCountType, ushort>[] {
                 new Tuple<string, OperandCountType, ushort>("OP2_2", OperandCountType.OP2, 2),
                 new Tuple<string, OperandCountType, ushort>("OP2_10", OperandCountType.OP2, 10),
-                new Tuple<string, OperandCountType, ushort>("OP1_132", OperandCountType.OP1, 132),
-                new Tuple<string, OperandCountType, ushort>("OP0_177", OperandCountType.OP0, 177),
+                new Tuple<string, OperandCountType, ushort>("OP1_132", OperandCountType.OP1, 4),
+                new Tuple<string, OperandCountType, ushort>("OP0_177", OperandCountType.OP0, 1),
                 new Tuple<string, OperandCountType, ushort>("EXT_1", OperandCountType.EXT, 1),
                 new Tuple<string, OperandCountType, ushort>("EXT_21", OperandCountType.EXT, 21),
-                new Tuple<string, OperandCountType, ushort>("VAR_228", OperandCountType.VAR, 228),
+                new Tuple<string, OperandCountType, ushort>("VAR_228", OperandCountType.VAR, 4),
             };
 
             foreach (var item in data)

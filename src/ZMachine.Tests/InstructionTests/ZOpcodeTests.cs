@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using ZMachine.Instructions;
+using ZMachine.Tests;
 
 namespace ZMachine.Memory.Tests
 {
@@ -41,6 +42,61 @@ namespace ZMachine.Memory.Tests
                     Assert.AreEqual(operandTypes[i], zop.OperandType[i], $"OperandTypes {i}");
                 }
             }
+        }
+
+        [TestMethod]
+        public void OpcodeDecoderTest()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            // zork mini has at 0x37d9 should be "call 1d9b 3e88 ffff ->sp"
+            ZOpcode oc = new ZOpcode(zm.MainMemory.Bytes, 0x37d9);
+            Console.WriteLine(oc);
+            Assert.AreEqual("call", oc.Definition.Name );
+
+            Assert.AreEqual("37D9: call 1D9B 3E88 FFFF ->sp", oc.ToString());
+
+        }
+
+        [TestMethod]
+        public void KnownOpcodeTest()
+        {
+            string opcodeIDString = "VAR_224";
+            var id = new OpcodeIdentifier(opcodeIDString);
+            var opcode = OpcodeDefinition.GetKnownOpcode(id);
+
+            Assert.AreEqual("call", opcode.Name, opcodeIDString);
+            Assert.AreEqual(0, opcode.ID.OpcodeNumber, opcodeIDString);
+            Assert.AreEqual(true, opcode.HasStore, opcodeIDString);
+            Assert.AreEqual(false, opcode.HasBranch, opcodeIDString);
+
+            opcodeIDString = "OP0_181";
+            id = new OpcodeIdentifier(opcodeIDString);
+            opcode = OpcodeDefinition.GetKnownOpcode(id);
+
+            Assert.AreEqual("save", opcode.Name, opcodeIDString);
+            Assert.AreEqual(5, opcode.ID.OpcodeNumber, opcodeIDString);
+            Assert.AreEqual(false, opcode.HasStore, opcodeIDString);
+            Assert.AreEqual(true, opcode.HasBranch, opcodeIDString);
+
+            opcodeIDString = "OP2_25";
+            id = new OpcodeIdentifier(opcodeIDString);
+            opcode = OpcodeDefinition.GetKnownOpcode(id);
+
+            Assert.AreEqual("call_s2", opcode.Name, opcodeIDString);
+            Assert.AreEqual(0x19, opcode.ID.OpcodeNumber, opcodeIDString);
+            Assert.AreEqual(true, opcode.HasStore, opcodeIDString);
+            Assert.AreEqual(false, opcode.HasBranch, opcodeIDString);
+
+            opcodeIDString = "OP1_130";
+            id = new OpcodeIdentifier(opcodeIDString);
+            opcode = OpcodeDefinition.GetKnownOpcode(id);
+
+            Assert.AreEqual("get_child", opcode.Name, opcodeIDString);
+            Assert.AreEqual(2, opcode.ID.OpcodeNumber, opcodeIDString);
+            Assert.AreEqual(true, opcode.HasStore, opcodeIDString);
+            Assert.AreEqual(true, opcode.HasBranch, opcodeIDString);
         }
     }
 }

@@ -14,17 +14,17 @@ namespace ZMachine.Instructions
         /// <summary>
         /// the original bits of the variable type of the operand
         /// </summary>
-        public ushort Data { get; set; }
+        public ushort ID { get; set; }
 
         public ZVariableLocation Location
         {
             get
             {
-                if (Value >= 16)
+                if (ID >= 16)
                 {
                     return ZVariableLocation.Global;
                 }
-                else if (Value >= 1)
+                else if (ID >= 1)
                 {
                     return ZVariableLocation.Local;
                 }
@@ -35,15 +35,18 @@ namespace ZMachine.Instructions
             }
         }
 
-        public ushort Value
+        public override string ToString()
         {
-            get
+            switch (Location)
             {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
+                case ZVariableLocation.Global:
+                    return "g" + ID.ToString();
+                case ZVariableLocation.Local:
+                    return "local" + ID.ToString();
+                case ZVariableLocation.Stack:
+                    return "sp";
+                default:
+                    throw new InvalidOperationException($"Unknown variable location '{Location}'");
             }
         }
     }

@@ -41,8 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddressHelper.cs" />
+    <Compile Include="Instructions\BranchOffset.cs" />
     <Compile Include="Instructions\OpcodeDefinition.cs" />
     <Compile Include="Instructions\OpcodeForm.cs" />
+    <Compile Include="Instructions\OpcodeIdentifier.cs" />
     <Compile Include="Instructions\OperandCountType.cs" />
     <Compile Include="Instructions\OperandTypes.cs" />
     <Compile Include="Instructions\ZOperand.cs" />

@@ -47,6 +47,11 @@ namespace ZMachine
 
         private List<ushort> _allBits;
 
+        public int LengthInBytes
+        {
+            get { return _allBits.Count; }
+        }
+
         public void AddWord(ushort bits)
         {
             if (_allBits == null)

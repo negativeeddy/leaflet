@@ -6,51 +6,6 @@ using System.Threading.Tasks;
 
 namespace ZMachine.Instructions
 {
-    public struct OpcodeIdentifier
-    {
-        public OperandCountType OperandCount;
-        public ushort OpcodeNumber;
-
-        public OpcodeIdentifier(OperandCountType operandCount, ushort opcodeNumber)
-        {
-            OperandCount = operandCount;
-            OpcodeNumber = opcodeNumber;
-        }
-
-        public OpcodeIdentifier(string specIdentifier)
-        {
-            int underscoreIdx = specIdentifier.IndexOf('_');
-            string operandCount = specIdentifier.Substring(0, underscoreIdx);
-            OperandCount = (OperandCountType)Enum.Parse(typeof(OperandCountType), operandCount);
-            OpcodeNumber = ushort.Parse(specIdentifier.Substring(underscoreIdx + 1));
-        }
-
-        public int ID
-        {
-            get { return GetOpcodeIdentifier(OperandCount, OpcodeNumber); }
-        }
-
-        public override int GetHashCode()
-        {
-            return ID.GetHashCode();
-        }
-
-        public override bool Equals(object obj)
-        {
-            return ((OpcodeIdentifier)obj).ID == ID;
-        }
-
-        public override string ToString()
-        {
-            return $"OP{OperandCount:N}_{OpcodeNumber:X}";
-        }
-
-        static public int GetOpcodeIdentifier(OperandCountType operandCount, ushort opcodeNumber)
-        {
-            return (ushort)operandCount << 16 & opcodeNumber;
-        }
-    }
-
     public struct OpcodeDefinition
     {
         public string Name;
@@ -156,10 +111,10 @@ namespace ZMachine.Instructions
             // Zero operand opcodes 
             ///////////////////////
 
-            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP0_176"), HasStore = false, HasBranch = false, Name ="rtrue" ,} , 
-            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP0_177"), HasStore = false, HasBranch = false, Name ="rfalse" ,} , 
-            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP0_178"), HasStore = false, HasBranch = false, Name ="print" ,} , 
-            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP0_179"), HasStore = false, HasBranch = false, Name ="print_ret" ,} , 
+            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP0_176"), HasStore = false, HasBranch = false, Name ="rtrue" ,} ,
+            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP0_177"), HasStore = false, HasBranch = false, Name ="rfalse" ,} ,
+            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP0_178"), HasStore = false, HasBranch = false, Name ="print" ,} ,
+            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP0_179"), HasStore = false, HasBranch = false, Name ="print_ret" ,} ,
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP0_180"), HasStore = false, HasBranch = false, Name ="nop" ,} ,
 
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP0_181"), HasStore = false, HasBranch = true,  Name ="save" ,} ,
