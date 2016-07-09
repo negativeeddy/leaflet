@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using ZMachine.Files;
 using ZMachine.Memory;
+using ZMachine.Story;
 
 namespace ZMachine
 {

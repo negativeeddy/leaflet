@@ -52,15 +52,15 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="InstructionTests\BranchOffsetTests.cs" />
-    <Compile Include="InstructionTests\ZOpcodeDefinitionTests.cs" />
-    <Compile Include="InstructionTests\ZOpcodeTests.cs" />
+    <Compile Include="Instructions\BranchOffsetTests.cs" />
+    <Compile Include="Instructions\ZOpcodeDefinitionTests.cs" />
+    <Compile Include="Instructions\ZOpcodeTests.cs" />
     <Compile Include="Memory\AddressHelperTests.cs" />
     <Compile Include="Story\ObjectTableTests.cs" />
     <Compile Include="Story\DictionaryTests.cs" />
     <Compile Include="Story\FileHeaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Story\ZStringBuilderTests.cs" />
+    <Compile Include="Memory\ZStringBuilderTests.cs" />
     <Compile Include="ZMachineLoader.cs" />
   </ItemGroup>
   <ItemGroup>

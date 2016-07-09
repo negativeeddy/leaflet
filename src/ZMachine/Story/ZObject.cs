@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ZMachine.Memory;
 
-namespace ZMachine
+namespace ZMachine.Story
 {
     public class ZObject
     {

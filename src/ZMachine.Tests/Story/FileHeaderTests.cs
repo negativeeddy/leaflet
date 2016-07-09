@@ -1,8 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using ZMachine.Tests;
 
-namespace ZMachine.Tests
+namespace ZMachine.Story.Tests
 {
     [TestClass]
     public class FileHeaderTests

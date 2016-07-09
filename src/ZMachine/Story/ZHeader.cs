@@ -1,7 +1,7 @@
 ﻿using System;
 using ZMachine.Memory;
 
-namespace ZMachine.Files
+namespace ZMachine.Story
 {
     public class ZHeader
     {

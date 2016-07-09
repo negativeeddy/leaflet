@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ZMachine.Tests;
 
-namespace ZMachine.Tests
+namespace ZMachine.Memory.Tests
 {
     [TestClass]
     public class ZStringBuilderTests

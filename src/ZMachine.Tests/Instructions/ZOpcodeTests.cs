@@ -1,10 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
-using ZMachine.Instructions;
 using ZMachine.Tests;
 
-namespace ZMachine.Memory.Tests
+namespace ZMachine.Instructions.Tests
 {
     [TestClass()]
     public class ZOpcodeTests

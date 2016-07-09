@@ -2,9 +2,8 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using ZMachine.Memory;
 
-namespace ZMachine
+namespace ZMachine.Memory
 {
     public class ZStringBuilder
     {
