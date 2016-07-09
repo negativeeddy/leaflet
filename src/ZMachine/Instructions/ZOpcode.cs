@@ -140,11 +140,21 @@ namespace ZMachine.Instructions
                         var opType = (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_6, 2);
                         return new OperandTypes[] { opType };
                     case OperandCountType.OP2:
-                        return new OperandTypes[]
+                        if (Form == OpcodeForm.Short)
                         {
+                            return new OperandTypes[]
+                            {
+                             _bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_6, 1) == 1 ? OperandTypes.SmallConstant : OperandTypes.Variable,
+                             _bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 1) == 1 ? OperandTypes.SmallConstant : OperandTypes.Variable,
+                            };
+                        }else
+                        {
+                            return new OperandTypes[]
+                            {
                              _bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_6, 1) == 0 ? OperandTypes.SmallConstant : OperandTypes.Variable,
                              _bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 1) == 0 ? OperandTypes.SmallConstant : OperandTypes.Variable,
-                        };
+                            };
+                        }
                     case OperandCountType.VAR:
                     case OperandCountType.EXT:
                         List<OperandTypes> list = new List<OperandTypes>(4);
@@ -187,7 +197,7 @@ namespace ZMachine.Instructions
                 if (Definition.HasBranch) return (BranchOffsetAddr + BranchOffset.LengthInBytes) - _baseAddress;
                 if (Definition.HasStore) return (StoreOffsetAddr + 1) - _baseAddress;
                 // if none of the optional items exist, then the the StoreOffsetAddr is actually the next opcode in memory
-                return StoreOffsetAddr - _baseAddress; 
+                return StoreOffsetAddr - _baseAddress;
 
             }
         }
@@ -217,13 +227,27 @@ namespace ZMachine.Instructions
                     {
                         var operandType = OperandType[i];
 
-                        var operand = new ZOperand(operandType)
+                        var operand = new ZOperand(operandType);
+                        // load the data for the operand
+                        switch (operandType)
                         {
-                            Variable = new ZVariable()
-                            {
-                                ID = _bytes.GetWord(operandAddr),
-                            }
-                        };
+                            case OperandTypes.Variable:
+                                operand.Variable = new ZVariable()
+                                {
+                                    ID = _bytes.GetWord(operandAddr),
+                                };
+                                break;
+                            case OperandTypes.LargeConstant:
+                                operand.Constant = _bytes.GetWord(operandAddr);
+                                break;
+                            case OperandTypes.SmallConstant:
+                                operand.Constant = _bytes[operandAddr];
+                                break;
+                            case OperandTypes.Omitted:
+                                // ignore
+                                break;
+
+                        }
 
                         _operands.Add(operand);
 
@@ -238,7 +262,17 @@ namespace ZMachine.Instructions
 
         private int StoreOffsetAddr
         {
-            get { return OperandAddress + _operands.Sum(opr => opr.LengthInBytes); }
+            get
+            {
+                if (_operands == null)
+                {
+                    return OperandAddress;
+                }
+                else
+                {
+                    return OperandAddress + _operands.Sum(opr => opr.LengthInBytes);
+                }
+            }
         }
         public ZVariable Store
         {
@@ -310,17 +344,30 @@ namespace ZMachine.Instructions
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append($"0x{_baseAddress:X}: {Definition.Name}");
+            sb.Append($"{_baseAddress:x}: {Definition.Name}");
             foreach (var opr in Operands)
             {
-                sb.Append($" {opr.Variable.ID:X4}");
+                switch (opr.Type)
+                {
+
+                    case OperandTypes.Variable:
+                        sb.Append($" {opr.Variable:x}");
+                        break;
+                    case OperandTypes.LargeConstant:
+                        sb.Append($" {opr.Constant:x4}");
+                        break;
+                    case OperandTypes.SmallConstant:
+                        sb.Append($" {opr.Constant:x2}");
+                        break;
+                    default:
+                        throw new InvalidOperationException();
+                }
             }
 
             if (this.Definition.HasStore)
             {
                 sb.Append($" ->{Store}");
             }
-
 
             if (this.Definition.HasBranch)
             {

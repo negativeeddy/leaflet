@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ZMachine.Instructions;
 using ZMachine.Tests;
 
@@ -15,58 +16,90 @@ namespace ZMachine.Memory.Tests
             byte b = Convert.ToByte("00101111", 2);
 
         }
-        
+
         [TestMethod()]
         public void OpCodeTest()
-        {
-            Assert.Inconclusive();
-            var inputs = new List<Tuple<byte[], OpcodeForm, ushort, OperandTypes[]>>()
-            {
-                new Tuple<byte[], OpcodeForm, ushort, OperandTypes[]>(new byte[] { 0x01, 0x02, 0x00 }, OpcodeForm.Short, 0x0102, new [] { OperandTypes.Omitted }),
-            };
-
-            foreach (var input in inputs)
-            {
-                byte[] data = input.Item1;
-                ZOpcode zop = new ZOpcode(data, 0);
-
-                OpcodeForm form = input.Item2;
-                ushort opcode = input.Item3;
-                OperandTypes[] operandTypes = input.Item4;
-
-                Assert.AreEqual(form, zop.Form, "Form");
-                Assert.AreEqual(opcode, zop.Opcode, "Opcde");
-                Assert.AreEqual(operandTypes.Length, zop.OperandType.Count, "OperandTypes Count");
-                for (int i = 0; i < zop.OperandType.Count; i++)
-                {
-                    Assert.AreEqual(operandTypes[i], zop.OperandType[i], $"OperandTypes {i}");
-                }
-            }
-        }
-
-        [TestMethod]
-        public void OpcodeDecoderTest()
         {
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
 
-            // zork mini has at 0x37d9 should be "call 1d9b 3e88 ffff ->sp"
-            int startAddress = 0x37d9;
-            int endAddress = 0x3816;
-            int instructionPointer = startAddress;
-                
-            ZOpcode oc = new ZOpcode(zm.MainMemory.Bytes, instructionPointer);
-            Console.WriteLine(oc);
-            //Assert.AreEqual("call", oc.Definition.Name );
+            int address = 0x3803; // "3803: insert_obj g73 g00
+            
+            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
 
-            //Assert.AreEqual("37D9: call 1D9B 3E88 FFFF ->sp", oc.ToString());
-
-            while(instructionPointer < endAddress)
+            Assert.AreEqual(OpcodeForm.Short, zop.Form, "Form");
+            Assert.AreEqual(14, zop.Opcode, "Opcde");
+            Assert.AreEqual(2, zop.OperandType.Count, "OperandTypes Count");
+            for (int i = 0; i < zop.OperandType.Count; i++)
             {
-                instructionPointer += oc.LengthInBytes;
-                oc = new ZOpcode(zm.MainMemory.Bytes, instructionPointer);
-                Console.WriteLine(oc);
+                Assert.AreEqual(OperandTypes.Variable, zop.OperandType[i], $"OperandTypes {i}");
             }
+        }
+
+
+        [TestMethod]
+        public void ExplicitOpcodeDecoderTest()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            Tuple<int, string>[] testData = GetOpcodeInputData();
+
+            // test opcode output with explicit addresses
+            foreach (var item in testData)
+            {
+                ZOpcode oc = new ZOpcode(zm.MainMemory.Bytes, item.Item1);
+                Console.WriteLine(oc);
+                Assert.AreEqual(item.Item2, oc.ToString(), $"Bad decode at address 0x{item.Item1:x4}");
+            }
+        }
+
+        [TestMethod]
+        public void SequenctialOpcodeDecoderTest()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            Tuple<int, string>[] testData = GetOpcodeInputData();
+
+            // test opcode output & lengths
+            int firstOpcode = testData.First().Item1;
+            int lastOpcode = testData.Last().Item1;
+
+            int instructionPointer = firstOpcode;
+            int instructionCount = 0;
+            while (instructionPointer < lastOpcode)
+            {
+                var opcode = new ZOpcode(zm.MainMemory.Bytes, instructionPointer);
+                Console.WriteLine(opcode);
+                instructionCount++;
+                instructionPointer += opcode.LengthInBytes;
+            }
+            Assert.AreEqual(testData.Length, instructionCount);
+        }
+
+        private static Tuple<int, string>[] GetOpcodeInputData()
+        {
+            // this set of instructions in minizork are sequential in memory
+            Tuple<int, string>[] testData = new Tuple<int, string>[]
+            {
+                                   // address, instruction text
+                new Tuple<int, string>(0x37d9, "37d9: call 1d9b 3e88 ffff ->sp"),
+                new Tuple<int, string>(0x37e2, "37e2: storew sp 00 01"),
+                new Tuple<int, string>(0x37e7, "37e7: call 1d9b 4e50 28 ->sp"),
+                new Tuple<int, string>(0x37ef, "37ef: call 1d9b 4792 96 ->sp"),
+                new Tuple<int, string>(0x37f7, "37f7: store 10 2e"),
+                new Tuple<int, string>(0x37fa, "37fa: store 8a a7"),
+                new Tuple<int, string>(0x37fd, "37fd: store 36 01"),
+                new Tuple<int, string>(0x3800, "3800: store 83 1e"),
+                new Tuple<int, string>(0x3803, "3803: insert_obj g73 g00"),
+                new Tuple<int, string>(0x3806, "3806: call 2c31 ->sp"),
+                new Tuple<int, string>(0x380b, "380b: new_line"),
+                new Tuple<int, string>(0x380c, "380c: call 30fa ->sp"),
+                new Tuple<int, string>(0x3811, "3811: call 1c0d ->sp"),
+                new Tuple<int, string>(0x3816, "3816: jump ffc2"),
+            };
+            return testData;
         }
 
         [TestMethod]
