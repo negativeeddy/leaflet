@@ -22,11 +22,25 @@ namespace ZMachine.Memory
 
         public static ushort GetWord(this IList<byte> data, int address)
         {
+            Debug.Assert(address <= data.Count);
+
             int upper = data[address] << 8;
             int lower = data[address + 1];
             uint uppershort = (uint)upper;
             uint lowershort = (uint)lower;
             return (ushort)(uppershort + lowershort);
+        }
+
+        public static IList<ushort> GetWords(this IList<byte> data, int address, int count)
+        {
+            Debug.Assert(address + count <= data.Count);
+
+            ushort[] words = new ushort[count];
+            for(int i=0; i<count; i++)
+            {
+                words[i] = GetWord(data, address + i * 2);
+            }
+            return words;
         }
 
         public static uint GetDWord(this IList<byte> data, int address)

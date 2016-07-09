@@ -12,7 +12,7 @@ namespace ZMachine
         public void LoadStory(Stream storyStream)
         {
             MainMemory = new ZMemory(storyStream);
-            Stack = new ZStack();
+            Stack = new Stack<Routine>();
             ProgramCounter = MainMemory.Header.PCStart;
         }
         
@@ -20,6 +20,6 @@ namespace ZMachine
         public ZMemory MainMemory { get; set; }
 
         public ZProcessor Processor { get; set; }
-        public ZStack Stack { get; set; }
+        public Stack<Routine> Stack { get; set; }
     }
 }

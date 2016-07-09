@@ -22,8 +22,14 @@ namespace ConsoleHost
             Console.WriteLine($"Gamefile Version {zm.MainMemory.Header.Version}");
 
             string output = zm.MainMemory.ObjectTree.DumpObjectTree();
-            Console.WriteLine(output);
-            Console.WriteLine(output.Length);
+            Console.WriteLine($"Object tree contains {zm.MainMemory.ObjectTree.Objects.Count} objects");
+
+            Routine routine = new Routine(zm.MainMemory.Bytes, 0x3b36);
+
+            foreach (var item in routine.Locals.Select((l, i) => new { l, i }))
+            {
+                Console.WriteLine($"local{item.i}=0x{item.l:x4}");
+            }
         }
     }
 }
