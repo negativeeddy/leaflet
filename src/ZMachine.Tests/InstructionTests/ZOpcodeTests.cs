@@ -15,27 +15,128 @@ namespace ZMachine.Memory.Tests
         {
             byte b = Convert.ToByte("00101111", 2);
 
+            ZOperand operand = new ZOperand(OperandTypes.Variable);
         }
 
         [TestMethod()]
-        public void OpCodeTest()
+        public void OpCodeTest_insert_ob()
         {
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
 
             int address = 0x3803; // "3803: insert_obj g73 g00
-            
             ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
 
-            Assert.AreEqual(OpcodeForm.Short, zop.Form, "Form");
+            //byte[] bytes = new byte[] { 0x6e, 0x83, 0x10, 0xe0, 0x3f, 0x2c };
+            // 0110 1110    Form Long, 2OP
+            //              opcode 01110 => 14
+            //              bit 6 = 1 => operand = VAR
+            //              bit 5 = 1 => operand = VAR
+            // 1000 0011    Operand1, 0x83
+            // 0001 0000    Operand2, 0x10
+
+            // 1110 0000
+            // 0011 1111
+            // 0010 1010
+
+            ZVariable[] operandValues = new ZVariable[] {
+                new ZVariable( 0x83),
+                new ZVariable(0x10),
+            };
+
+            //ZOpcode zop = new ZOpcode(bytes, 0);
+            Console.WriteLine(zop);
+            Assert.AreEqual(OpcodeForm.Long, zop.Form, "Form");
             Assert.AreEqual(14, zop.Opcode, "Opcde");
-            Assert.AreEqual(2, zop.OperandType.Count, "OperandTypes Count");
+            Assert.AreEqual(2, zop.OperandType.Count, "OperandTypes Count");  // Long form is always 2 operands
+            Assert.AreEqual(3, zop.LengthInBytes);
+
+
             for (int i = 0; i < zop.OperandType.Count; i++)
             {
                 Assert.AreEqual(OperandTypes.Variable, zop.OperandType[i], $"OperandTypes {i}");
+                Assert.AreEqual(operandValues[i].Location, zop.Operands[i].Variable.Location, $"Operand values {i}");
+                Assert.AreEqual(operandValues[i].Value, zop.Operands[i].Variable.Value, $"Operand values {i}");
+
             }
+
+            string stringConversion = "3803: insert_obj g73 g00";
+            Assert.AreEqual(stringConversion, zop.ToString());
         }
 
+        [TestMethod()]
+        public void OpCodeTest_jump()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            int address = 0x3816; // "3816: jump ffc2
+            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+
+            //byte[] bytes = new byte[] { 0x8c, 0xff, 0xc2};
+            // 1000 1010    Form SHORT, 1OP
+            //              opcode 1010 => 0x0c
+            //              bits 5,4 = 00 -> Large Constant Operand
+            // 1111 1111    Operand1 = 0xffc2
+            // 1010 0010    (contributes to large constant)
+
+            int expectedOpcode = 0x0c;
+            OpcodeForm expectedForm = OpcodeForm.Short;
+            ZOperand[] expectedOperands = new ZOperand[] {
+                                                new ZOperand(OperandTypes.LargeConstant) { Constant = 0xffc2 },
+            };
+            int expectedOperandCount = expectedOperands.Length;
+            int expectedLengthInBytes = 3;
+            string expectedStringConversion = "3816: jump ffc2";
+
+            CompareOpcodeWithExpectedValues(
+                zop, 
+                expectedOpcode, 
+                expectedForm, 
+                expectedOperands, 
+                expectedLengthInBytes, 
+                expectedStringConversion);
+        }
+
+        private static void CompareOpcodeWithExpectedValues(ZOpcode zop, int expectedOpcode, OpcodeForm expectedForm, ZOperand[] expectedOperands, int expectedLengthInBytes, string expectedStringConversion)
+        {
+            Console.WriteLine($"Checking the following opcode: {zop}");
+
+            // check basic form
+            Assert.AreEqual(expectedForm, zop.Form, "Form");
+            Assert.AreEqual(expectedOpcode, zop.Opcode, "Opcde");
+
+            // check operands
+            int expectedOperandCount = expectedOperands.Length;
+            Assert.AreEqual(expectedOperandCount, zop.OperandType.Count, "OperandTypes Count");  // Long form is always 2 operands
+
+            for (int i = 0; i < zop.Operands.Count; i++)
+            {
+                Assert.AreEqual(expectedOperands[i].Type, zop.OperandType[i], $"OperandTypes {i}");
+                switch(expectedOperands[i].Type)
+                {
+                    case OperandTypes.Variable:
+                        Assert.AreEqual(expectedOperands[i].Variable.Location, zop.Operands[i].Variable.Location, $"Operand{i} VAR location ");
+                        Assert.AreEqual(expectedOperands[i].Variable.Value, zop.Operands[i].Variable.Value, $"Operand{i} VAR value ");
+                        break;
+                    case OperandTypes.LargeConstant:
+                    case OperandTypes.SmallConstant:
+                        Assert.AreEqual(expectedOperands[i].Constant, zop.Operands[i].Constant, $"Operand{i} {expectedOperands[i].Type} value ");
+                        break;
+                    case OperandTypes.Omitted:
+                        Assert.Fail("Found an omitted operand. Omitted operands should not be created.");
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Invalid Operand{i} Type detected {expectedOperands[i].Type}");
+                }
+            }
+
+            // check overall length
+            Assert.AreEqual(expectedLengthInBytes, zop.LengthInBytes, "Length Test");
+
+            // check text output
+            Assert.AreEqual(expectedStringConversion, zop.ToString());
+        }
 
         [TestMethod]
         public void ExplicitOpcodeDecoderTest()
@@ -68,7 +169,7 @@ namespace ZMachine.Memory.Tests
 
             int instructionPointer = firstOpcode;
             int instructionCount = 0;
-            while (instructionPointer < lastOpcode)
+            while (instructionPointer <= lastOpcode)
             {
                 var opcode = new ZOpcode(zm.MainMemory.Bytes, instructionPointer);
                 Console.WriteLine(opcode);

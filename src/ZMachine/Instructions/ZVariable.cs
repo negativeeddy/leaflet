@@ -14,17 +14,41 @@ namespace ZMachine.Instructions
         /// <summary>
         /// the original bits of the variable type of the operand
         /// </summary>
-        public ushort ID { get; set; }
+        public byte Bits { get; }
+
+        public ZVariable(byte bits)
+        {
+            Bits = bits;
+        }
+
+        public int Value
+        {
+            get
+            {
+                if (Bits >= 0x10)
+                {
+                    return Bits - 0x10;
+                }
+                else if (Bits >= 0x01)
+                {
+                    return Bits- 0x01;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
 
         public ZVariableLocation Location
         {
             get
             {
-                if (ID >= 16)
+                if (Bits >= 0x10)
                 {
                     return ZVariableLocation.Global;
                 }
-                else if (ID >= 1)
+                else if (Bits >= 0x01)
                 {
                     return ZVariableLocation.Local;
                 }
@@ -40,9 +64,9 @@ namespace ZMachine.Instructions
             switch (Location)
             {
                 case ZVariableLocation.Global:
-                    return "g" + ID.ToString();
+                    return "g" + Value.ToString("x2");
                 case ZVariableLocation.Local:
-                    return "local" + ID.ToString();
+                    return "local" + Value.ToString("x2");
                 case ZVariableLocation.Stack:
                     return "sp";
                 default:

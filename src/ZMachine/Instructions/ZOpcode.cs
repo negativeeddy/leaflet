@@ -135,7 +135,7 @@ namespace ZMachine.Instructions
                 switch (OperandCount)
                 {
                     case OperandCountType.OP0:
-                        return new OperandTypes[] { OperandTypes.Omitted };
+                        return new OperandTypes[] { };
                     case OperandCountType.OP1:
                         var opType = (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_6, 2);
                         return new OperandTypes[] { opType };
@@ -147,7 +147,8 @@ namespace ZMachine.Instructions
                              _bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_6, 1) == 1 ? OperandTypes.SmallConstant : OperandTypes.Variable,
                              _bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 1) == 1 ? OperandTypes.SmallConstant : OperandTypes.Variable,
                             };
-                        }else
+                        }
+                        else
                         {
                             return new OperandTypes[]
                             {
@@ -206,8 +207,17 @@ namespace ZMachine.Instructions
         {
             get
             {
-                // in double VAR operand types are 2 bytes, others are 1 (spec 4.4.3.1)
-                int sizeofOperandType = (Opcode == (ushort)12 || Opcode == (ushort)26) ? 2 : 1;
+                // in double VAR opcodes (call_vs2 and call_vn2) operand types are 2 bytes, others are 1 (spec 4.4.3.1)
+                int sizeofOperandType;
+                if ((Form == OpcodeForm.Variable) && (Opcode == (ushort)12 || Opcode == (ushort)26))
+                {
+                    sizeofOperandType = 2;
+                }
+                else
+                {
+                    sizeofOperandType = 1;
+                }
+
                 return OperandTypeAddress + sizeofOperandType;
             }
         }
@@ -232,10 +242,7 @@ namespace ZMachine.Instructions
                         switch (operandType)
                         {
                             case OperandTypes.Variable:
-                                operand.Variable = new ZVariable()
-                                {
-                                    ID = _bytes.GetWord(operandAddr),
-                                };
+                                operand.Variable = new ZVariable(_bytes[operandAddr]);
                                 break;
                             case OperandTypes.LargeConstant:
                                 operand.Constant = _bytes.GetWord(operandAddr);
@@ -281,7 +288,7 @@ namespace ZMachine.Instructions
                 Debug.Assert(Definition.HasStore, "instruction does not have a store variable");
                 if (Definition.HasStore)
                 {
-                    return new ZVariable { ID = _bytes[StoreOffsetAddr] };
+                    return new ZVariable(_bytes[StoreOffsetAddr]);
                 }
                 else
                 {
@@ -344,7 +351,7 @@ namespace ZMachine.Instructions
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append($"{_baseAddress:x}: {Definition.Name}");
+            sb.Append($"{_baseAddress:x4}: {Definition.Name}");
             foreach (var opr in Operands)
             {
                 switch (opr.Type)
