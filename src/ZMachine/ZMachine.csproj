@@ -49,6 +49,7 @@
     <Compile Include="Instructions\OperandTypes.cs" />
     <Compile Include="Instructions\ZOperand.cs" />
     <Compile Include="Instructions\ZVariable.cs" />
+    <Compile Include="Memory\PackedAddress.cs" />
     <Compile Include="Story\ZDictionary.cs" />
     <Compile Include="Story\ZObject.cs" />
     <Compile Include="Story\ZObjectTable.cs" />

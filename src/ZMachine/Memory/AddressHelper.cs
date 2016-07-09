@@ -9,6 +9,17 @@ namespace ZMachine.Memory
 {
     public static class AddressHelper
     {
+        public static uint UnpackAddress(ushort address)
+        {
+            return (uint)(address * 2); // unpack for v1-3
+        }
+
+        public static uint GetWordUnpacked(this IList<byte> data, int address)
+        {
+            ushort word = GetWord(data, address);
+            return UnpackAddress(word);
+        }
+
         public static ushort GetWord(this IList<byte> data, int address)
         {
             int upper = data[address] << 8;
