@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ZMachine;
+using ZMachine.Memory;
 
 namespace ConsoleHost
 {
