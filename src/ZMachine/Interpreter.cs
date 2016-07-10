@@ -90,6 +90,41 @@ namespace ZMachine
                 case "call":
                     Handle_Call(opcode);
                     break;
+                case "ret":
+                    Handle_Return(opcode);
+                    break;
+                case "add":
+                    ExecValueInstruction(opcode, op =>
+                    {
+                        short a = (short)GetOperandValue(op.Operands[0]);
+                        short b = (short)GetOperandValue(op.Operands[1]);
+                        return a + b;
+                    });
+                    break;
+                case "sub":
+                    ExecValueInstruction(opcode, op =>
+                    {
+                        short a = (short)GetOperandValue(op.Operands[0]);
+                        short b = (short)GetOperandValue(op.Operands[1]);
+                        return a - b;
+                    });
+                    break;
+                case "mul":
+                    ExecValueInstruction(opcode, op =>
+                    {
+                        short a = (short)GetOperandValue(op.Operands[0]);
+                        short b = (short)GetOperandValue(op.Operands[1]);
+                        return a * b;
+                    });
+                    break;
+                case "div":
+                    ExecValueInstruction(opcode, op =>
+                    {
+                        short a = (short)GetOperandValue(op.Operands[0]);
+                        short b = (short)GetOperandValue(op.Operands[1]);
+                        return a / b;
+                    });
+                    break;
                 default:
                     throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
             }
@@ -117,11 +152,29 @@ namespace ZMachine
             }
         }
 
+        void Handle_Return(ZOpcode opcode)
+        {
+            // get the return value
+            int retVal = GetOperandValue(opcode.Operands[0]);
+
+            // remove the current frame from the stack
+            var oldFrame = FrameStack.Pop();
+
+            // put the return value wherever the oldFrame required
+            SetVariable(oldFrame.Store, (ushort)retVal);
+
+            // update the instruction counter
+            ProgramCounter = oldFrame.ReturnAddress;
+        }
+
         private void LoadNewFrame(int newAddress, int returnAddress, ZVariable returnStore, params ZOperand[] operands)
         {
+            // initialize a new frame
             var initLocals = operands.Select(op => (ushort)GetOperandValue(op)).ToArray();
             Routine newRoutine = new Routine(MainMemory.Bytes, newAddress, returnAddress, returnStore, initLocals);
             FrameStack.Push(newRoutine);
+
+            // update the instruction counter
             ProgramCounter = newRoutine.FirstInstructionAddress;
         }
 
@@ -138,5 +191,38 @@ namespace ZMachine
                     throw new NotImplementedException();
             }
         }
+
+        private void ExecValueInstruction(ZOpcode opcode, Action<ZOpcode> handler)
+        {
+            handler(opcode);
+            BranchOrNext(opcode);
+        }
+
+        private void ExecValueInstruction(ZOpcode opcode, Func<ZOpcode, int> handler)
+        {
+            int result = handler(opcode);
+            SetVariable(opcode.Store, (ushort)result);
+            BranchOrNext(opcode);
+        }   
+
+        private void BranchOrNext(ZOpcode opcode)
+        {
+            BranchOffset branch = opcode.BranchOffset;
+            if (branch != null)
+            {
+                int branchValue = ReadVariable(opcode.Store);
+                bool branchIfNotZero = branch.WhenTrue;
+                if ((branchIfNotZero && branchValue != 0) ||
+                    (!branchIfNotZero && branchValue == 0))
+                {
+                    ProgramCounter = branch.Offset;
+                    return;
+                }
+            }
+
+            // just move to the next instruction 
+            ProgramCounter += opcode.LengthInBytes;
+        }
+
     }
 }
