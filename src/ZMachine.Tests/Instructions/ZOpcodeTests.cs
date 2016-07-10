@@ -58,7 +58,7 @@ namespace ZMachine.Instructions.Tests
 
             }
 
-            string stringConversion = "3803: insert_obj g73 g00";
+            string stringConversion = "3803: insert_obj g73 g0";
             Assert.AreEqual(stringConversion, zop.ToString());
         }
 
@@ -219,7 +219,7 @@ namespace ZMachine.Instructions.Tests
                 new Tuple<int, string>(0x37fa, "37fa: store 8a a7"),
                 new Tuple<int, string>(0x37fd, "37fd: store 36 01"),
                 new Tuple<int, string>(0x3800, "3800: store 83 1e"),
-                new Tuple<int, string>(0x3803, "3803: insert_obj g73 g00"),
+                new Tuple<int, string>(0x3803, "3803: insert_obj g73 g0"),
                 new Tuple<int, string>(0x3806, "3806: call 5862 ->sp"),
                 new Tuple<int, string>(0x380b, "380b: new_line"),
                 new Tuple<int, string>(0x380c, "380c: call 61f4 ->sp"),
