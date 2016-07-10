@@ -59,27 +59,27 @@ namespace ZMachine
             }
         }
 
-        public void Print()
+        public void Print(bool printFrames = false)
         {
-            Console.WriteLine("---------------------");
-            if (FrameStack.Count > 0)
+            if (printFrames)
             {
-
-                foreach (var frame in FrameStack)
+                Console.WriteLine("---------------------");
+                if (FrameStack.Count > 0)
                 {
-                    Console.WriteLine(frame);
+
+                    foreach (var frame in FrameStack)
+                    {
+                        Console.WriteLine(frame);
+                    }
                 }
-            }
-            else
-            {
-                Console.WriteLine("<no frames>");
-            }
-            Console.WriteLine();
+                else
+                {
+                    Console.WriteLine("<no frames>");
+                }
 
+            }
             ZOpcode opcode = new ZOpcode(MainMemory.Bytes, ProgramCounter);
-
             Console.WriteLine(opcode);
-            Console.WriteLine("---------------------");
         }
 
         public void ExecuteCurrentInstruction()
@@ -125,6 +125,17 @@ namespace ZMachine
                         return a / b;
                     });
                     break;
+                case "mod":
+                    ExecValueInstruction(opcode, op =>
+                    {
+                        short a = (short)GetOperandValue(op.Operands[0]);
+                        short b = (short)GetOperandValue(op.Operands[1]);
+                        return a % b;
+                    });
+                    break;
+                case "jump":
+                    Handle_Jump(opcode);
+                    break;
                 default:
                     throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
             }
@@ -167,6 +178,13 @@ namespace ZMachine
             ProgramCounter = oldFrame.ReturnAddress;
         }
 
+        private void Handle_Jump(ZOpcode opcode)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
         private void LoadNewFrame(int newAddress, int returnAddress, ZVariable returnStore, params ZOperand[] operands)
         {
             // initialize a new frame
@@ -205,13 +223,22 @@ namespace ZMachine
             BranchOrNext(opcode);
         }   
 
+        /// <summary>
+        /// Shifts the state to the next instruction depending on whether the 
+        /// current opcode is a branching instruction or just needs to increment
+        /// the instruction counter to the next instruction sequentially
+        /// </summary>
+        /// <param name="opcode"></param>
         private void BranchOrNext(ZOpcode opcode)
         {
             BranchOffset branch = opcode.BranchOffset;
             if (branch != null)
             {
+                // read the resulting value from the opcode store variable
                 int branchValue = ReadVariable(opcode.Store);
                 bool branchIfNotZero = branch.WhenTrue;
+
+                // test the branch condition against the stored value
                 if ((branchIfNotZero && branchValue != 0) ||
                     (!branchIfNotZero && branchValue == 0))
                 {
@@ -223,6 +250,5 @@ namespace ZMachine
             // just move to the next instruction 
             ProgramCounter += opcode.LengthInBytes;
         }
-
     }
 }
