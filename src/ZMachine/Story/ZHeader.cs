@@ -53,7 +53,7 @@ namespace ZMachine.Story
         public uint Flags1 { get { return _data.GetDWord(HeaderOffset_Flags1); } }
         public int ReleaseNumber { get { return _data.GetWord(HeaderOffset_ReleaseNumber); } }
         public ushort HighMemoryAddress { get { return _data.GetWord(HeaderOffset_BaseOfHighMemory); } }
-        public ushort PCStart { get { return _data.GetWord(HeaderOffset_InitialValueOfProgramCounter); } }
+        public int PCStart { get { return (int)_data.GetWord(HeaderOffset_InitialValueOfProgramCounter); } }
         public ushort DictionaryAddress { get { return _data.GetWord(HeaderOffset_LocationOfDictionary); } }
         public ushort ObjectTableAddress { get { return _data.GetWord(HeaderOffset_LocationOfObjectTable); } }
         public ushort GlobalVariablesTableAddress { get { return _data.GetWord(HeaderOffset_LocationOfGlobalVariablesTable); } }

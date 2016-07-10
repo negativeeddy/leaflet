@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
 using ZMachine.Instructions;
 
 namespace ZMachine.Memory
@@ -21,6 +23,7 @@ namespace ZMachine.Memory
         /// </summary>
         public ZVariable Store { get; }
         public IList<ushort> Locals { get; }
+        public Stack<ushort> EvaluationStack { get; } = new Stack<ushort>();
 
         public int FirstInstructionAddress
         {
@@ -34,16 +37,40 @@ namespace ZMachine.Memory
         /// </summary>
         /// <param name="bytes">bytes representing memory</param>
         /// <param name="routineAddress">the beginning of the Routine's frame in memory</param>
-        public Routine(IList<byte> bytes, int routineAddress)
+        public Routine(IList<byte> bytes, int routineAddress, int returnAddress, ZVariable returnStore)
         {
             Debug.Assert(routineAddress % 2 == 0, "A routine is required to begin at an address in memory which can be represented by a packed address (spec 5.1)");
             _bytes = bytes;
             _baseAddress = routineAddress;
+            this.ReturnAddress = returnAddress;
+            Store = returnStore;
 
             int count = bytes[routineAddress];
             Locals = bytes.GetWords(routineAddress + 1, count);
         }
 
-        public Stack<ushort> EvaluationStack = new Stack<ushort>();
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("Locals ");
+            foreach(var l in Locals)
+            {
+                sb.Append(l);
+                sb.Append(' ');
+            }
+            sb.AppendLine();
+
+            sb.Append("Stack");
+            foreach(var item in EvaluationStack)
+            {
+                sb.Append(item.ToString());
+                sb.Append(' ');
+            }
+            sb.AppendLine();
+
+            sb.AppendLine($"Resume at: {ReturnAddress:x}");
+
+            return sb.ToString();
+        }
     }
 }

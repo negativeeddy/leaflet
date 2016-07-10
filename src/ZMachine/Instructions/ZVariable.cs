@@ -64,9 +64,9 @@ namespace ZMachine.Instructions
             switch (Location)
             {
                 case ZVariableLocation.Global:
-                    return "g" + Value.ToString("x2");
+                    return "g" + Value.ToString("x");
                 case ZVariableLocation.Local:
-                    return "local" + Value.ToString("x2");
+                    return "local" + Value.ToString("x");
                 case ZVariableLocation.Stack:
                     return "sp";
                 default:

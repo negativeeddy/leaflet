@@ -63,6 +63,34 @@ namespace ZMachine.Instructions.Tests
         }
 
         [TestMethod()]
+        public void OpCodeTest_call()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            int address = 0x3b3d; // "3b3d: call 3b4a local0 ->local2
+            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+
+            int expectedOpcode = 0x00;
+            OpcodeForm expectedForm = OpcodeForm.Variable;
+            ZOperand[] expectedOperands = new ZOperand[] {
+                                                new ZOperand(OperandTypes.LargeConstant) { Constant = 0x3b4a },
+                                                new ZOperand(OperandTypes.Variable) { Variable = new ZVariable(0x01) },
+            };
+            int expectedOperandCount = expectedOperands.Length;
+            int expectedLengthInBytes = 6;
+            string expectedStringConversion = "3b3d: call 3b4a local0 ->local2";
+
+            CompareOpcodeWithExpectedValues(
+                zop, 
+                expectedOpcode, 
+                expectedForm, 
+                expectedOperands, 
+                expectedLengthInBytes, 
+                expectedStringConversion);
+        }
+
+        [TestMethod()]
         public void OpCodeTest_jump()
         {
             string filename = @"GameFiles\minizork.z3";
@@ -102,7 +130,7 @@ namespace ZMachine.Instructions.Tests
 
             // check basic form
             Assert.AreEqual(expectedForm, zop.Form, "Form");
-            Assert.AreEqual(expectedOpcode, zop.Opcode, "Opcde");
+            Assert.AreEqual(expectedOpcode, zop.Opcode, "Opcode");
 
             // check operands
             int expectedOperandCount = expectedOperands.Length;

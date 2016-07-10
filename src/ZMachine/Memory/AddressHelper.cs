@@ -31,12 +31,21 @@ namespace ZMachine.Memory
             return (ushort)(uppershort + lowershort);
         }
 
+        public static void SetWord(this IList<byte> data, ushort word, int address)
+        {
+            Debug.Assert(address + 1 < data.Count);
+            byte upper = (byte)(word >> 8);
+            byte lower = (byte)word;
+            data[address] = upper;
+            data[address + 1] = lower;
+        }
+
         public static IList<ushort> GetWords(this IList<byte> data, int address, int count)
         {
             Debug.Assert(address + count <= data.Count);
 
             ushort[] words = new ushort[count];
-            for(int i=0; i<count; i++)
+            for (int i = 0; i < count; i++)
             {
                 words[i] = GetWord(data, address + i * 2);
             }
@@ -83,7 +92,7 @@ namespace ZMachine.Memory
         public static int ToWordZStringAddress(this ushort value)
         {
             return value * 2;
-        } 
+        }
     }
 
     /// <summary>

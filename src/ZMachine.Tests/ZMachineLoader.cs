@@ -5,10 +5,10 @@ namespace ZMachine.Tests
 {
     public class ZMachineLoader
     {
-        static public ZMachine Load(string filename)
+        static public Interpreter Load(string filename)
         {
             Console.WriteLine("Loading " + filename);
-            var zm = new ZMachine();
+            var zm = new Interpreter();
             using (var stream = File.OpenRead(filename))
             {
                 zm.LoadStory(stream);

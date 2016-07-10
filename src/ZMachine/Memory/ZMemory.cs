@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ZMachine.Instructions;
 using ZMachine.Memory;
 using ZMachine.Story;
 
@@ -112,6 +113,14 @@ namespace ZMachine
 
             // convert the bytes to characters
             return fragment.ToString();
+        }
+
+        public WordOverByteOverlay GlobalVariables
+        {
+            get
+            {
+                return new WordOverByteOverlay(Bytes, Header.GlobalVariablesTableAddress, 255-16);
+            }
         }
     }
 }

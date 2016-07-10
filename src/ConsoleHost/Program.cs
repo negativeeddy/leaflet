@@ -13,7 +13,7 @@ namespace ConsoleHost
     {
         static void Main(string[] args)
         {
-            var zm = new ZMachine.ZMachine();
+            var zm = new ZMachine.Interpreter();
 
             string filename = @"GameFiles\minizork.z3";
             using (var stream = File.OpenRead(filename))
@@ -24,13 +24,9 @@ namespace ConsoleHost
 
             string output = zm.MainMemory.ObjectTree.DumpObjectTree();
             Console.WriteLine($"Object tree contains {zm.MainMemory.ObjectTree.Objects.Count} objects");
-
-            Routine routine = new Routine(zm.MainMemory.Bytes, 0x3b36);
-
-            foreach (var item in routine.Locals.Select((l, i) => new { l, i }))
-            {
-                Console.WriteLine($"local{item.i}=0x{item.l:x4}");
-            }
+            zm.Print();
+            zm.ExecuteCurrentInstruction();
+            zm.Print();
         }
     }
 }
