@@ -15,14 +15,9 @@ namespace ZMachine
         {
             MainMemory = new ZMemory(storyStream);
             FrameStack = new Stack<Routine>();
-            ProgramCounter = (int)MainMemory.Header.PCStart;
-        }
+            //ProgramCounter = (int)MainMemory.Header.PCStart;
 
-        private void LoadNewFrame(int newAddress, ZVariable returnStore)
-        {
-            Routine newRoutine = new Routine(MainMemory.Bytes, ProgramCounter, newAddress, returnStore);
-            FrameStack.Push(newRoutine);
-            ProgramCounter =  newRoutine.FirstInstructionAddress;
+            LoadNewFrame(MainMemory.Header.PCStart - 1, 0, null);
         }
 
         public int ProgramCounter { get; set; }
@@ -30,7 +25,6 @@ namespace ZMachine
 
         public ZProcessor Processor { get; set; }
         public Stack<Routine> FrameStack { get; set; }
-
 
         public int ReadVariable(ZVariable variable)
         {
@@ -116,9 +110,32 @@ namespace ZMachine
             {
                 SetVariable(opcode.Store, 0);
                 ProgramCounter++;
-            } else
+            }
+            else
             {
-                LoadNewFrame((int)callAddress, opcode.Store);
+                LoadNewFrame((int)callAddress, ProgramCounter + opcode.LengthInBytes, opcode.Store, opcode.Operands.Skip(1).ToArray());
+            }
+        }
+
+        private void LoadNewFrame(int newAddress, int returnAddress, ZVariable returnStore, params ZOperand[] operands)
+        {
+            var initLocals = operands.Select(op => (ushort)GetOperandValue(op)).ToArray();
+            Routine newRoutine = new Routine(MainMemory.Bytes, newAddress, returnAddress, returnStore, initLocals);
+            FrameStack.Push(newRoutine);
+            ProgramCounter = newRoutine.FirstInstructionAddress;
+        }
+
+        public int GetOperandValue(ZOperand operand)
+        {
+            switch (operand.Type)
+            {
+                case OperandTypes.LargeConstant:
+                case OperandTypes.SmallConstant:
+                    return (int)operand.Constant;
+                case OperandTypes.Variable:
+                    return ReadVariable(operand.Variable);
+                default:
+                    throw new NotImplementedException();
             }
         }
     }

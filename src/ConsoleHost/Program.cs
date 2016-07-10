@@ -27,6 +27,8 @@ namespace ConsoleHost
             zm.Print();
             zm.ExecuteCurrentInstruction();
             zm.Print();
+            zm.ExecuteCurrentInstruction();
+            zm.Print();
         }
     }
 }

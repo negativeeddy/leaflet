@@ -37,7 +37,7 @@ namespace ZMachine.Memory
         /// </summary>
         /// <param name="bytes">bytes representing memory</param>
         /// <param name="routineAddress">the beginning of the Routine's frame in memory</param>
-        public Routine(IList<byte> bytes, int routineAddress, int returnAddress, ZVariable returnStore)
+        public Routine(IList<byte> bytes, int routineAddress, int returnAddress, ZVariable returnStore, IList<ushort> localInitValues)
         {
             Debug.Assert(routineAddress % 2 == 0, "A routine is required to begin at an address in memory which can be represented by a packed address (spec 5.1)");
             _bytes = bytes;
@@ -47,15 +47,23 @@ namespace ZMachine.Memory
 
             int count = bytes[routineAddress];
             Locals = bytes.GetWords(routineAddress + 1, count);
+
+            for(int i=0; i<localInitValues.Count; i++)
+            {
+                Locals[i] = localInitValues[i];
+            }
         }
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("Locals ");
-            foreach(var l in Locals)
+            for(int i=0; i<Locals.Count; i++)
             {
-                sb.Append(l);
+                sb.Append("local");
+                sb.Append(i);
+                sb.Append('=');
+                sb.Append(Locals[i].ToString("x4"));
                 sb.Append(' ');
             }
             sb.AppendLine();
@@ -68,7 +76,7 @@ namespace ZMachine.Memory
             }
             sb.AppendLine();
 
-            sb.AppendLine($"Resume at: {ReturnAddress:x}");
+            sb.AppendLine($"Resume at: {ReturnAddress:x4}");
 
             return sb.ToString();
         }
