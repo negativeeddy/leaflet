@@ -273,7 +273,29 @@ namespace ZMachine
                         return value;
                     });
                     break;
-                // next to implement => pull, inc, dec, inc_chk and dec_chk.
+                case "inc":    // inc (variable)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandCount == 0);
+                        var actualZVar = GetDereferencedFirstZVar(op);
+                        short value = (short)ReadVariable(actualZVar, true);
+                        value++;
+                        SetVariable(actualZVar, (ushort)value, true);
+                        return value;
+                    });
+                    break;
+                case "dec":    // dec (variable)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandCount == 0);
+                        var actualZVar = GetDereferencedFirstZVar(op);
+                        short value = (short)ReadVariable(actualZVar, true);
+                        value--;
+                        SetVariable(actualZVar, (ushort)value, true);
+                        return value;
+                    });
+                    break;
+                // next to implement => inc_chk and dec_chk.
                 default:
                     throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
             }
