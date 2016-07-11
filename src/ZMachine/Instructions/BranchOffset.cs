@@ -38,5 +38,10 @@ namespace ZMachine.Instructions
 
         public bool WhenTrue { get; }
         public ushort Offset { get; }
+
+        public override string ToString()
+        {
+            return $"?{(ushort)Offset:x4}";
+        }
     }
 }

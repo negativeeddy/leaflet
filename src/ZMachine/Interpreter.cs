@@ -133,8 +133,13 @@ namespace ZMachine
                         return a % b;
                     });
                     break;
-                case "jump":
-                    Handle_Jump(opcode);
+                case "je":
+                    ExecValueInstruction(opcode, op =>
+                    {
+                        short a = (short)GetOperandValue(op.Operands[0]);
+                        short b = (short)GetOperandValue(op.Operands[1]);
+                        return a == b ? 1 : 0;
+                    });
                     break;
                 default:
                     throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
@@ -178,9 +183,27 @@ namespace ZMachine
             ProgramCounter = oldFrame.ReturnAddress;
         }
 
-        private void Handle_Jump(ZOpcode opcode)
+        /// <summary>
+        /// je a b ?(label)
+        /// </summary>
+        /// <param name="opcode"></param>
+        private void Handle_je(ZOpcode opcode)
         {
-            throw new NotImplementedException();
+            bool jump = true;
+            int firstValue = GetOperandValue(opcode.Operands[0]);
+            for (int i = 1; i < opcode.Operands.Count; i++)
+            {
+                if (firstValue == GetOperandValue(opcode.Operands[i]))
+                {
+                    jump = true;
+                    break;
+                }
+            }
+
+            if (jump)
+            {
+                ProgramCounter += opcode.BranchOffset.Offset;
+            }
         }
 
 
@@ -213,15 +236,18 @@ namespace ZMachine
         private void ExecValueInstruction(ZOpcode opcode, Action<ZOpcode> handler)
         {
             handler(opcode);
-            BranchOrNext(opcode);
+            BranchOrNext(opcode, 1);
         }
 
         private void ExecValueInstruction(ZOpcode opcode, Func<ZOpcode, int> handler)
         {
             int result = handler(opcode);
-            SetVariable(opcode.Store, (ushort)result);
-            BranchOrNext(opcode);
-        }   
+            if (opcode.Definition.HasStore)
+            {
+                SetVariable(opcode.Store, (ushort)result);
+            }
+            BranchOrNext(opcode, result);
+        }
 
         /// <summary>
         /// Shifts the state to the next instruction depending on whether the 
@@ -229,13 +255,12 @@ namespace ZMachine
         /// the instruction counter to the next instruction sequentially
         /// </summary>
         /// <param name="opcode"></param>
-        private void BranchOrNext(ZOpcode opcode)
+        private void BranchOrNext(ZOpcode opcode, int branchValue)
         {
             BranchOffset branch = opcode.BranchOffset;
             if (branch != null)
             {
                 // read the resulting value from the opcode store variable
-                int branchValue = ReadVariable(opcode.Store);
                 bool branchIfNotZero = branch.WhenTrue;
 
                 // test the branch condition against the stored value

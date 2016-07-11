@@ -31,7 +31,7 @@ namespace ZMachine.Instructions
                 }
                 else if (Bits >= 0x01)
                 {
-                    return Bits- 0x01;
+                    return Bits - 0x01;
                 }
                 else
                 {
