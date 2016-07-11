@@ -27,7 +27,14 @@ namespace ZMachine
         public ZProcessor Processor { get; set; }
         public Stack<Routine> FrameStack { get; set; }
 
-        public int ReadVariable(ZVariable variable)
+        /// <summary>
+        /// Reads the value of a ZVariable
+        /// </summary>
+        /// <param name="variable">the variable to read</param>
+        /// <param name="inPlace">if the value is in the evaluation stack, whether the read should pop values or read them in place. Otherwise
+        /// it has no effect</param>
+        /// <returns></returns>
+        public int ReadVariable(ZVariable variable, bool inPlace = false)
         {
             switch (variable.Location)
             {
@@ -36,13 +43,21 @@ namespace ZMachine
                 case ZVariableLocation.Local:
                     return FrameStack.Peek().Locals[variable.Value];
                 case ZVariableLocation.Stack:
-                    return FrameStack.Peek().EvaluationStack.Peek();
+                    var varStack = FrameStack.Peek().EvaluationStack;
+                    return inPlace ? varStack.Peek() : varStack.Pop();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(variable.Location));
             }
         }
 
-        public void SetVariable(ZVariable variable, ushort value)
+        /// <summary>
+        /// Sets the value of a variable in memory
+        /// </summary>
+        /// <param name="variable">the variable to set</param>
+        /// <param name="value">the value</param>
+        /// <param name="inPlace">If setting a value on the stack, this indicates whether to change 
+        /// the top value in place instead of pushing a new value. Has no effect on local or globals.</param>
+        public void SetVariable(ZVariable variable, ushort value, bool inPlace = false)
         {
             switch (variable.Location)
             {
@@ -53,7 +68,12 @@ namespace ZMachine
                     FrameStack.Peek().Locals[variable.Value] = value;
                     break;
                 case ZVariableLocation.Stack:
-                    FrameStack.Peek().EvaluationStack.Push(value);
+                    var varStack = FrameStack.Peek().EvaluationStack;
+                    if (inPlace)
+                    {
+                        varStack.Pop();
+                    }
+                    varStack.Push(value);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(variable.Location));
