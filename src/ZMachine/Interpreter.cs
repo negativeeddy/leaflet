@@ -440,7 +440,7 @@ namespace ZMachine
                 bool branchIfIfOne = branch.WhenTrue;
 
                 // test the branch condition against the stored value
-                if ((branchIfIfOne && branchValue == 0) ||
+                if ((branchIfIfOne && branchValue == 1) ||
                     (!branchIfIfOne && branchValue == 0))
                 {
                     ProgramCounter = opcode.BranchToAddress;
