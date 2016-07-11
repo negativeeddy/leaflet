@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -94,7 +95,7 @@ namespace ZMachine
                     Handle_Return(opcode);
                     break;
                 case "add":
-                    ExecValueInstruction(opcode, op =>
+                    ExecInstruction(opcode, op =>
                     {
                         short a = (short)GetOperandValue(op.Operands[0]);
                         short b = (short)GetOperandValue(op.Operands[1]);
@@ -102,7 +103,7 @@ namespace ZMachine
                     });
                     break;
                 case "sub":
-                    ExecValueInstruction(opcode, op =>
+                    ExecInstruction(opcode, op =>
                     {
                         short a = (short)GetOperandValue(op.Operands[0]);
                         short b = (short)GetOperandValue(op.Operands[1]);
@@ -110,7 +111,7 @@ namespace ZMachine
                     });
                     break;
                 case "mul":
-                    ExecValueInstruction(opcode, op =>
+                    ExecInstruction(opcode, op =>
                     {
                         short a = (short)GetOperandValue(op.Operands[0]);
                         short b = (short)GetOperandValue(op.Operands[1]);
@@ -118,7 +119,7 @@ namespace ZMachine
                     });
                     break;
                 case "div":
-                    ExecValueInstruction(opcode, op =>
+                    ExecInstruction(opcode, op =>
                     {
                         short a = (short)GetOperandValue(op.Operands[0]);
                         short b = (short)GetOperandValue(op.Operands[1]);
@@ -126,7 +127,7 @@ namespace ZMachine
                     });
                     break;
                 case "mod":
-                    ExecValueInstruction(opcode, op =>
+                    ExecInstruction(opcode, op =>
                     {
                         short a = (short)GetOperandValue(op.Operands[0]);
                         short b = (short)GetOperandValue(op.Operands[1]);
@@ -134,7 +135,7 @@ namespace ZMachine
                     });
                     break;
                 case "je":
-                    ExecValueInstruction(opcode, op =>
+                    ExecInstruction(opcode, op =>
                     {
                         short a = (short)GetOperandValue(op.Operands[0]);
                         short b = (short)GetOperandValue(op.Operands[1]);
@@ -233,15 +234,10 @@ namespace ZMachine
             }
         }
 
-        private void ExecValueInstruction(ZOpcode opcode, Action<ZOpcode> handler)
-        {
-            handler(opcode);
-            BranchOrNext(opcode, 1);
-        }
-
-        private void ExecValueInstruction(ZOpcode opcode, Func<ZOpcode, int> handler)
+        private void ExecInstruction(ZOpcode opcode, Func<ZOpcode, int> handler)
         {
             int result = handler(opcode);
+
             if (opcode.Definition.HasStore)
             {
                 SetVariable(opcode.Store, (ushort)result);
@@ -261,6 +257,7 @@ namespace ZMachine
             if (branch != null)
             {
                 // read the resulting value from the opcode store variable
+                int branchValue = ReadVariable(opcode.Store);
                 bool branchIfNotZero = branch.WhenTrue;
 
                 // test the branch condition against the stored value
