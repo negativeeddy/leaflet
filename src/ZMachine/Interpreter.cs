@@ -80,6 +80,12 @@ namespace ZMachine
             }
         }
 
+        public ZVariable Dereference(ZVariable zVarRef)
+        {
+            byte zvarVal = (byte)ReadVariable(zVarRef);
+            return new ZVariable(zvarVal);
+        }
+
         public int GetOperandValue(ZOperand operand)
         {
             switch (operand.Type)
@@ -237,10 +243,33 @@ namespace ZMachine
                         return -1;
                     });
                     break;
+                case "load":    // load (variable) -> (result)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType[0] == OperandTypes.Variable);
+                        Debug.Assert(op.OperandType.Count == 1);
+
+                        ZVariable zvarRef = op.Operands[0].Variable;
+                        ZVariable actualZVar = Dereference(zvarRef);
+                        int value = ReadVariable(actualZVar, true);
+                        return value;
+                    });
+                    break;
                 case "store":   // store (variable) value
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType[0] == OperandTypes.SmallConstant);
+                        Debug.Assert(op.OperandType.Count == 2);
 
-                    throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
+                        ZVariable zvarRef = new ZVariable((byte)op.Operands[0].Constant);
+                        ZVariable actualZVar = Dereference(zvarRef);
+                        int valueToStore = GetOperandValue(op.Operands[1]);
 
+                        SetVariable(actualZVar, (ushort)valueToStore, true);                        
+                        return -1;
+                    });
+                    break;
+                // next to implement => pull, inc, dec, inc_chk and dec_chk.
                 default:
                     throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
             }
