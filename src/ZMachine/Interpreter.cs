@@ -281,7 +281,7 @@ namespace ZMachine
                         short value = (short)ReadVariable(actualZVar, true);
                         value++;
                         SetVariable(actualZVar, (ushort)value, true);
-                        return value;
+                        return UNUSED_RETURN_VALUE;
                     });
                     break;
                 case "dec":    // dec (variable)
@@ -292,10 +292,41 @@ namespace ZMachine
                         short value = (short)ReadVariable(actualZVar, true);
                         value--;
                         SetVariable(actualZVar, (ushort)value, true);
-                        return value;
+                        return UNUSED_RETURN_VALUE;
                     });
                     break;
-                // next to implement => inc_chk and dec_chk.
+                case "inc_chk":    // inc_chk (variable) value ?(label)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandCount == 0);
+
+                        // do the increment
+                        var actualZVar = GetDereferencedFirstZVar(op);
+                        short value = (short)ReadVariable(actualZVar, true);
+                        value++;
+                        SetVariable(actualZVar, (ushort)value, true);
+
+                        // do the compare
+                        short compareVal = (short)GetOperandValue(op.Operands[1]);
+                        return value == compareVal ? 1 : 0;
+                    });
+                    break;
+                case "dec_chk":    // inc_chk (variable) value ?(label)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandCount == 0);
+
+                        // do the decrement
+                        var actualZVar = GetDereferencedFirstZVar(op);
+                        short value = (short)ReadVariable(actualZVar, true);
+                        value--;
+                        SetVariable(actualZVar, (ushort)value, true);
+
+                        // do the compare
+                        short compareVal = (short)GetOperandValue(op.Operands[1]);
+                        return value == compareVal ? 1 : 0;
+                    });
+                    break;
                 default:
                     throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
             }
