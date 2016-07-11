@@ -12,6 +12,8 @@ namespace ZMachine
 {
     public class Interpreter
     {
+        private const int UNUSED_RETURN_VALUE = -1;
+
         public void LoadStory(Stream storyStream)
         {
             MainMemory = new ZMemory(storyStream);
@@ -228,7 +230,7 @@ namespace ZMachine
                         int byteIndex = GetOperandValue(op.Operands[1]);
                         byte value = (byte)GetOperandValue(op.Operands[2]);
                         MainMemory.Bytes[arrayAddress + byteIndex] = value;
-                        return -1;
+                        return UNUSED_RETURN_VALUE;
                     });
                     break;
                 case "storew":  // storew array word-index value
@@ -240,17 +242,14 @@ namespace ZMachine
 
                         var wob = new WordOverByteArray(MainMemory.Bytes, arrayAddress);
                         wob[wordIndex] = value;
-                        return -1;
+                        return UNUSED_RETURN_VALUE;
                     });
                     break;
                 case "load":    // load (variable) -> (result)
                     ExecInstruction(opcode, op =>
                     {
-                        Debug.Assert(op.OperandType[0] == OperandTypes.Variable);
                         Debug.Assert(op.OperandType.Count == 1);
-
-                        ZVariable zvarRef = op.Operands[0].Variable;
-                        ZVariable actualZVar = Dereference(zvarRef);
+                        var actualZVar = GetDereferencedFirstZVar(op);
                         int value = ReadVariable(actualZVar, true);
                         return value;
                     });
@@ -258,21 +257,37 @@ namespace ZMachine
                 case "store":   // store (variable) value
                     ExecInstruction(opcode, op =>
                     {
-                        Debug.Assert(op.OperandType[0] == OperandTypes.SmallConstant);
                         Debug.Assert(op.OperandType.Count == 2);
-
-                        ZVariable zvarRef = new ZVariable((byte)op.Operands[0].Constant);
-                        ZVariable actualZVar = Dereference(zvarRef);
+                        var actualZVar = GetDereferencedFirstZVar(op);
                         int valueToStore = GetOperandValue(op.Operands[1]);
-
-                        SetVariable(actualZVar, (ushort)valueToStore, true);                        
-                        return -1;
+                        SetVariable(actualZVar, (ushort)valueToStore, true);
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
+                case "pull":    // pull (variable)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandCount == 0);
+                        var actualZVar = GetDereferencedFirstZVar(op);
+                        int value = ReadVariable(actualZVar, true);
+                        return value;
                     });
                     break;
                 // next to implement => pull, inc, dec, inc_chk and dec_chk.
                 default:
                     throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
             }
+        }
+
+        private ZVariable GetDereferencedFirstZVar(ZOpcode opcode)
+        {
+            Debug.Assert(opcode.OperandType.Count >= 1);
+            Debug.Assert(opcode.OperandType[0] == OperandTypes.SmallConstant);
+
+            // first instruction is a derefernced ZVar
+            ZVariable zvarRef = new ZVariable((byte)opcode.Operands[0].Constant);
+            ZVariable actualZVar = Dereference(zvarRef);
+            return actualZVar;
         }
 
         private Routine CurrentRoutineFrame
