@@ -25,11 +25,12 @@ namespace ConsoleHost
             string output = zm.MainMemory.ObjectTree.DumpObjectTree();
             Console.WriteLine($"Object tree contains {zm.MainMemory.ObjectTree.Objects.Count} objects");
 
-            zm.Print();
+            bool showFrames = false;
+            zm.Print(showFrames);
             while (true)
             {
                 zm.ExecuteCurrentInstruction();
-                zm.Print();
+                zm.Print(showFrames);
             }
         }
     }

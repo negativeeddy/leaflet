@@ -353,7 +353,12 @@ namespace ZMachine.Instructions
 
             if (this.Definition.HasBranch)
             {
-                sb.Append($" br {BranchOffset}");
+                sb.Append($" ?");
+                if (!BranchOffset.WhenTrue)
+                {
+                    sb.Append('~');
+                }
+                sb.Append($"{BranchOffset.Offset + _baseAddress:x}");
             }
 
             return sb.ToString();

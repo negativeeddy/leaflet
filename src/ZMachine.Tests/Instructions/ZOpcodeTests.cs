@@ -69,14 +69,13 @@ namespace ZMachine.Instructions.Tests
             var zm = ZMachineLoader.Load(filename);
 
             int address = 0x3b5d; // "3b5d: je local3 local2  ?~3b77
+            string expectedStringConversion = "3b5d: je local3 local2  ?~3b77";
             // 0x61,0x04,0x03,0x58,0x55,0x45
             // 0110 0001
             // 0000 0100   var local 3
             // 0000 0011   var local 2
             // 0101 1000   branch
             // 0101 0101
-
-            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
 
             int expectedOpcode = 0x01;
             OpcodeForm expectedForm = OpcodeForm.Long;
@@ -86,7 +85,8 @@ namespace ZMachine.Instructions.Tests
             };
             int expectedOperandCount = expectedOperands.Length;
             int expectedLengthInBytes = 4;
-            string expectedStringConversion = "3b3d: call 3b4a local0 ->local2";
+
+            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
 
             CompareOpcodeWithExpectedValues(
                 zop,

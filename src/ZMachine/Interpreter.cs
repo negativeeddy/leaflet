@@ -80,6 +80,8 @@ namespace ZMachine
 
             }
             ZOpcode opcode = new ZOpcode(MainMemory.Bytes, ProgramCounter);
+            if (opcode.Definition.HasBranch)
+                Console.WriteLine("{0:x}", FrameStack.Peek().FirstInstructionAddress - opcode.BranchOffset.Offset);
             Console.WriteLine(opcode);
         }
 
@@ -137,10 +139,21 @@ namespace ZMachine
                 case "je":
                     ExecInstruction(opcode, op =>
                     {
+                        // je a b c d ? (label)
                         short a = (short)GetOperandValue(op.Operands[0]);
-                        short b = (short)GetOperandValue(op.Operands[1]);
-                        return a == b ? 1 : 0;
+                        for (int i = 1; i < op.Operands.Count; i++)
+                        {
+                            // is true if the first operand matches any of the others
+                            if (a == GetOperandValue(op.Operands[i]))
+                            {
+                                return 1;
+                            }
+                        }
+                        return 0;   // didn't match so don't branch
                     });
+                    break;
+                case "jz":  // jz a ?(label)
+                    ExecInstruction(opcode, op => GetOperandValue(op.Operands[0]) == 0 ? 1 : 0);
                     break;
                 default:
                     throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
@@ -183,31 +196,6 @@ namespace ZMachine
             // update the instruction counter
             ProgramCounter = oldFrame.ReturnAddress;
         }
-
-        /// <summary>
-        /// je a b ?(label)
-        /// </summary>
-        /// <param name="opcode"></param>
-        private void Handle_je(ZOpcode opcode)
-        {
-            bool jump = true;
-            int firstValue = GetOperandValue(opcode.Operands[0]);
-            for (int i = 1; i < opcode.Operands.Count; i++)
-            {
-                if (firstValue == GetOperandValue(opcode.Operands[i]))
-                {
-                    jump = true;
-                    break;
-                }
-            }
-
-            if (jump)
-            {
-                ProgramCounter += opcode.BranchOffset.Offset;
-            }
-        }
-
-
 
         private void LoadNewFrame(int newAddress, int returnAddress, ZVariable returnStore, params ZOperand[] operands)
         {
@@ -257,7 +245,6 @@ namespace ZMachine
             if (branch != null)
             {
                 // read the resulting value from the opcode store variable
-                int branchValue = ReadVariable(opcode.Store);
                 bool branchIfNotZero = branch.WhenTrue;
 
                 // test the branch condition against the stored value
