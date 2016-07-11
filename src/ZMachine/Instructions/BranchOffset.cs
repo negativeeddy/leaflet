@@ -6,8 +6,11 @@ namespace ZMachine.Instructions
 {
     public class BranchOffset
     {
-        public BranchOffset(IList<byte> _bytes)
+        private IList<byte> _bytes;
+
+        public BranchOffset(IList<byte> bytes)
         {
+            _bytes = bytes;
             // implements spec 4.7
 
             Debug.Assert(_bytes.Count == 2);
@@ -29,7 +32,7 @@ namespace ZMachine.Instructions
             }
             else
             {
-                Offset = (ushort)((_bytes[0].FetchBits(BitNumber.Bit_5, 6) << 8) | _bytes[1]);
+                Offset = (ushort)(_bytes.GetWord(0) & 0x3fff);  
                 LengthInBytes = 2;
             }
         }

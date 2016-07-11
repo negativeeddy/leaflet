@@ -115,11 +115,11 @@ namespace ZMachine
             return fragment.ToString();
         }
 
-        public WordOverByteOverlay GlobalVariables
+        public WordOverByteArray GlobalVariables
         {
             get
             {
-                return new WordOverByteOverlay(Bytes, Header.GlobalVariablesTableAddress, 255-16);
+                return new WordOverByteArray(Bytes, Header.GlobalVariablesTableAddress, 255-16);
             }
         }
     }

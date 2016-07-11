@@ -34,6 +34,11 @@ namespace ZMachine.Instructions
             }
         }
 
+        public override string ToString()
+        {
+            return Name + " " + ID.ToString();
+        }
+
         public static readonly OpcodeDefinition InvalidOpcode = new OpcodeDefinition() { Name = "Invalid" };
 
         /// <summary>

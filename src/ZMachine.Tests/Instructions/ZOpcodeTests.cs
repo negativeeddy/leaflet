@@ -68,8 +68,8 @@ namespace ZMachine.Instructions.Tests
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
 
-            int address = 0x3b5d; // "3b5d: je local3 local2  ?~3b77
-            string expectedStringConversion = "3b5d: je local3 local2  ?~3b77";
+            int address = 0x3b5d; // "3b5d: je local3 local2 ?~3b77
+            string expectedStringConversion = "3b5d: je local3 local2 ?~3b77";
             // 0x61,0x04,0x03,0x58,0x55,0x45
             // 0110 0001
             // 0000 0100   var local 3
@@ -95,6 +95,42 @@ namespace ZMachine.Instructions.Tests
                 expectedOperands,
                 expectedLengthInBytes,
                 expectedStringConversion);
+
+            Assert.AreEqual(0x3b77.ToString("x"), zop.BranchToAddress.ToString("x"));
+        }
+
+        [TestMethod()]
+        public void OpCodeTest_jz()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            int address = 0x3b65; // 3b65: jz local1 ?3b6c
+            string expectedStringConversion = "3b65: jz local1 ?3b6c";
+            // 0xa0 0x02 0xc6
+            // 1010 0000    short form, OP1, opcode 0
+            // 0000 0010    var local 1
+            // 1100 0110    branch 
+
+            int expectedOpcode = 0;
+            OpcodeForm expectedForm = OpcodeForm.Short;
+            ZOperand[] expectedOperands = new ZOperand[] {
+                                                new ZOperand(OperandTypes.Variable) { Variable = new ZVariable(0x02) },
+            };
+            int expectedOperandCount = expectedOperands.Length;
+            int expectedLengthInBytes = 3;
+
+            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+
+            CompareOpcodeWithExpectedValues(
+                zop,
+                expectedOpcode,
+                expectedForm,
+                expectedOperands,
+                expectedLengthInBytes,
+                expectedStringConversion);
+
+            Assert.AreEqual(0x3b6c.ToString("x"), (zop.BranchToAddress).ToString("x"));
         }
 
         [TestMethod()]
@@ -164,25 +200,25 @@ namespace ZMachine.Instructions.Tests
             Console.WriteLine($"Checking the following opcode: {zop}");
 
             // check basic form
-            Assert.AreEqual(expectedForm, zop.Form, "Form");
-            Assert.AreEqual(expectedOpcode, zop.Opcode, "Opcode");
+            Assert.AreEqual(expectedForm, zop.Form, "Form is wrong");
+            Assert.AreEqual(expectedOpcode, zop.Opcode, "Opcode is wrong");
 
             // check operands
             int expectedOperandCount = expectedOperands.Length;
-            Assert.AreEqual(expectedOperandCount, zop.OperandType.Count, "OperandTypes Count");  // Long form is always 2 operands
+            Assert.AreEqual(expectedOperandCount, zop.OperandType.Count, "OperandTypes Count is wrong");  // Long form is always 2 operands
 
             for (int i = 0; i < zop.Operands.Count; i++)
             {
-                Assert.AreEqual(expectedOperands[i].Type, zop.OperandType[i], $"OperandTypes {i}");
+                Assert.AreEqual(expectedOperands[i].Type, zop.OperandType[i], $"OperandTypes[{i}] is wrong");
                 switch(expectedOperands[i].Type)
                 {
                     case OperandTypes.Variable:
-                        Assert.AreEqual(expectedOperands[i].Variable.Location, zop.Operands[i].Variable.Location, $"Operand{i} VAR location ");
-                        Assert.AreEqual(expectedOperands[i].Variable.Value, zop.Operands[i].Variable.Value, $"Operand{i} VAR value ");
+                        Assert.AreEqual(expectedOperands[i].Variable.Location, zop.Operands[i].Variable.Location, $"Operand{i} VAR location is wrong");
+                        Assert.AreEqual(expectedOperands[i].Variable.Value, zop.Operands[i].Variable.Value, $"Operand{i} VAR value is wrong");
                         break;
                     case OperandTypes.LargeConstant:
                     case OperandTypes.SmallConstant:
-                        Assert.AreEqual(expectedOperands[i].Constant, zop.Operands[i].Constant, $"Operand{i} {expectedOperands[i].Type} value ");
+                        Assert.AreEqual(expectedOperands[i].Constant, zop.Operands[i].Constant, $"Operand{i} {expectedOperands[i].Type} value is wrong");
                         break;
                     case OperandTypes.Omitted:
                         Assert.Fail("Found an omitted operand. Omitted operands should not be created.");

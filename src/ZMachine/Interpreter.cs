@@ -80,8 +80,6 @@ namespace ZMachine
 
             }
             ZOpcode opcode = new ZOpcode(MainMemory.Bytes, ProgramCounter);
-            if (opcode.Definition.HasBranch)
-                Console.WriteLine("{0:x}", FrameStack.Peek().FirstInstructionAddress - opcode.BranchOffset.Offset);
             Console.WriteLine(opcode);
         }
 
@@ -155,6 +153,52 @@ namespace ZMachine
                 case "jz":  // jz a ?(label)
                     ExecInstruction(opcode, op => GetOperandValue(op.Operands[0]) == 0 ? 1 : 0);
                     break;
+                case "jl":  // jl a b ?(label)
+                    ExecInstruction(opcode, op => (short)GetOperandValue(op.Operands[0]) < (short)GetOperandValue(op.Operands[0]) ? 1 : 0);
+                    break;
+                case "jg":  // jg a b ?(label)
+                    ExecInstruction(opcode, op => (short)GetOperandValue(op.Operands[0]) > (short)GetOperandValue(op.Operands[0]) ? 1 : 0);
+                    break;
+                case "loadb":   // loadb array byte-index -> (result)
+                    ExecInstruction(opcode, op =>
+                    {
+                        int arrayAddress = GetOperandValue(op.Operands[0]);
+                        int byteIndex = GetOperandValue(op.Operands[1]);
+                        return MainMemory.Bytes[arrayAddress + byteIndex];
+                    });
+                    break;
+                case "loadw":   // loadw array word-index -> (result)
+                    ExecInstruction(opcode, op =>
+                    {
+                        int arrayAddress = GetOperandValue(op.Operands[0]);
+                        int wordIndex = GetOperandValue(op.Operands[1]);
+                        var wob = new WordOverByteArray(MainMemory.Bytes, arrayAddress);
+                        return wob[wordIndex];
+
+                    });
+                    break;
+                case "storeb":  // storeb array byte-index value
+                    ExecInstruction(opcode, op =>
+                    {
+                        int arrayAddress = GetOperandValue(op.Operands[0]);
+                        int byteIndex = GetOperandValue(op.Operands[1]);
+                        byte value = (byte)GetOperandValue(op.Operands[2]);
+                        MainMemory.Bytes[arrayAddress + byteIndex] = value;
+                        return -1;
+                    });
+                    break;
+                case "storew":  // storew array word-index value
+                    ExecInstruction(opcode, op =>
+                    {
+                        int arrayAddress = GetOperandValue(op.Operands[0]);
+                        int wordIndex = GetOperandValue(op.Operands[1]);
+                        ushort value = (ushort)GetOperandValue(op.Operands[2]);
+
+                        var wob = new WordOverByteArray(MainMemory.Bytes, arrayAddress);
+                        wob[wordIndex] = value;
+                        return -1;
+                    });
+                    break;
                 default:
                     throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
             }
@@ -171,14 +215,15 @@ namespace ZMachine
         void Handle_Call(ZOpcode opcode)
         {
             uint callAddress = opcode.Operands[0].Constant;
+            int nextInstruction = ProgramCounter += opcode.LengthInBytes;
             if (callAddress == 0)
             {
                 SetVariable(opcode.Store, 0);
-                ProgramCounter++;
+                ProgramCounter = nextInstruction;
             }
             else
             {
-                LoadNewFrame((int)callAddress, ProgramCounter + opcode.LengthInBytes, opcode.Store, opcode.Operands.Skip(1).ToArray());
+                LoadNewFrame((int)callAddress, nextInstruction, opcode.Store, opcode.Operands.Skip(1).ToArray());
             }
         }
 
@@ -245,13 +290,13 @@ namespace ZMachine
             if (branch != null)
             {
                 // read the resulting value from the opcode store variable
-                bool branchIfNotZero = branch.WhenTrue;
+                bool branchIfIfOne = branch.WhenTrue;
 
                 // test the branch condition against the stored value
-                if ((branchIfNotZero && branchValue != 0) ||
-                    (!branchIfNotZero && branchValue == 0))
+                if ((branchIfIfOne && branchValue == 0) ||
+                    (!branchIfIfOne && branchValue == 0))
                 {
-                    ProgramCounter = branch.Offset;
+                    ProgramCounter = opcode.BranchToAddress;
                     return;
                 }
             }

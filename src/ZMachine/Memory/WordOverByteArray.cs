@@ -8,34 +8,44 @@ using System.Threading.Tasks;
 
 namespace ZMachine.Memory
 {
-    public class WordOverByteOverlay : IList<ushort>
+    /// <summary>
+    /// An array which is constructed from a section of a byte array
+    /// The array words are 
+    /// </summary>
+    public class WordOverByteArray : IList<ushort>
     {
         private IList<byte> _bytes;
         private int _baseAddress;
-        private int _length;
+
+        /// <summary>
+        /// Number of words in the array
+        /// </summary>
+        private int _count;
 
         public int Count
         {
             get
             {
-                throw new NotImplementedException();
+                return _count;
             }
         }
 
-        public bool IsReadOnly
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public bool IsReadOnly { get { return false; } }
 
-        public WordOverByteOverlay(IList<byte> bytes, int baseAddress, int length)
+        public WordOverByteArray(IList<byte> bytes, int baseAddress, int length)
         {
             Debug.Assert(bytes.Count >= baseAddress + length * 2);
             _bytes = bytes;
             _baseAddress = baseAddress;
-            _length = length;
+            _count = length;
+        }
+
+        public WordOverByteArray(IList<byte> bytes, int baseAddress)
+        {
+            Debug.Assert(bytes.Count >= _count);
+            _count = (bytes.Count - baseAddress) / 2;
+            _bytes = bytes;
+            _baseAddress = baseAddress;
         }
 
         public ushort this[int index]
@@ -91,8 +101,8 @@ namespace ZMachine.Memory
         }
 
         public IEnumerator<ushort> GetEnumerator()
-        { 
-            for(int i = 0; i<_length; i++)
+        {
+            for (int i = 0; i < Count; i++)
             {
                 yield return this[i];
             }
@@ -100,7 +110,7 @@ namespace ZMachine.Memory
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            for(int i=0; i<_length; i++)
+            for (int i = 0; i < Count; i++)
             {
                 yield return this[i];
             }
