@@ -324,6 +324,10 @@ namespace ZMachine.Instructions
         {
             get
             {
+                if (!Definition.HasBranch)
+                {
+                    throw new InvalidOperationException("Opcode has not branch data");
+                }
                 // spec 4.7.2
                 return (BaseAddress + LengthInBytes) + BranchOffset.Offset - 2;
             }
@@ -391,31 +395,59 @@ namespace ZMachine.Instructions
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
+            // print the address & operand name
             sb.Append($"{BaseAddress:x4}: {Definition.Name}");
-            foreach (var opr in Operands)
-            {
-                switch (opr.Type)
-                {
 
-                    case OperandTypes.Variable:
-                        sb.Append($" {opr.Variable:x}");
-                        break;
-                    case OperandTypes.LargeConstant:
-                        sb.Append($" {opr.Constant:x4}");
-                        break;
-                    case OperandTypes.SmallConstant:
-                        sb.Append($" {opr.Constant:x2}");
-                        break;
-                    default:
-                        throw new InvalidOperationException();
+            // print the operands
+            for(int i=0; i<Operands.Count; i++)
+            {
+                var opr = Operands[i];
+
+                if (Definition.UsesIndirection && i == 0)
+                {
+                    switch (opr.Type)
+                    {
+
+                        case OperandTypes.Variable:
+                            sb.Append($" {new ZVariable((byte)opr.Constant):x2}");
+                            break;
+                        case OperandTypes.LargeConstant:
+                            sb.Append($" {new ZVariable((byte)opr.Constant):x2}");
+                            break;
+                        case OperandTypes.SmallConstant:
+                            sb.Append($" {new ZVariable((byte)opr.Constant):x2}");
+                            break;
+                        default:
+                            throw new InvalidOperationException();
+                    }
+                }
+                else
+                {
+                    switch (opr.Type)
+                    {
+
+                        case OperandTypes.Variable:
+                            sb.Append($" {opr.Variable:x}");
+                            break;
+                        case OperandTypes.LargeConstant:
+                            sb.Append($" {opr.Constant:x4}");
+                            break;
+                        case OperandTypes.SmallConstant:
+                            sb.Append($" {opr.Constant:x2}");
+                            break;
+                        default:
+                            throw new InvalidOperationException();
+                    }
                 }
             }
 
+            // print the optional store
             if (this.Definition.HasStore)
             {
                 sb.Append($" ->{Store}");
             }
 
+            // print the optional branch info
             if (this.Definition.HasBranch)
             {
                 sb.Append($" ?");

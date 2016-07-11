@@ -187,13 +187,47 @@ namespace ZMachine.Instructions.Tests
             string expectedStringConversion = "3816: jump 37d9";
 
             CompareOpcodeWithExpectedValues(
-                zop, 
-                expectedOpcode, 
-                expectedForm, 
-                expectedOperands, 
-                expectedLengthInBytes, 
+                zop,
+                expectedOpcode,
+                expectedForm,
+                expectedOperands,
+                expectedLengthInBytes,
                 expectedStringConversion);
         }
+
+        public void OpCodeTest_store()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            int address = 0x3816; // 37f7: store 10 2e
+            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+            string expectedStringConversion = "37f7: store 10 2e";
+
+            //byte[] bytes = new byte[] { 0x8c, 0xff, 0xc2};
+            // 1000 1010    Form SHORT, 1OP
+            //              opcode 1010 => 0x0c
+            //              bits 5,4 = 00 -> Large Constant Operand
+            // 1111 1111    Operand1 = 0xffc2
+            // 1010 0010    (contributes to large constant)
+
+            int expectedOpcode = 0x0d;
+            OpcodeForm expectedForm = OpcodeForm.Short;
+            ZOperand[] expectedOperands = new ZOperand[] {
+                                                new ZOperand(OperandTypes.LargeConstant) { Constant = 0x37d9 },
+            };
+            int expectedOperandCount = expectedOperands.Length;
+            int expectedLengthInBytes = 3;
+
+            CompareOpcodeWithExpectedValues(
+                zop,
+                expectedOpcode,
+                expectedForm,
+                expectedOperands,
+                expectedLengthInBytes,
+                expectedStringConversion);
+        }
+
 
         private static void CompareOpcodeWithExpectedValues(ZOpcode zop, int expectedOpcode, OpcodeForm expectedForm, ZOperand[] expectedOperands, int expectedLengthInBytes, string expectedStringConversion)
         {
@@ -286,10 +320,10 @@ namespace ZMachine.Instructions.Tests
                 new Tuple<int, string>(0x37e2, "37e2: storew sp 00 01"),
                 new Tuple<int, string>(0x37e7, "37e7: call 3b36 4e50 28 ->sp"),
                 new Tuple<int, string>(0x37ef, "37ef: call 3b36 4792 96 ->sp"),
-                new Tuple<int, string>(0x37f7, "37f7: store 10 2e"),
-                new Tuple<int, string>(0x37fa, "37fa: store 8a a7"),
-                new Tuple<int, string>(0x37fd, "37fd: store 36 01"),
-                new Tuple<int, string>(0x3800, "3800: store 83 1e"),
+                new Tuple<int, string>(0x37f7, "37f7: store g0 2e"),
+                new Tuple<int, string>(0x37fa, "37fa: store g7a a7"),
+                new Tuple<int, string>(0x37fd, "37fd: store g26 01"),
+                new Tuple<int, string>(0x3800, "3800: store g73 1e"),
                 new Tuple<int, string>(0x3803, "3803: insert_obj g73 g0"),
                 new Tuple<int, string>(0x3806, "3806: call 5862 ->sp"),
                 new Tuple<int, string>(0x380b, "380b: new_line"),

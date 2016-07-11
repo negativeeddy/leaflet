@@ -60,6 +60,20 @@ namespace ZMachine
             }
         }
 
+        public int GetOperandValue(ZOperand operand)
+        {
+            switch (operand.Type)
+            {
+                case OperandTypes.LargeConstant:
+                case OperandTypes.SmallConstant:
+                    return (int)operand.Constant;
+                case OperandTypes.Variable:
+                    return ReadVariable(operand.Variable);
+                default:
+                    throw new NotImplementedException($"Reading from {operand.Type} not implemented");
+            }
+        }
+
         public void Print(bool printFrames = false)
         {
             if (printFrames)
@@ -159,6 +173,10 @@ namespace ZMachine
                 case "jg":  // jg a b ?(label)
                     ExecInstruction(opcode, op => (short)GetOperandValue(op.Operands[0]) > (short)GetOperandValue(op.Operands[0]) ? 1 : 0);
                     break;
+                case "jump":    // jump ?(label)
+                    int jumpAddress = GetOperandValue(opcode.Operands[0]);
+                    ProgramCounter = jumpAddress;
+                    break;
                 case "loadb":   // loadb array byte-index -> (result)
                     ExecInstruction(opcode, op =>
                     {
@@ -199,6 +217,10 @@ namespace ZMachine
                         return -1;
                     });
                     break;
+                case "store":   // store (variable) value
+
+                    throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
+
                 default:
                     throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
             }
@@ -251,20 +273,6 @@ namespace ZMachine
 
             // update the instruction counter
             ProgramCounter = newRoutine.FirstInstructionAddress;
-        }
-
-        public int GetOperandValue(ZOperand operand)
-        {
-            switch (operand.Type)
-            {
-                case OperandTypes.LargeConstant:
-                case OperandTypes.SmallConstant:
-                    return (int)operand.Constant;
-                case OperandTypes.Variable:
-                    return ReadVariable(operand.Variable);
-                default:
-                    throw new NotImplementedException();
-            }
         }
 
         private void ExecInstruction(ZOpcode opcode, Func<ZOpcode, int> handler)

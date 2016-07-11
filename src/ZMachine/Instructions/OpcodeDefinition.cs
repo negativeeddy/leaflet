@@ -8,6 +8,7 @@ namespace ZMachine.Instructions
 {
     public struct OpcodeDefinition
     {
+        public bool UsesIndirection;
         public bool IsCall;
         public string Name;
         public OpcodeIdentifier ID;
@@ -53,8 +54,8 @@ namespace ZMachine.Instructions
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_1"),  HasStore = false, HasBranch = true,  Name ="je", } ,
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_2"),  HasStore = false, HasBranch = true,  Name ="jl", } ,
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_3"),  HasStore = false, HasBranch = true,  Name ="jg", } ,
-            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_4"),  HasStore = false, HasBranch = true,  Name ="dec_chk", } ,
-            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_5"),  HasStore = false, HasBranch = true,  Name ="inc_chk", } ,
+            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_4"),  HasStore = false, HasBranch = true,  Name ="dec_chk", UsesIndirection=true, } ,
+            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_5"),  HasStore = false, HasBranch = true,  Name ="inc_chk", UsesIndirection=true, } ,
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_6"),  HasStore = false, HasBranch = true,  Name ="jin", } ,
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_7"),  HasStore = false, HasBranch = true,  Name ="test", } ,
 
@@ -65,7 +66,7 @@ namespace ZMachine.Instructions
 
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_11"), HasStore = false, HasBranch = false, Name ="set_attr", } ,
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_12"), HasStore = false, HasBranch = false, Name ="clear_attr",} ,
-            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_13"), HasStore = false, HasBranch = false, Name ="store", } ,
+            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_13"), HasStore = false, HasBranch = false, Name ="store", UsesIndirection=true, } ,
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_14"), HasStore = false, HasBranch = false, Name ="insert_obj", } ,
 
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP2_15"), HasStore = true,  HasBranch = false, Name ="loadw", } ,
@@ -97,8 +98,8 @@ namespace ZMachine.Instructions
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP1_131"), HasStore = true,  HasBranch = false, Name ="get_parent" ,} ,
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP1_132"), HasStore = true,  HasBranch = false, Name ="get_prop_len" ,} ,
 
-            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP1_133"), HasStore = false, HasBranch = false, Name ="inc" ,} ,
-            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP1_134"), HasStore = false, HasBranch = false, Name ="dec" ,} ,
+            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP1_133"), HasStore = false, HasBranch = false, Name ="inc" , UsesIndirection=true, } ,
+            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP1_134"), HasStore = false, HasBranch = false, Name ="dec" , UsesIndirection=true, } ,
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP1_135"), HasStore = false, HasBranch = false, Name ="print_addr" ,} ,
 
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP1_136"), IsCall=true, HasStore = true,  HasBranch = false, Name ="call_1s" ,} ,
@@ -109,7 +110,7 @@ namespace ZMachine.Instructions
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP1_140"), HasStore = false, HasBranch = false, Name ="jump" ,} ,
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP1_141"), HasStore = false, HasBranch = false, Name ="print_paddr" ,} ,
 
-            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP1_142"), HasStore = true,  HasBranch = false, Name ="load" ,} ,
+            new OpcodeDefinition{ ID = new OpcodeIdentifier("OP1_142"), HasStore = true,  HasBranch = false, Name ="load" ,  UsesIndirection=true,} ,
             new OpcodeDefinition{ ID = new OpcodeIdentifier("OP1_143"), IsCall=true, HasStore = true,  HasBranch = false, Name ="not" ,} ,   // v1-4
             // new OpcodeDefinition{ ID = new OpcodeIdentifier("OP1_143"), HasStore = false, HasBranch = false, Name ="call_1n" ,} , // v5
 
@@ -160,7 +161,7 @@ namespace ZMachine.Instructions
             new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_231"), HasStore = true,  HasBranch = false, Name ="random" ,} ,
 
             new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_232"), HasStore = false, HasBranch = false, Name ="push" ,} ,
-            new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_233"), HasStore = false, HasBranch = false, Name ="pull" ,} ,  // v1
+            new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_233"), HasStore = false, HasBranch = false, Name ="pull" , UsesIndirection=true,} ,  // v1
             //new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_233"), HasStore = true,  HasBranch = false, Name ="pull" ,} ,  // v6
 
             new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_234"), HasStore = false, HasBranch = false, Name ="split_window" ,} , // v3
