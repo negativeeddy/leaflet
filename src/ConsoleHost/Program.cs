@@ -23,6 +23,7 @@ namespace ConsoleHost
             Console.WriteLine($"Gamefile Version {zm.MainMemory.Header.Version}");
 
             string output = zm.MainMemory.ObjectTree.DumpObjectTree();
+            Console.WriteLine(output);
             Console.WriteLine($"Object tree contains {zm.MainMemory.ObjectTree.Objects.Count} objects");
 
             bool showFrames = false;

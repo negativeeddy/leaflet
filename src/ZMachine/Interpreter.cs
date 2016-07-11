@@ -267,7 +267,7 @@ namespace ZMachine
                 case "pull":    // pull (variable)
                     ExecInstruction(opcode, op =>
                     {
-                        Debug.Assert(op.OperandCount == 0);
+                        Debug.Assert(op.OperandType.Count == 1);
                         var actualZVar = GetDereferencedFirstZVar(op);
                         int value = ReadVariable(actualZVar, true);
                         return value;
@@ -276,7 +276,7 @@ namespace ZMachine
                 case "inc":    // inc (variable)
                     ExecInstruction(opcode, op =>
                     {
-                        Debug.Assert(op.OperandCount == 0);
+                        Debug.Assert(op.OperandType.Count == 1);
                         var actualZVar = GetDereferencedFirstZVar(op);
                         short value = (short)ReadVariable(actualZVar, true);
                         value++;
@@ -287,7 +287,7 @@ namespace ZMachine
                 case "dec":    // dec (variable)
                     ExecInstruction(opcode, op =>
                     {
-                        Debug.Assert(op.OperandCount == 0);
+                        Debug.Assert(op.OperandType.Count == 1);
                         var actualZVar = GetDereferencedFirstZVar(op);
                         short value = (short)ReadVariable(actualZVar, true);
                         value--;
@@ -298,7 +298,7 @@ namespace ZMachine
                 case "inc_chk":    // inc_chk (variable) value ?(label)
                     ExecInstruction(opcode, op =>
                     {
-                        Debug.Assert(op.OperandCount == 0);
+                        Debug.Assert(op.OperandType.Count == 2);
 
                         // do the increment
                         var actualZVar = GetDereferencedFirstZVar(op);
@@ -314,7 +314,7 @@ namespace ZMachine
                 case "dec_chk":    // inc_chk (variable) value ?(label)
                     ExecInstruction(opcode, op =>
                     {
-                        Debug.Assert(op.OperandCount == 0);
+                        Debug.Assert(op.OperandType.Count == 2);
 
                         // do the decrement
                         var actualZVar = GetDereferencedFirstZVar(op);
@@ -325,6 +325,17 @@ namespace ZMachine
                         // do the compare
                         short compareVal = (short)GetOperandValue(op.Operands[1]);
                         return value == compareVal ? 1 : 0;
+                    });
+                    break;
+                case "jin":    // jin obj1 obj2 ?(label)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 2);
+
+                        int childId = GetOperandValue(op.Operands[0]);
+                        int parentId = GetOperandValue(op.Operands[1]);
+
+                        return MainMemory.ObjectTree.IsValidChild(parentId, childId) ? 1 : 0;
                     });
                     break;
                 default:
@@ -392,6 +403,17 @@ namespace ZMachine
             ProgramCounter = newRoutine.FirstInstructionAddress;
         }
 
+        /// <summary>
+        /// Executes the supplied handler method and then optionally stores the return
+        /// value and then moves the instruction counter forward (either incrmentally or as a 
+        /// valid branch).
+        /// </summary>
+        /// <param name="opcode">The opcode of the instruction which determines the Store and Branch
+        /// functionality</param>
+        /// <param name="handler">The primary logic of the instruction (minus Store and Branch
+        /// functionality). If the opcode has a Store location, the return value from the handler
+        /// will be put there. If the opcode is a branch, the return value is also used to determine
+        /// whether the branch will happen</param>
         private void ExecInstruction(ZOpcode opcode, Func<ZOpcode, int> handler)
         {
             int result = handler(opcode);

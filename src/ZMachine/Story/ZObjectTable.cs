@@ -86,5 +86,11 @@ namespace ZMachine.Story
                 PrintObject(Objects[current.SiblingID - 1], level, sb);
             }
         }
+
+
+        public bool IsValidChild(int parentId, int childId)
+        {
+            return Objects.Any(o => o.ID == childId && o.ParentID == parentId);
+        }
     }
 }
