@@ -25,32 +25,32 @@ namespace ZMachine.Story.Tests
             Console.WriteLine("Found the following objects");
             foreach (var o in zm.MainMemory.ObjectTree.Objects)
             {
-                Console.WriteLine($"{o.ID} at 0x{o.BaseAddress:X4} named {o.ShortName} with Properties at 0x{o.PropertyAddress:X4}");
+                Console.WriteLine($"{o.ID} at 0x{o.BaseAddress:X4} named {o.ShortName} with Properties at 0x{o.PropertyTableAddress:X4}");
             }
 
             var o2 = zm.MainMemory.ObjectTree.Objects.First();
             Assert.AreEqual(o2.ShortName, "forest");
             Assert.AreEqual(o2.ID, 1);
             Assert.AreEqual(o2.ParentID, 36);
-            Assert.AreEqual(o2.PropertyAddress, 0x0a4f);
+            Assert.AreEqual(o2.PropertyTableAddress, 0x0a4f);
 
             o2 = zm.MainMemory.ObjectTree.Objects.Last();
             Assert.AreEqual(o2.ShortName, "pseudo");
             Assert.AreEqual(o2.ID, 179);
             Assert.AreEqual(o2.ParentID, 36);
-            Assert.AreEqual(o2.PropertyAddress, 0x196c);
+            Assert.AreEqual(o2.PropertyTableAddress, 0x196c);
 
             o2 = zm.MainMemory.ObjectTree.Objects[16];
             Assert.AreEqual(o2.ShortName, "pair of candles");
             Assert.AreEqual(o2.ID, 17);
             Assert.AreEqual(o2.ParentID, 140);
-            Assert.AreEqual(o2.PropertyAddress, 0x0bac);
+            Assert.AreEqual(o2.PropertyTableAddress, 0x0bac);
 
             o2 = zm.MainMemory.ObjectTree.Objects[26];
             Assert.AreEqual(o2.ShortName, ZObject.UNNAMED_OBJECT_NAME);
             Assert.AreEqual(o2.ID, 27);
             Assert.AreEqual(o2.ParentID, 0);
-            Assert.AreEqual(o2.PropertyAddress, 0x0c95);
+            Assert.AreEqual(o2.PropertyTableAddress, 0x0c95);
         }
 
         [TestMethod]
@@ -107,9 +107,27 @@ namespace ZMachine.Story.Tests
             Assert.AreEqual(27, obj.ParentID);
             Assert.AreEqual(56, obj.SiblingID);
             Assert.AreEqual(175, obj.ChildID);
-            Assert.AreEqual(0x18c2, obj.PropertyAddress);
+            Assert.AreEqual(0x18c2, obj.PropertyTableAddress);
 
-            Assert.Inconclusive("Need to check properties too");
+            Assert.AreEqual(5, obj.Properties.Length);
+
+            ValidateProperty(obj.Properties[0], 22, new byte[] { 0x38, });
+            ValidateProperty(obj.Properties[1], 18, new byte[] { 0x57, 0x40 });
+            ValidateProperty(obj.Properties[2], 14, new byte[] { 0x5e, 0x24 });
+            ValidateProperty(obj.Properties[3], 12, new byte[] { 0x76 });
+            ValidateProperty(obj.Properties[4], 9, new byte[] { 0x00, 0x14 });
+        }
+
+        private void ValidateProperty(ZObjectProperty property, int ID, byte[] Data)
+        {
+            Assert.AreEqual(ID, property.ID);
+            Assert.AreEqual(Data.Length, property.Data.Count);
+
+            var compares = Data.Zip(property.Data, (expected, actual) => new { expected, actual });
+            foreach (var item in compares)
+            {
+                Assert.AreEqual(item.expected, item.actual);
+            }
         }
     }
 }
