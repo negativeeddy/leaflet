@@ -562,8 +562,22 @@ namespace ZMachine
                     break;
                 case "catch":
                     throw new NotImplementedException($"TODO: catch instruction not yet implemented");
+                case "get_prop": // get_prop object property -> (result)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 2);
+                        // Read property from object (resulting in the default value if it had no such
+                        // declared property). If the property has length 1, the value is only that byte. 
+                        // If it has length 2, the first two bytes of the property are taken as a word 
+                        // value. It is illegal for the opcode to be used if the property has length 
+                        // greater than 2, and the result is unspecified. 
+                        throw new NotImplementedException($"TODO: [{opcode}] instruction not yet implemented");
+                    });
+                    break;
+                // get_prop object property -> (result)
+                // get_prop, get_prop_addr, get_next_prop, get_prop_len and putprop.
                 default:
-                    throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
+                    throw new NotImplementedException($"Opcode [{opcode}] not implemented yet");
             }
         }
 

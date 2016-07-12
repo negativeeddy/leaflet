@@ -27,10 +27,10 @@ namespace ZMachine.Story
 
         public int BaseAddress { get; }
         public int ID { get; }
-        public uint Attributes
+        private uint Attributes
         {
             get { return _bytes.GetDWord(BaseAddress); }
-            private set { _bytes.SetDWord(value, BaseAddress); }
+            set { _bytes.SetDWord(value, BaseAddress); }
         }
 
         public int ParentID
