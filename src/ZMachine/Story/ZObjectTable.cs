@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,7 +9,7 @@ using ZMachine.Memory;
 
 namespace ZMachine.Story
 {
-    public class ZObjectTable
+    public class ZObjectTable : IEnumerable<ZObject>
     {
         public ZObjectTable(byte[] data, int loadAddress)
         {
@@ -50,6 +51,12 @@ namespace ZMachine.Story
         /// All of the ZObjects in the machine
         /// </summary>
         public List<ZObject> Objects { get; } = new List<ZObject>(256);
+
+
+        public ZObject this[int index]
+        {
+            get { return GetObject(index); }
+        }
 
         /// <summary>
         /// Creates a string representation of the entire object tree in memory
@@ -129,6 +136,11 @@ namespace ZMachine.Story
             return Objects.FirstOrDefault(o => o.ID == objectID).ParentID;
         }
 
+        /// <summary>
+        /// Returns an object from the table
+        /// </summary>
+        /// <param name="objectID">the ID of the object to return</param>
+        /// <returns>an object, null if the ID is 0</returns>
         public ZObject GetObject(int objectID)
         {
             if (objectID == 0)
@@ -169,6 +181,22 @@ namespace ZMachine.Story
             // set the object sibling to the new parents previous first child
             int newSiblingID = newParent.ChildID;
             movingObject.SiblingID = newSiblingID;
+        }
+
+        public IEnumerator<ZObject> GetEnumerator()
+        {
+            foreach(var obj in Objects)
+            {
+                yield return obj;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            foreach (var obj in Objects)
+            {
+                yield return obj;
+            }
         }
     }
 }

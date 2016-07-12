@@ -66,7 +66,6 @@ namespace ZMachine
             }
         }
 
-
         public IEnumerable<int> AbbreviationTable()
         {
             ushort address = Header.AbbreviationsTableAddress;

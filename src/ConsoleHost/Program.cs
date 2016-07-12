@@ -24,12 +24,24 @@ namespace ConsoleHost
 
             //string output = zm.MainMemory.ObjectTree.DumpObjectTree();
             //Console.WriteLine(output);
-            //Console.WriteLine($"Object tree contains {zm.MainMemory.ObjectTree.Objects.Count} objects");
+            Console.WriteLine($"Object tree contains {zm.MainMemory.ObjectTree.Objects.Count} objects");
 
+            var objTree = zm.MainMemory.ObjectTree;
+            
+            foreach(var obj in objTree)
+            {
+                Console.WriteLine(obj);
+            }
+
+            //RunGame(zm);
+        }
+
+        private static void RunGame(Interpreter zm)
+        {
             bool showFrames = false;
             while (true)
             {
-                //.Print(showFrames);
+                //zm.Print(showFrames);
                 zm.ExecuteCurrentInstruction();
             }
         }
