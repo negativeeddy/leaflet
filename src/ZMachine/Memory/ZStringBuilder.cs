@@ -48,7 +48,7 @@ namespace ZMachine.Memory
 
         public int LengthInBytes
         {
-            get { return _allBits.Count; }
+            get { return _allBits.Count * 2; }
         }
 
         public void AddWord(ushort bits)

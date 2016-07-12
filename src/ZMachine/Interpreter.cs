@@ -376,7 +376,88 @@ namespace ZMachine
                     });
                     break;
                 case "print":   // print <literal-string>
-                    throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 0);
+                        Debug.Assert(op.Definition.HasText == true);
+                        // Print the quoted (literal) Z-encoded string.
+                        Console.Write(opcode.Text);
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
+                case "print_obj":   // print_obj object
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 1);
+                        // takes an object number and prints its short name
+                        int objID = GetOperandValue(opcode.Operands[0]);
+                        var obj = MainMemory.ObjectTree.GetObject(objID);
+                        Console.Write(obj.ShortName);
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
+                case "print_addr":  // print_addr byte-address-of-string"
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 1);
+                        // Print (Z-encoded) string at given byte address
+                        int address = GetOperandValue(opcode.Operands[0]);
+                        var obj = new ZStringBuilder(MainMemory.Bytes, address);
+                        Console.Write(obj.ToString());
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
+                case "print_paddr":  // print_paddr packed-address-of-string
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 1);
+                        // Print (Z-encoded) string at given byte address
+                        int address = GetOperandValue(opcode.Operands[0]) * 2;
+                        var obj = new ZStringBuilder(MainMemory.Bytes, address);
+                        Console.Write(obj.ToString());
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
+                case "print_ret":  // print_ret <literal-string>
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 0);
+                        Debug.Assert(op.Definition.HasText == true);
+                        // Print the quoted (literal) Z-encoded string, then print
+                        // a new-line and then return true (i.e., 1). 
+                        Console.WriteLine(opcode.Text);
+                        return 1;
+                    });
+                    break;
+                case "print_num":  // print_num value
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 1);
+                        // Print(signed) number in decimal.
+                        int val = GetOperandValue(opcode.Operands[0]);
+                        Console.WriteLine(val.ToString("N"));
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
+                case "print_char":  // print_char output-character-code
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 1);
+                        // Print a ZSCII character
+                        int val = GetOperandValue(opcode.Operands[0]);
+                        Debug.Assert(val >= 0 && val < 1023, "print_char out of range");
+                        Console.Write(ZStringBuilder.ZSCIIAlphabetTables[0][val]);
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
+                case "new_line":  // new_line
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 0);
+                        Console.WriteLine();
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
 
                 default:
                     throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");

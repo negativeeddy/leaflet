@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using ZMachine.Tests;
 
 namespace ZMachine.Memory.Tests
@@ -49,6 +50,20 @@ namespace ZMachine.Memory.Tests
             var zm = ZMachineLoader.Load(filename);
 
             var zb = new ZStringBuilder(zm.MainMemory.Bytes, 0xb106, 6);
+            string actual = zb.ToString();
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void ZStringBuilderTest()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            string expected = "MINI-ZORK I: ";
+
+            var zb = new ZStringBuilder(zm.MainMemory.Bytes, 0x5866);
             string actual = zb.ToString();
 
             Assert.AreEqual(expected, actual);

@@ -129,7 +129,7 @@ namespace ZMachine.Story
             return Objects.FirstOrDefault(o => o.ID == objectID).ParentID;
         }
 
-        private ZObject GetObject(int objectID)
+        public ZObject GetObject(int objectID)
         {
             if (objectID == 0)
             {

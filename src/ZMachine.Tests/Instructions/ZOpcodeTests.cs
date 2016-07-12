@@ -78,7 +78,7 @@ namespace ZMachine.Instructions.Tests
             OpcodeForm expectedForm = OpcodeForm.Short;
             ZOperand[] expectedOperands = new ZOperand[] { };
             int expectedOperandCount = expectedOperands.Length;
-            int expectedLengthInBytes = 9;
+            int expectedLengthInBytes = 17;
 
             ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
 
