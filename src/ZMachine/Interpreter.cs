@@ -375,6 +375,9 @@ namespace ZMachine
                         return UNUSED_RETURN_VALUE;
                     });
                     break;
+                case "print":   // print <literal-string>
+                    throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
+
                 default:
                     throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
             }

@@ -19,7 +19,7 @@ namespace ZMachine.Instructions
             get
             {
                 return (ID.OperandCount == OperandCountType.OP0) &&
-                        (ID.OpcodeNumber == 178 || ID.OpcodeNumber == 179);
+                        (ID.OpcodeNumber == 2 || ID.OpcodeNumber == 3);
             }
         }
 

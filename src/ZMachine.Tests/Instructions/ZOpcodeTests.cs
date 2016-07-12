@@ -62,6 +62,35 @@ namespace ZMachine.Instructions.Tests
             Assert.AreEqual(stringConversion, zop.ToString());
         }
 
+
+        [TestMethod()]
+        public void OpCodeTest_print()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            int address = 0x5865; // "5865: print  MINI-ZORK I:"
+            string expectedStringConversion = "5865: print MINI-ZORK I: ";
+            // 0xb2
+            // 1011 0010 Form = short, OP2, opcode 10010 = 0x12
+            
+            int expectedOpcode = 0x02;
+            OpcodeForm expectedForm = OpcodeForm.Short;
+            ZOperand[] expectedOperands = new ZOperand[] { };
+            int expectedOperandCount = expectedOperands.Length;
+            int expectedLengthInBytes = 9;
+
+            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+
+            CompareOpcodeWithExpectedValues(
+                zop,
+                expectedOpcode,
+                expectedForm,
+                expectedOperands,
+                expectedLengthInBytes,
+                expectedStringConversion);
+        }
+
         [TestMethod()]
         public void OpCodeTest_je()
         {

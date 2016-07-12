@@ -359,7 +359,14 @@ namespace ZMachine.Instructions
         {
             get
             {
+                if (BranchOffset == null)
+                {
+                    return BranchOffsetAddr;
+                }
+                else
+                {
                 return BranchOffsetAddr + BranchOffset.LengthInBytes;
+                }
             }
         }
 
@@ -456,6 +463,12 @@ namespace ZMachine.Instructions
                     sb.Append('~');
                 }
                 sb.Append($"{BranchToAddress:x}");
+            }
+
+            if (this.Definition.HasText)
+            {
+                sb.Append(" ");
+                sb.Append(Text);
             }
 
             return sb.ToString();
