@@ -79,6 +79,15 @@ namespace ZMachine.Story
             return sb.ToString();
         }
 
+        ObjectProperty[] Properties
+        {
+            get
+            {
+                var p = new ObjectProperty(new ArraySegment<byte>(_bytes, PropertyAddress, 100));
+                return new ObjectProperty[] { p };
+            }
+        }
+
         public string ShortName
         {
             get
@@ -129,6 +138,23 @@ namespace ZMachine.Story
         internal void SetAttribute(BitNumber attributeNumber, bool set)
         {
                 Attributes = Attributes.SetBit(attributeNumber, set);
+        }
+    }
+
+    class ObjectProperty
+    {
+        public int Size;
+        public int LengthInBytes{ get; }
+        public byte[] Data { get; }
+
+        public ObjectProperty(IList<byte> bytes)
+        {
+            byte sizeByte = bytes[0];
+            Console.WriteLine(sizeByte.ToString("x4"));
+            if (sizeByte == 0)
+            {
+                return;
+            }
         }
     }
 }
