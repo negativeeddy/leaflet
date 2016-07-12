@@ -22,11 +22,11 @@ namespace ConsoleHost
             }
             Console.WriteLine($"Gamefile Version {zm.MainMemory.Header.Version}");
 
-            //DumpObjectTree(zm);
+            DumpObjectTree(zm);
 
-            //DumpObjects(zm);
+            DumpObjects(zm);
 
-            RunGame(zm);
+            //RunGame(zm);
         }
 
         private static void DumpObjectTree(Interpreter zm)

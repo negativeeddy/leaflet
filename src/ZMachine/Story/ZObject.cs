@@ -63,7 +63,7 @@ namespace ZMachine.Story
             sb.Append($"{ID}. Attributes: ");
             foreach (var bit in Attributes.GetBits())
             {
-                sb.Append((31-(int)bit).ToString());    // TODO: Is printing wrong or is bit labels backwards?
+                sb.Append((31 - (int)bit).ToString());    // TODO: Is printing wrong or is bit labels backwards?
                 sb.Append(',');
             }
             sb.AppendLine();
@@ -73,7 +73,7 @@ namespace ZMachine.Story
 
             sb.AppendLine($"       Description: \"{this.ShortName}\"");
             sb.AppendLine("        Properties:");
-            foreach (var prop in Properties)
+            foreach (var prop in CustomProperties)
             {
                 sb.Append($"        [{prop.ID}] ");
                 foreach (byte b in prop.Data)
@@ -119,7 +119,34 @@ namespace ZMachine.Story
         }
         private int NameLengthInBytes { get; set; }
 
-        public ZObjectProperty[] Properties
+        public uint GetPropertyValue(int propertyID)
+        {
+            var prop = CustomProperties.FirstOrDefault(p => p.ID == propertyID);
+            if (prop != null)
+            {
+                var data = prop.Data;
+
+                if (data.Count == 1)
+                {
+                    return data[0];
+                }
+                else if (data.Count == 2)
+                {
+                    return data.GetWord(0);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Cannot get property value. It has {data.Count} bytes");
+                }
+            }
+            else
+            {
+                // return default property value
+                return DefaultProperties[propertyID];
+            }
+        }
+
+        public ZObjectProperty[] CustomProperties
         {
             get
             {

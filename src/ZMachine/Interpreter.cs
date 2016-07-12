@@ -569,10 +569,14 @@ namespace ZMachine
                         // If it has length 2, the first two bytes of the property are taken as a word 
                         // value. It is illegal for the opcode to be used if the property has length 
                         // greater than 2, and the result is unspecified. 
+                        int objID = GetOperandValue(opcode.Operands[0]);
+                        int propertyID = GetOperandValue(opcode.Operands[1]);
+
+                        var obj = MainMemory.ObjectTree.GetObject(objID);
+                        //Debug.Assert(obj.customProperties
                         throw new NotImplementedException($"TODO: [{opcode}] instruction not yet implemented");
                     });
                     break;
-                // get_prop object property -> (result)
                 // get_prop, get_prop_addr, get_next_prop, get_prop_len and putprop.
                 default:
                     throw new NotImplementedException($"Opcode [{opcode}] not implemented yet");

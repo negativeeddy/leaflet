@@ -109,13 +109,13 @@ namespace ZMachine.Story.Tests
             Assert.AreEqual(175, obj.ChildID);
             Assert.AreEqual(0x18c2, obj.PropertyTableAddress);
 
-            Assert.AreEqual(5, obj.Properties.Length);
+            Assert.AreEqual(5, obj.CustomProperties.Length);
 
-            ValidateProperty(obj.Properties[0], 22, new byte[] { 0x38, });
-            ValidateProperty(obj.Properties[1], 18, new byte[] { 0x57, 0x40 });
-            ValidateProperty(obj.Properties[2], 14, new byte[] { 0x5e, 0x24 });
-            ValidateProperty(obj.Properties[3], 12, new byte[] { 0x76 });
-            ValidateProperty(obj.Properties[4], 9, new byte[] { 0x00, 0x14 });
+            ValidateProperty(obj.CustomProperties[0], 22, new byte[] { 0x38, });
+            ValidateProperty(obj.CustomProperties[1], 18, new byte[] { 0x57, 0x40 });
+            ValidateProperty(obj.CustomProperties[2], 14, new byte[] { 0x5e, 0x24 });
+            ValidateProperty(obj.CustomProperties[3], 12, new byte[] { 0x76 });
+            ValidateProperty(obj.CustomProperties[4], 9, new byte[] { 0x00, 0x14 });
         }
 
         private void ValidateProperty(ZObjectProperty property, int ID, byte[] Data)
