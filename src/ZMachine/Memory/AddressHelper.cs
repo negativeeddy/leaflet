@@ -60,6 +60,41 @@ namespace ZMachine.Memory
                    (uint)(data[address + 3]);
         }
 
+        public static void SetDWord(this IList<byte> data, uint dword, int address)
+        {
+            data[address] = (byte)(dword >> 24);
+            data[address + 1] = (byte)(dword >> 16);
+            data[address + 2] = (byte)(dword >> 8);
+            data[address + 3] = (byte)(dword);
+        }
+
+        public static uint SetBit(this uint dword, BitNumber bit, bool setToOne )
+        {
+            if (setToOne)
+            {
+                uint mask = (1u << (int)bit);
+                return dword | mask;
+            }
+            {
+                uint mask = ~(1u << (int)bit);
+                return dword & mask;
+           }
+        }
+
+        /// <summary>
+        /// Retrieves a subset of the bits in an 32-bit dword
+        /// </summary>
+        /// <param name="word">the original 32-bit dword</param>
+        /// <param name="high">the highest bit to retrieve (LSB is 0, MSB is 15)</param>
+        /// <param name="length">how many bits to retrieve</param>
+        /// <returns></returns>
+        public static uint FetchBits(this uint dword, BitNumber high, int length)
+        {
+            var mask = ~(-1 << length);
+            var result = (dword >> ((int)high - length + 1)) & mask;
+            return (uint)result;
+        }
+
         /// <summary>
         /// Retrieves a subset of the bits in an 16-bit word
         /// </summary>
@@ -118,5 +153,21 @@ namespace ZMachine.Memory
         Bit_13,
         Bit_14,
         Bit_15,
+        Bit_16,
+        Bit_17,
+        Bit_18,
+        Bit_19,
+        Bit_20,
+        Bit_21,
+        Bit_22,
+        Bit_23,
+        Bit_24,
+        Bit_25,
+        Bit_26,
+        Bit_27,
+        Bit_28,
+        Bit_29,
+        Bit_30,
+        Bit_31,
     }
 }

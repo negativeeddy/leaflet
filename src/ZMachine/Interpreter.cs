@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ZMachine.Instructions;
 using ZMachine.Memory;
+using ZMachine.Story;
 
 namespace ZMachine
 {
@@ -489,6 +490,44 @@ namespace ZMachine
                         int flags = GetOperandValue(opcode.Operands[1]);
                         int result = (bitmap & flags) == flags ? 1 : 0;
                         return result;
+                    });
+                    break;
+                case "test_attr": // test_attr object attribute ?(label)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 2);
+                        // Jump if object has attribute.
+                        int objectID = GetOperandValue(opcode.Operands[0]);
+                        BitNumber attribute = (BitNumber)GetOperandValue(opcode.Operands[1]);
+                        ZObject obj = MainMemory.ObjectTree.GetObject(objectID);
+                        int result = obj.HasAttribute(attribute) ? 1 : 0;
+                        return result;
+                    });
+                    break;
+                case "set_attr": // set_attr object attribute
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 2);
+                        // Make object have the attribute numbered attribute.
+                        int objectID = GetOperandValue(opcode.Operands[0]);
+                        BitNumber attribute = (BitNumber)GetOperandValue(opcode.Operands[1]);
+
+                        ZObject obj = MainMemory.ObjectTree.GetObject(objectID);
+                        obj.SetAttribute(attribute, true);
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
+                case "clear_attr": // clear_attr object attribute
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 2);
+                        // Make object not have the attribute numbered attribute.
+                        int objectID = GetOperandValue(opcode.Operands[0]);
+                        BitNumber attribute = (BitNumber)GetOperandValue(opcode.Operands[1]);
+
+                        ZObject obj = MainMemory.ObjectTree.GetObject(objectID);
+                        obj.SetAttribute(attribute, false);
+                        return UNUSED_RETURN_VALUE;
                     });
                     break;
                 case "and": // and a b -> (result)

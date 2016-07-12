@@ -1,12 +1,41 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ZMachine.Memory.Tests
 {
     [TestClass()]
     public class AddressHelperTests
     {
+        [TestMethod]
+        public void SetBitTest()
+        {
+            var inputs = new Tuple<uint, BitNumber, uint>[]
+            {
+                new Tuple<uint,BitNumber,uint>(0x0000u, BitNumber.Bit_0,  0x00000001u),
+                new Tuple<uint,BitNumber,uint>(0x0000u, BitNumber.Bit_31, 0x80000000u),
+                new Tuple<uint,BitNumber,uint>(0x0000u, BitNumber.Bit_5,  0x00000020u),
+            };
+
+            foreach(var data in inputs)
+            {
+                // set  bits
+                uint dword = data.Item1;
+                uint actual = dword.SetBit(data.Item2, true);
+                uint expected = data.Item3;
+                Assert.AreEqual(expected, actual);
+
+                // clear bits
+                dword = ~data.Item1;
+                actual = dword.SetBit(data.Item2, false);
+                expected = ~data.Item3;
+                Assert.AreEqual(expected, actual);
+            }
+
+
+        }
+
         [TestMethod()]
         public void GetWordTest()
         {
@@ -58,6 +87,46 @@ namespace ZMachine.Memory.Tests
                 uint actual = data.GetDWord(address);
                 Assert.AreEqual(expected, actual, input.ToString());
             }
+        }
+
+        [TestMethod()]
+        public void SetDWordTest()
+        {
+            var inputs = new List<Tuple<byte[], uint>>()
+            {
+                //  expected result, test index, test value
+                new Tuple<byte[], uint>(new byte[] { 0x01, 0x23, 0x34, 0x56 }, 0x01233456),
+                new Tuple<byte[], uint>(new byte[] { 0x23, 0x34, 0x56, 0x87 },  0x23345687),
+                new Tuple<byte[], uint>(new byte[] { 0x34, 0x56, 0x87, 0x9F },  0x3456879F),
+            };
+
+            byte[] starterBytes = Enumerable.Range(0, 20).Select(x => (byte)0xff).ToArray();
+            Console.WriteLine("Initial data");
+            Console.WriteLine(ArrayToString(starterBytes));
+            Console.WriteLine();
+
+            for (int i = 0; i < starterBytes.Length - 3; i++)
+            {
+                // run the indices from the beginning to the end of the array
+                foreach (var input in inputs)
+                {
+                    byte[] testData = (byte[])starterBytes.Clone();
+                    testData.SetDWord(input.Item2, i);
+
+                    Console.WriteLine(ArrayToString(testData));
+
+                    byte[] expectedResults = input.Item1;
+                    for(int testIdx = 0; testIdx < expectedResults.Length; testIdx++)
+                    {
+                        Assert.AreEqual(expectedResults[testIdx], testData[testIdx + i], $"i={i}, testIdx={testIdx}");
+                    }
+                }
+            }
+        }
+
+        private string ArrayToString(IList<byte> bytes)
+        {
+            return bytes.Aggregate(string.Empty, (current, b) => current += $"0x{b:x2},", x => x);
         }
 
         [TestMethod()]

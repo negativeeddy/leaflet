@@ -27,7 +27,11 @@ namespace ZMachine.Story
 
         public int BaseAddress { get; }
         public int ID { get; }
-        public uint Attributes { get { return _bytes.GetDWord(BaseAddress); } }
+        public uint Attributes
+        {
+            get { return _bytes.GetDWord(BaseAddress); }
+            private set { _bytes.SetDWord(value, BaseAddress); }
+        }
 
         public int ParentID
         {
@@ -81,6 +85,22 @@ namespace ZMachine.Story
             this.ID = ID;
             _bytes = bytes;
             BaseAddress = baseAddress;
+        }
+
+        /// <summary>
+        /// Checks if the object has a specific attribute enabled
+        /// </summary>
+        /// <param name="attributeNumber"></param>
+        /// <returns></returns>
+        internal bool HasAttribute(BitNumber attributeNumber)
+        {
+
+            return Attributes.FetchBits(attributeNumber, 1) == 1;
+        }
+
+        internal void SetAttribute(BitNumber attributeNumber, bool set)
+        {
+                Attributes = Attributes.SetBit(attributeNumber, set);
         }
     }
 }
