@@ -85,6 +85,11 @@ namespace ZMachine.Memory
             '9', '.', ',', '!', '?', '_', '#', '\'', '"', '/', '\\', '-', ':', '(', ')',     },
         };
 
+        public static char GetChar(ushort zCharValue)
+        {
+            return (char)(zCharValue);
+        }
+
         private IEnumerable<byte> BytesFromBits()
         {
             foreach (var bits in _allBits)

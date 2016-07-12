@@ -446,7 +446,7 @@ namespace ZMachine
                         // Print a ZSCII character
                         int val = GetOperandValue(opcode.Operands[0]);
                         Debug.Assert(val >= 0 && val < 1023, "print_char out of range");
-                        Console.Write(ZStringBuilder.ZSCIIAlphabetTables[0][val]);
+                        Console.Write(ZStringBuilder.GetChar((ushort)val));
                         return UNUSED_RETURN_VALUE;
                     });
                     break;
@@ -458,7 +458,58 @@ namespace ZMachine
                         return UNUSED_RETURN_VALUE;
                     });
                     break;
-
+                case "test":    // "test bitmap flags ? (label)"
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 2);
+                        // Jump if all of the flags in bitmap are set(i.e. if bitmap & flags == flags).
+                        int bitmap = GetOperandValue(opcode.Operands[0]);
+                        int flags = GetOperandValue(opcode.Operands[1]);
+                        int result = (bitmap & flags) == flags ? 1 : 0;
+                        return result;
+                    });
+                    break;
+                case "and": // and a b -> (result)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 2);
+                        // Bitwise AND
+                        int a = GetOperandValue(opcode.Operands[0]);
+                        int b = GetOperandValue(opcode.Operands[1]);
+                        return a & b;
+                    });
+                    break;
+                case "or": // or a b -> (result)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 2);
+                        // Bitwise OR
+                        int a = GetOperandValue(opcode.Operands[0]);
+                        int b = GetOperandValue(opcode.Operands[1]);
+                        return a | b;
+                    });
+                    break;
+                case "pop": // pop
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 0);
+                        // Throws away the top item on the stack. (This was useful 
+                        // to lose unwanted routine call results in early Versions.)
+                        CurrentRoutineFrame.EvaluationStack.Pop(); 
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
+                case "ret_popped": // ret_popped
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 0);
+                        // Pops top of stack and returns that. (This is equivalent 
+                        // to ret sp, but is one byte cheaper.) 
+                        return CurrentRoutineFrame.EvaluationStack.Pop(); 
+                    });
+                    break;
+                case "catch":
+                    throw new NotImplementedException($"TODO: catch instruction not yet implemented");
                 default:
                     throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
             }

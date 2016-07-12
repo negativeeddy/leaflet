@@ -127,6 +127,14 @@ namespace ZMachine.Instructions
                              _bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 1) == 1 ? OperandTypes.SmallConstant : OperandTypes.Variable,
                             };
                         }
+                        else if (Form == OpcodeForm.Variable)
+                        {
+                            types = new OperandTypes[]
+                            {
+                             (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_7, 2),
+                             (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 2),
+                            };
+                        }
                         else
                         {
                             types = new OperandTypes[]
@@ -365,7 +373,7 @@ namespace ZMachine.Instructions
                 }
                 else
                 {
-                return BranchOffsetAddr + BranchOffset.LengthInBytes;
+                    return BranchOffsetAddr + BranchOffset.LengthInBytes;
                 }
             }
         }
@@ -406,7 +414,7 @@ namespace ZMachine.Instructions
             sb.Append($"{BaseAddress:x4}: {Definition.Name}");
 
             // print the operands
-            for(int i=0; i<Operands.Count; i++)
+            for (int i = 0; i < Operands.Count; i++)
             {
                 var opr = Operands[i];
 

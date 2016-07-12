@@ -92,6 +92,41 @@ namespace ZMachine.Instructions.Tests
         }
 
         [TestMethod()]
+        public void OpCodeTest_and()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            int address = 0x58d4; // "58d4: and sp 07ff ->sp"
+            string expectedStringConversion = "58d4: and sp 07ff ->sp";
+            // 0xc9, 0x8f, 0x00, 0x07, 0xff         
+            // 1100 1001 Form = variable, OP2, opcode 01001 = 0x09 
+            // 1000 1111 VAR, LConst, Omit, Omit 
+            // 0000 0000 1st operand VAR
+            // 0000 0111 2nd operand LConst part 1
+            // 1111 1111 2nd operand LConst part 2
+
+            int expectedOpcode = 0x09;
+            OpcodeForm expectedForm = OpcodeForm.Variable;
+            ZOperand[] expectedOperands = new ZOperand[] {
+                new ZOperand(OperandTypes.Variable) { Variable = new ZVariable(0x00) },
+                new ZOperand(OperandTypes.LargeConstant) { Constant = 0x07ff},
+            };
+            int expectedOperandCount = expectedOperands.Length;
+            int expectedLengthInBytes = 6;
+
+            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+
+            var tmp = zop.OperandType;
+            CompareOpcodeWithExpectedValues(
+                zop,
+                expectedOpcode,
+                expectedForm,
+                expectedOperands,
+                expectedLengthInBytes,
+                expectedStringConversion);
+        }
+        [TestMethod()]
         public void OpCodeTest_je()
         {
             string filename = @"GameFiles\minizork.z3";
