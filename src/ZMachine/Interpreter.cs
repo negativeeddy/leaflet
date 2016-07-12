@@ -128,8 +128,6 @@ namespace ZMachine
 
         public void ExecuteCurrentInstruction()
         {
-            ushort retval;
-
             ZOpcode opcode = new ZOpcode(MainMemory.Bytes, ProgramCounter);
             switch (opcode.Definition.Name)
             {
@@ -458,7 +456,7 @@ namespace ZMachine
                         Debug.Assert(op.OperandType.Count == 1);
                         // Print(signed) number in decimal.
                         int val = GetOperandValue(opcode.Operands[0]);
-                        Console.WriteLine(val.ToString("N"));
+                        Console.Write(val.ToString("N"));
                         return UNUSED_RETURN_VALUE;
                     });
                     break;

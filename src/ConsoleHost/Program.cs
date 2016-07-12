@@ -22,18 +22,28 @@ namespace ConsoleHost
             }
             Console.WriteLine($"Gamefile Version {zm.MainMemory.Header.Version}");
 
-            //string output = zm.MainMemory.ObjectTree.DumpObjectTree();
-            //Console.WriteLine(output);
-            Console.WriteLine($"Object tree contains {zm.MainMemory.ObjectTree.Objects.Count} objects");
+            //DumpObjectTree(zm);
 
+            //DumpObjects(zm);
+
+            RunGame(zm);
+        }
+
+        private static void DumpObjectTree(Interpreter zm)
+        {
+            string output = zm.MainMemory.ObjectTree.DumpObjectTree();
+            Console.WriteLine(output);
+            Console.WriteLine($"Object tree contains {zm.MainMemory.ObjectTree.Objects.Count} objects");
+        }
+
+        private static void DumpObjects(Interpreter zm)
+        {
             var objTree = zm.MainMemory.ObjectTree;
-            
-            foreach(var obj in objTree)
+
+            foreach (var obj in objTree)
             {
                 Console.WriteLine(obj.ToFullString());
             }
-
-            //RunGame(zm);
         }
 
         private static void RunGame(Interpreter zm)

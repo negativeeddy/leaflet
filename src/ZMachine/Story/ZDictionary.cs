@@ -12,9 +12,6 @@ namespace ZMachine.Story
     /// </summary>
     public class ZDictionary
     {
-        private int _entryBaseAddress;
-        private byte _entryLength;
-
         private char[] _separators;
 
         public char[] Separators
