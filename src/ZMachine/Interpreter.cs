@@ -43,9 +43,9 @@ namespace ZMachine
                 case ZVariableLocation.Global:
                     return MainMemory.GlobalVariables[variable.Value];
                 case ZVariableLocation.Local:
-                    return FrameStack.Peek().Locals[variable.Value];
+                    return CurrentRoutineFrame.Locals[variable.Value];
                 case ZVariableLocation.Stack:
-                    var varStack = FrameStack.Peek().EvaluationStack;
+                    var varStack = CurrentRoutineFrame.EvaluationStack;
                     return inPlace ? varStack.Peek() : varStack.Pop();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(variable.Location));
@@ -67,10 +67,10 @@ namespace ZMachine
                     MainMemory.GlobalVariables[variable.Value] = value;
                     break;
                 case ZVariableLocation.Local:
-                    FrameStack.Peek().Locals[variable.Value] = value;
+                    CurrentRoutineFrame.Locals[variable.Value] = value;
                     break;
                 case ZVariableLocation.Stack:
-                    var varStack = FrameStack.Peek().EvaluationStack;
+                    var varStack = CurrentRoutineFrame.EvaluationStack;
                     if (inPlace)
                     {
                         varStack.Pop();
@@ -250,7 +250,7 @@ namespace ZMachine
                     {
                         Debug.Assert(op.OperandType.Count == 1);
                         var actualZVar = GetDereferencedFirstZVar(op);
-                        int value = ReadVariable(actualZVar, true);
+                        int value = ReadVariable(actualZVar, false);
                         return value;
                     });
                     break;
@@ -260,7 +260,7 @@ namespace ZMachine
                         Debug.Assert(op.OperandType.Count == 2);
                         var actualZVar = GetDereferencedFirstZVar(op);
                         int valueToStore = GetOperandValue(op.Operands[1]);
-                        SetVariable(actualZVar, (ushort)valueToStore, true);
+                        SetVariable(actualZVar, (ushort)valueToStore, false);
                         return UNUSED_RETURN_VALUE;
                     });
                     break;
@@ -338,6 +338,43 @@ namespace ZMachine
                         return MainMemory.ObjectTree.IsValidChild(parentId, childId) ? 1 : 0;
                     });
                     break;
+                case "get_child":    // get_child object -> (result) ?(label)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 1);
+
+                        int objectId = GetOperandValue(op.Operands[0]);
+                        return MainMemory.ObjectTree.GetChild(objectId);
+                    });
+                    break;
+                case "get_sibling":    // get_sibling object -> (result) ?(label)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 1);
+
+                        int objectId = GetOperandValue(op.Operands[0]);
+                        return MainMemory.ObjectTree.GetSiblingId(objectId);
+                    });
+                    break;
+                case "get_parent":    // get_parent object -> (result)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 1);
+
+                        int objectId = GetOperandValue(op.Operands[0]);
+                        return MainMemory.ObjectTree.GetParent(objectId);
+                    });
+                    break;
+                case "insert_obj":  // insert_obj object destination
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 2);
+                        int objectId = GetOperandValue(op.Operands[0]);
+                        int newParentId = GetOperandValue(op.Operands[1]);
+                        MainMemory.ObjectTree.ReparentObject(objectId, newParentId);
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
                 default:
                     throw new NotImplementedException($"Opcode {opcode.Identifier}:{opcode.Definition.Name} not implemented yet");
             }
@@ -346,12 +383,11 @@ namespace ZMachine
         private ZVariable GetDereferencedFirstZVar(ZOpcode opcode)
         {
             Debug.Assert(opcode.OperandType.Count >= 1);
-            Debug.Assert(opcode.OperandType[0] == OperandTypes.SmallConstant);
 
-            // first instruction is a derefernced ZVar
-            ZVariable zvarRef = new ZVariable((byte)opcode.Operands[0].Constant);
-            ZVariable actualZVar = Dereference(zvarRef);
-            return actualZVar;
+            // first instruction is a dereferenced ZVar
+            byte zVarValue = (byte)GetOperandValue(opcode.Operands[0]);
+            ZVariable zvarRef = new ZVariable(zVarValue);
+            return zvarRef;
         }
 
         private Routine CurrentRoutineFrame

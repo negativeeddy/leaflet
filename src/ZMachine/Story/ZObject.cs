@@ -9,10 +9,18 @@ namespace ZMachine.Story
 {
     public class ZObject
     {
-        private readonly byte[] _bytes;
+        // offsets into the byte array to find data items
+        private const int ParentIDOffset = 4;
+        private const int SiblingIDOffset = 5;
+        private const int ChildIDOffset = 6;
+        private const int PropertyAddressOffset = 7;
+        private const int ZOBJECT_ARRAY_SIZE = 31;
 
         public const string UNNAMED_OBJECT_NAME = "<unnamed>";
         public const int INVALID_ID = 0;
+
+        private readonly byte[] _bytes;
+
         public static ZObject InvalidObject = new ZObject(null, 0, ZObject.INVALID_ID);
 
         public static ushort[] DefaultProperties { get; set; }
@@ -20,10 +28,24 @@ namespace ZMachine.Story
         public int BaseAddress { get; }
         public int ID { get; }
         public uint Attributes { get { return _bytes.GetDWord(BaseAddress); } }
-        public int ParentID { get { return _bytes[BaseAddress + 4]; } }
-        public int SiblingID { get { return _bytes[BaseAddress + 5]; } }
-        public int ChildID { get { return _bytes[BaseAddress + 6]; } }
-        public int PropertyAddress { get { return (int)_bytes.GetWord(BaseAddress + 7); } }
+
+        public int ParentID
+        {
+            get { return _bytes[BaseAddress + ParentIDOffset]; }
+            set { _bytes[BaseAddress + ParentIDOffset] = (byte)value; }
+        }
+        public int SiblingID
+        {
+            get { return _bytes[BaseAddress + SiblingIDOffset]; }
+            set { _bytes[BaseAddress + SiblingIDOffset] = (byte)value; }
+        }
+        public int ChildID
+        {
+            get { return _bytes[BaseAddress + ChildIDOffset]; }
+            set { _bytes[BaseAddress + ChildIDOffset] = (byte)value; }
+        }
+
+        public int PropertyAddress { get { return (int)_bytes.GetWord(BaseAddress + PropertyAddressOffset); } }
 
         public override string ToString()
         {
@@ -51,7 +73,7 @@ namespace ZMachine.Story
 
         static ZObject()
         {
-            DefaultProperties = new ushort[31];
+            DefaultProperties = new ushort[ZOBJECT_ARRAY_SIZE];
         }
 
         public ZObject(byte[] bytes, int baseAddress, int ID)
