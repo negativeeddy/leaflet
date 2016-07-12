@@ -56,6 +56,29 @@ namespace ZMachine.Story
             return $"[{ID:D3}] {ShortName}";
         }
 
+        public string ToFullString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"{ID}. Attributes: ");
+            foreach(var bit in Attributes.GetBits())
+            {
+                sb.Append(((int)bit).ToString());
+                sb.Append(',');
+            }
+            sb.AppendLine();
+
+            sb.AppendLine($"   Parent object:  {ParentID}  Sibling object: {SiblingID}  Child object:  {ChildID}");
+            sb.AppendLine($"   Property address: {PropertyAddress:x4}");
+
+            sb.AppendLine($"       Description: \"{this.ShortName}\"");
+            sb.AppendLine("        Properties:");
+            //  [23] 64 ae
+            //[22] 77
+            //[18] 44 09
+            //[12] 4c 01
+            return sb.ToString();
+        }
+
         public string ShortName
         {
             get

@@ -81,5 +81,35 @@ namespace ZMachine.Story.Tests
             }
 
         }
+
+        [TestMethod]
+        public void TestObjectReader()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            var objTree = zm.MainMemory.ObjectTree;
+            var obj = objTree[170];
+            Console.WriteLine($"Loaded Object =>");
+            Console.WriteLine(obj.ToFullString());
+            //170.Attributes: 7
+            //    Parent object:  27  Sibling object:  56  Child object: 175
+            //    Property address: 18c2
+            //    Description: "Thief's Lair"
+            //     Properties:
+            //         [22] 38
+            //         [18] 57 40
+            //         [14] 5e 24
+            //         [12] 76
+            //         [9] 00 14
+
+            Assert.AreEqual(170, obj.ID);
+            Assert.AreEqual(27, obj.ParentID);
+            Assert.AreEqual(56, obj.SiblingID);
+            Assert.AreEqual(175, obj.ChildID);
+            Assert.AreEqual(0x18c2, obj.PropertyAddress);
+
+            Assert.Inconclusive("Need to check properties too");
+        }
     }
 }

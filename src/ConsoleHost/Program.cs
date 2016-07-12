@@ -30,7 +30,7 @@ namespace ConsoleHost
             
             foreach(var obj in objTree)
             {
-                Console.WriteLine(obj);
+                Console.WriteLine(obj.ToFullString());
             }
 
             //RunGame(zm);

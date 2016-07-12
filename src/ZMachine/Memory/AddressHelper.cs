@@ -67,6 +67,20 @@ namespace ZMachine.Memory
             data[address + 2] = (byte)(dword >> 8);
             data[address + 3] = (byte)(dword);
         }
+        
+        public static BitNumber[] GetBits(this uint dword)
+        {
+            List<BitNumber> bits = new List<BitNumber>();
+            for(int i=0; i<32;i++)
+            {
+                BitNumber num = (BitNumber)i;
+                if (dword.FetchBits(num, 1) == 1)
+                {
+                    bits.Add(num);
+                }
+            }
+            return bits.ToArray();
+        }
 
         public static uint SetBit(this uint dword, BitNumber bit, bool setToOne )
         {
