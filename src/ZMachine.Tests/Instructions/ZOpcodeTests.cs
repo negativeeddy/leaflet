@@ -99,12 +99,13 @@ namespace ZMachine.Instructions.Tests
 
             int address = 0x58d4; // "58d4: and sp 07ff ->sp"
             string expectedStringConversion = "58d4: and sp 07ff ->sp";
-            // 0xc9, 0x8f, 0x00, 0x07, 0xff         
+            // 0xc9, 0x8f, 0x00, 0x07, 0xff, 0x00         
             // 1100 1001 Form = variable, OP2, opcode 01001 = 0x09 
             // 1000 1111 VAR, LConst, Omit, Omit 
             // 0000 0000 1st operand VAR
             // 0000 0111 2nd operand LConst part 1
             // 1111 1111 2nd operand LConst part 2
+            // 0000 0000 Store
 
             int expectedOpcode = 0x09;
             OpcodeForm expectedForm = OpcodeForm.Variable;
