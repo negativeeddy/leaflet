@@ -127,14 +127,36 @@ namespace ZMachine
 
         public void ExecuteCurrentInstruction()
         {
+            ushort retval;
+
             ZOpcode opcode = new ZOpcode(MainMemory.Bytes, ProgramCounter);
             switch (opcode.Definition.Name)
             {
                 case "call":
                     Handle_Call(opcode);
                     break;
-                case "ret":
-                    Handle_Return(opcode);
+                case "ret": // ret value
+                    Debug.Assert(opcode.OperandType.Count == 1);
+                    // return value is the first opcode
+                    ushort retVal = (ushort)GetOperandValue(opcode.Operands[0]);
+                    Handle_Return(opcode, retVal);
+                    break;
+                case "ret_popped": // ret_popped
+                    Debug.Assert(opcode.OperandType.Count == 0);
+                    // Pops top of stack and returns that. (This is equivalent 
+                    // to ret sp, but is one byte cheaper.) 
+                    retVal = CurrentRoutineFrame.EvaluationStack.Pop();
+                    Handle_Return(opcode, retVal);
+                    break;
+                case "rtrue":   // rtrue
+                    Debug.Assert(opcode.OperandType.Count == 0);
+                    // Return true (i.e., 1) from the current routine.
+                    Handle_Return(opcode, 1);
+                    break;
+                case "rfalse":  // rfalse
+                    Debug.Assert(opcode.OperandType.Count == 0);
+                    // Return false (i.e., 0) from the current routine.
+                    Handle_Return(opcode, 0);
                     break;
                 case "add":
                     ExecInstruction(opcode, op =>
@@ -495,17 +517,8 @@ namespace ZMachine
                         Debug.Assert(op.OperandType.Count == 0);
                         // Throws away the top item on the stack. (This was useful 
                         // to lose unwanted routine call results in early Versions.)
-                        CurrentRoutineFrame.EvaluationStack.Pop(); 
+                        CurrentRoutineFrame.EvaluationStack.Pop();
                         return UNUSED_RETURN_VALUE;
-                    });
-                    break;
-                case "ret_popped": // ret_popped
-                    ExecInstruction(opcode, op =>
-                    {
-                        Debug.Assert(op.OperandType.Count == 0);
-                        // Pops top of stack and returns that. (This is equivalent 
-                        // to ret sp, but is one byte cheaper.) 
-                        return CurrentRoutineFrame.EvaluationStack.Pop(); 
                     });
                     break;
                 case "catch":
@@ -548,16 +561,13 @@ namespace ZMachine
             }
         }
 
-        void Handle_Return(ZOpcode opcode)
+        void Handle_Return(ZOpcode opcode, ushort returnValue)
         {
-            // get the return value
-            int retVal = GetOperandValue(opcode.Operands[0]);
-
             // remove the current frame from the stack
             var oldFrame = FrameStack.Pop();
 
             // put the return value wherever the oldFrame required
-            SetVariable(oldFrame.Store, (ushort)retVal);
+            SetVariable(oldFrame.Store, (ushort)returnValue);
 
             // update the instruction counter
             ProgramCounter = oldFrame.ReturnAddress;
