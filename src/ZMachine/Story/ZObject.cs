@@ -90,14 +90,19 @@ namespace ZMachine.Story
         /// <summary>
         /// Checks if the object has a specific attribute enabled
         /// </summary>
-        /// <param name="attributeNumber"></param>
-        /// <returns></returns>
+        /// <param name="attributeNumber">the bit of the attribute to check (0-31)</param>
+        /// <returns>true if the object has the atttribute set</returns>
         internal bool HasAttribute(BitNumber attributeNumber)
         {
 
             return Attributes.FetchBits(attributeNumber, 1) == 1;
         }
 
+        /// <summary>
+        /// Sets or clears an attribute on an object
+        /// </summary>
+        /// <param name="attributeNumber">the bit of the attribute to change (0-31)</param>
+        /// <param name="set">if true, the attribute is set, else the attribute is cleared</param>
         internal void SetAttribute(BitNumber attributeNumber, bool set)
         {
                 Attributes = Attributes.SetBit(attributeNumber, set);
