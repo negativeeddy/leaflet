@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -22,11 +23,11 @@ namespace ConsoleHost
             }
             Console.WriteLine($"Gamefile Version {zm.MainMemory.Header.Version}");
 
-            DumpObjectTree(zm);
+            //DumpObjectTree(zm);
 
-            DumpObjects(zm);
+            //DumpObjects(zm);
 
-            //RunGame(zm);
+            RunGame(zm);
         }
 
         private static void DumpObjectTree(Interpreter zm)
@@ -51,7 +52,7 @@ namespace ConsoleHost
             bool showFrames = false;
             while (true)
             {
-                //zm.Print(showFrames);
+                Debug.WriteLine(zm.Print(showFrames));
                 zm.ExecuteCurrentInstruction();
             }
         }

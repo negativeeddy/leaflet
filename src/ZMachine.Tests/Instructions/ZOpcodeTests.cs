@@ -127,6 +127,48 @@ namespace ZMachine.Instructions.Tests
                 expectedLengthInBytes,
                 expectedStringConversion);
         }
+
+
+
+        // 6d3f:  c1 ab 83 01 00 68       JE              G73,L00,(SP)+ [FALSE] 6d6b
+
+        [TestMethod()]
+        public void OpCodeTest_je2()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            int address = 0x6d3f; // "3b5d: je local3 local2 ?~3b77
+            string expectedStringConversion = "3b5d: je local3 local2 ?~3b77";
+            // 0x61,0x04,0x03,0x58,0x55,0x45
+            // 0110 0001
+            // 0000 0100   var local 3
+            // 0000 0011   var local 2
+            // 0101 1000   branch
+            // 0101 0101
+
+            int expectedOpcode = 0x01;
+            OpcodeForm expectedForm = OpcodeForm.Long;
+            ZOperand[] expectedOperands = new ZOperand[] {
+                                                new ZOperand(OperandTypes.Variable) { Variable = new ZVariable(0x04) },
+                                                new ZOperand(OperandTypes.Variable) { Variable = new ZVariable(0x03) },
+            };
+            int expectedOperandCount = expectedOperands.Length;
+            int expectedLengthInBytes = 4;
+
+            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+
+            CompareOpcodeWithExpectedValues(
+                zop,
+                expectedOpcode,
+                expectedForm,
+                expectedOperands,
+                expectedLengthInBytes,
+                expectedStringConversion);
+
+            Assert.AreEqual(0x3b77.ToString("x"), zop.BranchToAddress.ToString("x"));
+        }
+
         [TestMethod()]
         public void OpCodeTest_je()
         {

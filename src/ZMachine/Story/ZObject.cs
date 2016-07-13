@@ -146,6 +146,32 @@ namespace ZMachine.Story
             }
         }
 
+        public void SetPropertyValue(int propertyID, int value)
+        {
+            var prop = CustomProperties.FirstOrDefault(p => p.ID == propertyID);
+            if (prop != null)
+            {
+                var data = prop.Data;
+
+                if (data.Count == 1)
+                {
+                    data[0] = (byte)value;
+                }
+                else if (data.Count == 2)
+                {
+                    data.SetWord((ushort)value, 0);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Cannot set property value. It has {data.Count} bytes");
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException($"Cannot set property value. Object {ID} does not have property {propertyID} bytes");
+            }
+        }
+
         public ZObjectProperty[] CustomProperties
         {
             get

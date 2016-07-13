@@ -103,27 +103,29 @@ namespace ZMachine
             }
         }
 
-        public void Print(bool printFrames = false)
+        public string Print(bool printFrames = false)
         {
+            StringBuilder sb = new StringBuilder();
             if (printFrames)
             {
-                Console.WriteLine("---------------------");
+                sb.AppendLine("---------------------");
                 if (FrameStack.Count > 0)
                 {
 
                     foreach (var frame in FrameStack)
                     {
-                        Console.WriteLine(frame);
+                        sb.AppendLine(frame.ToString());
                     }
                 }
                 else
                 {
-                    Console.WriteLine("<no frames>");
+                    sb.AppendLine("<no frames>");
                 }
 
             }
             ZOpcode opcode = new ZOpcode(MainMemory.Bytes, ProgramCounter);
-            Console.WriteLine(opcode);
+            sb.AppendLine(opcode.ToString());
+            return sb.ToString();
         }
 
         public void ExecuteCurrentInstruction()
@@ -565,19 +567,82 @@ namespace ZMachine
                     {
                         Debug.Assert(op.OperandType.Count == 2);
                         // Read property from object (resulting in the default value if it had no such
-                        // declared property). If the property has length 1, the value is only that byte. 
-                        // If it has length 2, the first two bytes of the property are taken as a word 
-                        // value. It is illegal for the opcode to be used if the property has length 
-                        // greater than 2, and the result is unspecified. 
+                        // declared property). 
                         int objID = GetOperandValue(opcode.Operands[0]);
                         int propertyID = GetOperandValue(opcode.Operands[1]);
 
                         var obj = MainMemory.ObjectTree.GetObject(objID);
-                        //Debug.Assert(obj.customProperties
-                        throw new NotImplementedException($"TODO: [{opcode}] instruction not yet implemented");
+                        Debug.Assert(obj != null);
+
+                        return (int)obj.GetPropertyValue(propertyID);
                     });
                     break;
-                // get_prop, get_prop_addr, get_next_prop, get_prop_len and putprop.
+                case "put_prop":    // put_prop object property value
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 3);
+                        // Writes the given value to the given property of the given object. 
+                        // If the property does not exist for that object, the interpreter should halt with a suitable error message.
+                        int objID = GetOperandValue(opcode.Operands[0]);
+                        int propertyID = GetOperandValue(opcode.Operands[1]);
+                        int value = GetOperandValue(opcode.Operands[2]);
+
+                        var obj = MainMemory.ObjectTree.GetObject(objID);
+                        Debug.Assert(obj != null);
+
+                        obj.SetPropertyValue(propertyID, value);
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
+                case "get_prop_len":    // get_prop_len property-address -> (result)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 1);
+                        // Writes the given value to the given property of the given object. 
+                        // If the property does not exist for that object, the interpreter should halt with a suitable error message.
+                        int propAddr = GetOperandValue(opcode.Operands[0]);
+
+                        ZObjectProperty prop = new ZObjectProperty(MainMemory.Bytes, propAddr);
+                        return prop.LengthInBytes;
+                    });
+                    break;
+                case "get_prop_addr":   // get_prop_addr object property -> (result)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 2);
+                        // Get the byte address (in dynamic memory) of the property data for the 
+                        // given object's property. 
+                        int objID = GetOperandValue(opcode.Operands[0]);
+                        int propertyID = GetOperandValue(opcode.Operands[1]);
+
+                        var obj = MainMemory.ObjectTree.GetObject(objID);
+
+                        var prop = obj.CustomProperties.FirstOrDefault(p => p.ID == propertyID);
+                        return prop?.BaseAddress ?? 0;
+                    });
+                    break;
+                case "get_next_prop": // get_next_prop object property -> (result)
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 1);
+                        int objID = GetOperandValue(opcode.Operands[0]);
+                        int propertyID = GetOperandValue(opcode.Operands[1]);
+
+                        // Gives the number of the next property provided by the quoted object. 
+                        // This may be zero, indicating the end of the property list; if called 
+                        // with zero, it gives the first property number present. It is illegal 
+                        // to try to find the next property of a property which does not exist, 
+                        // and an interpreter should halt with an error message (if it can efficiently 
+                        // check this condition). 
+                        var obj = MainMemory.ObjectTree.GetObject(objID);
+
+                        if (propertyID == 0) return obj.CustomProperties[0].ID;
+
+                        return obj.CustomProperties.SkipWhile(p => p.ID != propertyID)
+                                                    .Skip(1)
+                                                    .FirstOrDefault()?.ID ?? 0;
+                    });
+                    break;
                 default:
                     throw new NotImplementedException($"Opcode [{opcode}] not implemented yet");
             }
