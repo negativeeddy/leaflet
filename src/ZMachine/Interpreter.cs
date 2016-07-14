@@ -30,6 +30,104 @@ namespace ZMachine
         public ZProcessor Processor { get; set; }
         public Stack<Routine> FrameStack { get; set; }
 
+        public string ToInfoDumpFormat(ZOpcode zop)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"{zop.BaseAddress:x4}:  ");
+            for (int i = 0; i < zop.LengthInBytes; i++)
+            {
+                sb.Append(MainMemory.Bytes[zop.BaseAddress + i].ToString("x2"));
+                sb.Append(' ');
+            }
+
+            sb.Append(' ', 24 - zop.LengthInBytes * 3); // each byte is 2 chars plus a space
+
+            sb.Append(zop.Definition.Name.ToUpper());
+
+            sb.Append(' ', 16 - zop.Definition.Name.Length);
+
+            if (zop.Definition.Name == "jin")
+            {
+                foreach (var opr in zop.Operands)
+                {
+                    // print object names instead of values
+                    int idx = GetOperandValue(opr);
+                    var obj = MainMemory.ObjectTree.GetObject(idx);
+                    sb.AppendFormat($"\"{obj.ShortName}\",");
+                }
+                sb.Remove(sb.Length - 1, 1);
+            }
+            else
+            {
+                foreach (var opr in zop.Operands)
+                {
+                    switch (opr.Type)
+                    {
+
+                        case OperandTypes.Variable:
+                            switch (opr.Variable.Location)
+                            {
+                                case ZVariableLocation.Global:
+                                    sb.Append(opr.Variable.ToInfoDumpFormat());
+                                    break;
+                                case ZVariableLocation.Local:
+                                    sb.Append(opr.Variable.ToInfoDumpFormat());
+                                    break;
+                                case ZVariableLocation.Stack:
+                                    sb.Append(sb.Append(opr.Variable.ToInfoDumpFormat()));
+                                    break;
+                            }
+                            break;
+                        case OperandTypes.LargeConstant:
+                            sb.Append($"#{opr.Constant:x4}");
+                            break;
+                        case OperandTypes.SmallConstant:
+                            sb.Append($"#{opr.Constant:x2}");
+                            break;
+                        default:
+                            throw new InvalidOperationException();
+                    }
+                    sb.Append(' ');
+                }
+            }
+
+            if (zop.Definition.HasStore)
+            {
+                sb.Append("-> ");
+                switch (zop.Store.Location)
+                {
+                    case ZVariableLocation.Global:
+                        sb.Append(zop.Store.ToInfoDumpFormat());
+                        break;
+                    case ZVariableLocation.Local:
+                        sb.Append(zop.Store.ToInfoDumpFormat());
+                        break;
+                    case ZVariableLocation.Stack:
+                        sb.Append(zop.Store.ToInfoDumpFormat(true));
+                        break;
+                }
+            }
+
+            if (zop.Definition.HasBranch)
+            {
+                string branchText = zop.BranchOffset.WhenTrue ? "TRUE" : "FALSE";
+                switch (zop.BranchToAddress)
+                {
+                    case 0:
+                        sb.Append($" [{branchText}] RFALSE");
+                        break;
+                    case 1:
+                        sb.Append($" [{branchText}] RTRUE");
+                        break;
+                    default:
+                        sb.Append($" [{branchText}] {zop.BranchToAddress:x4}");
+                        break;
+                }
+            }
+
+            return sb.ToString();
+        }
+
         /// <summary>
         /// Reads the value of a ZVariable
         /// </summary>
@@ -744,7 +842,7 @@ namespace ZMachine
                 if ((branchIfIfOne && branchValue != 0) ||
                     (!branchIfIfOne && branchValue == 0))
                 {
-                    switch(opcode.BranchToAddress)
+                    switch (opcode.BranchToAddress)
                     {
                         case 0:
                         case 1:

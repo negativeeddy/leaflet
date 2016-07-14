@@ -1,0 +1,68 @@
+﻿ 6d2b:  a2 01 04 41             GET_CHILD       L00 -> L03 [FALSE] RTRUE
+ 6d2f:  06 1e 8f 45             JIN             "you","magic boat" [FALSE] 6d36
+ 6d33:  a3 83 07                GET_PARENT      G73 -> L06
+ 6d36:  0d 05 01                STORE           L04,#01
+ 6d39:  0d 06 01                STORE           L05,#01
+ 6d3c:  a3 01 00                GET_PARENT      L00 -> -(SP)
+ 6d3f:  c1 ab 83 01 00 68       JE              G73,L00,(SP)+ [FALSE] 6d6b
+ 6d45:  0d 0a 01                STORE           L09,#01
+ 6d48:  a2 01 04 c2             GET_CHILD       L00 -> L03 [TRUE] 6d4c
+ 6d4c:  a0 04 00 77             JZ              L03 [FALSE] 6dc5
+ 6d50:  a0 09 d3                JZ              L08 [TRUE] 6d64
+ 6d53:  a0 07 d0                JZ              L06 [TRUE] 6d64
+ 6d56:  a2 07 00 4c             GET_CHILD       L06 -> -(SP) [FALSE] 6d64
+ 6d5a:  95 03                   INC             L02
+ 6d5c:  e0 2a 36 8b 07 02 03 00 CALL            6d16 (L06,L01,L02) -> -(SP)
+ 6d64:  a0 05 c1                JZ              L04 [TRUE] RTRUE
+ 6d67:  a0 06 40                JZ              L05 [FALSE] RFALSE
+ 6d6a:  b0                      RTRUE           
+ 6d6b:  a0 04 bf db             JZ              L03 [TRUE] 6d48
+ 6d6f:  61 04 07 48             JE              L03,L06 [FALSE] 6d79
+ 6d73:  0d 09 01                STORE           L08,#01
+ 6d76:  8c 00 46                JUMP            6dbd
+ 6d79:  61 04 83 80 41          JE              L03,G73 [TRUE] 6dbd
+ 6d7e:  4a 04 0e 80 3c          TEST_ATTR       L03,#0e [TRUE] 6dbd
+ 6d83:  4a 04 0d f8             TEST_ATTR       L03,#0d [TRUE] 6dbd
+ 6d87:  51 04 0a 08             GET_PROP        L03,#0a -> L07
+ 6d8b:  a0 08 f1                JZ              L07 [TRUE] 6dbd
+ 6d8e:  4a 04 06 c8             TEST_ATTR       L03,#06 [TRUE] 6d98
+ 6d92:  ad 08                   PRINT_PADDR     L07
+ 6d94:  bb                      NEW_LINE        
+ 6d95:  0d 06 00                STORE           L05,#00
+ 6d98:  e0 2f 37 4a 04 00       CALL            6e94 (L03) -> -(SP)
+ 6d9e:  a0 00 de                JZ              (SP)+ [TRUE] 6dbd
+ 6da1:  a3 04 00                GET_PARENT      L03 -> -(SP)
+ 6da4:  51 00 06 00             GET_PROP        (SP)+,#06 -> -(SP)
+ 6da8:  a0 00 54                JZ              (SP)+ [FALSE] 6dbd
+ 6dab:  a2 04 00 50             GET_CHILD       L03 -> -(SP) [FALSE] 6dbd
+ 6daf:  e0 29 36 8b 04 02 00 00 CALL            6d16 (L03,L01,#00) -> -(SP)
+ 6db7:  a0 00 c5                JZ              (SP)+ [TRUE] 6dbd
+ 6dba:  0d 05 00                STORE           L04,#00
+ 6dbd:  a1 04 04 bf ab          GET_SIBLING     L03 -> L03 [TRUE] 6d6b
+ 6dc2:  8c ff a8                JUMP            6d6b
+ 6dc5:  c1 a7 04 07 1e 80 5e    JE              L03,L06,#1e [TRUE] 6e28
+ 6dcc:  4a 04 0e 80 59          TEST_ATTR       L03,#0e [TRUE] 6e28
+ 6dd1:  a0 0a 4e                JZ              L09 [FALSE] 6de0
+ 6dd4:  4a 04 0d ca             TEST_ATTR       L03,#0d [TRUE] 6de0
+ 6dd8:  51 04 0a 00             GET_PROP        L03,#0a -> -(SP)
+ 6ddc:  a0 00 00 4a             JZ              (SP)+ [FALSE] 6e28
+ 6de0:  4a 04 06 ed             TEST_ATTR       L03,#06 [TRUE] 6e0f
+ 6de4:  a0 05 d8                JZ              L04 [TRUE] 6dfd
+ 6de7:  e0 2b 37 18 01 03 00    CALL            6e30 (L00,L02) -> -(SP)
+ 6dee:  a0 00 c9                JZ              (SP)+ [TRUE] 6df8
+ 6df1:  42 03 00 45             JL              L02,#00 [FALSE] 6df8
+ 6df5:  0d 03 00                STORE           L02,#00
+ 6df8:  95 03                   INC             L02
+ 6dfa:  0d 05 00                STORE           L04,#00
+ 6dfd:  42 03 00 45             JL              L02,#00 [FALSE] 6e04
+ 6e01:  0d 03 00                STORE           L02,#00
+ 6e04:  e0 2a 36 1a 04 02 03 00 CALL            6c34 (L03,L01,L02) -> -(SP)
+ 6e0c:  8c 00 1b                JUMP            6e28
+ 6e0f:  a2 04 00 57             GET_CHILD       L03 -> -(SP) [FALSE] 6e28
+ 6e13:  e0 2f 37 4a 04 00       CALL            6e94 (L03) -> -(SP)
+ 6e19:  a0 00 ce                JZ              (SP)+ [TRUE] 6e28
+ 6e1c:  95 03                   INC             L02
+ 6e1e:  e0 2a 36 8b 04 02 03 00 CALL            6d16 (L03,L01,L02) -> -(SP)
+ 6e26:  96 03                   DEC             L02
+ 6e28:  a1 04 04 bf 21          GET_SIBLING     L03 -> L03 [TRUE] 6d4c
+ 6e2d:  8c ff 1e                JUMP            6d4c

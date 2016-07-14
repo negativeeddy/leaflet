@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.IO;
 using System.Linq;
 using ZMachine.Tests;
 
@@ -8,6 +9,28 @@ namespace ZMachine.Instructions.Tests
     [TestClass()]
     public class ZOpcodeTests
     {
+        [TestMethod()]
+        public void OpCodeTest_MiniZork()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            string[] input = File.ReadAllLines(@"GameFiles\minizork.dasm");
+
+            foreach(string line in input)
+            {
+                // determine if its a code line
+                var expectedStringConversion = line.Trim();
+                string addressText = expectedStringConversion.Substring(0, 4);
+                int address = Convert.ToInt32(addressText, 16);
+                ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+
+                string actualString = zm.ToInfoDumpFormat(zop);
+                Console.WriteLine(actualString);
+                Assert.AreEqual(expectedStringConversion, actualString);
+            }
+        }
+
         [TestMethod]
         public void VarOperandTypeTest()
         {

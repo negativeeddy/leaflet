@@ -73,5 +73,21 @@ namespace ZMachine.Instructions
                     throw new InvalidOperationException($"Unknown variable location '{Location}'");
             }
         }
+
+        public string ToInfoDumpFormat(bool popIfStack = true)
+        {
+            switch (Location)
+            {
+                case ZVariableLocation.Global:
+                    return "G" + Value.ToString("x2");
+                case ZVariableLocation.Local:
+                    return "L" + Value.ToString("x2");
+                case ZVariableLocation.Stack:
+                    return (popIfStack ? '-' : '+') + "(SP)";
+                default:
+                    throw new InvalidOperationException($"Unknown variable location '{Location}'");
+            }
+        }
+
     }
 }

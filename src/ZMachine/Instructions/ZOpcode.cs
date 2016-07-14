@@ -333,13 +333,11 @@ namespace ZMachine.Instructions
         {
             get
             {
-                if (!Definition.HasBranch)
-                {
-                    throw new InvalidOperationException("Opcode has not branch data");
-                }
+                Debug.Assert(Definition.HasBranch);
+
                 if (BranchOffset.Offset == 0 || BranchOffset.Offset == 1)
                 {
-                    // spec 4.7.1
+                    // spec 4.7.1 - indicate to interpreter to return true/false instead of branching
                     return BranchOffset.Offset;
                 }
                 // spec 4.7.2
