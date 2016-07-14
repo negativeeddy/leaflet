@@ -10,7 +10,7 @@ namespace ZMachine.Instructions.Tests
     public class ZOpcodeTests
     {
         [TestMethod()]
-        public void OpCodeTest_MiniZork()
+        public void OpCodeTest_MiniZorkDisassembly()
         {
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);

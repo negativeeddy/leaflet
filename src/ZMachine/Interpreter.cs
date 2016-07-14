@@ -40,11 +40,11 @@ namespace ZMachine
                 sb.Append(' ');
             }
 
-            sb.Append(' ', 24 - zop.LengthInBytes * 3); // each byte is 2 chars plus a space
+            sb.Append(' ', 31 - sb.Length); // print names at column 31
 
             sb.Append(zop.Definition.Name.ToUpper());
 
-            sb.Append(' ', 16 - zop.Definition.Name.Length);
+            sb.Append(' ', 47 - sb.Length);
 
             if (zop.Definition.Name == "jin")
             {
@@ -59,35 +59,43 @@ namespace ZMachine
             }
             else
             {
-                foreach (var opr in zop.Operands)
+                for (int i = 0; i < zop.Operands.Count; i++)
                 {
-                    switch (opr.Type)
+                    var opr = zop.Operands[i];
+                    if (zop.Definition.UsesIndirection && i == 0)
                     {
-
-                        case OperandTypes.Variable:
-                            switch (opr.Variable.Location)
-                            {
-                                case ZVariableLocation.Global:
-                                    sb.Append(opr.Variable.ToInfoDumpFormat());
-                                    break;
-                                case ZVariableLocation.Local:
-                                    sb.Append(opr.Variable.ToInfoDumpFormat());
-                                    break;
-                                case ZVariableLocation.Stack:
-                                    sb.Append(sb.Append(opr.Variable.ToInfoDumpFormat()));
-                                    break;
-                            }
-                            break;
-                        case OperandTypes.LargeConstant:
-                            sb.Append($"#{opr.Constant:x4}");
-                            break;
-                        case OperandTypes.SmallConstant:
-                            sb.Append($"#{opr.Constant:x2}");
-                            break;
-                        default:
-                            throw new InvalidOperationException();
+                        sb.Append($"{new ZVariable((byte)GetOperandValue(opr)).ToInfoDumpFormat()},");
                     }
-                    sb.Append(' ');
+                    else
+                    {
+                        switch (opr.Type)
+                        {
+
+                            case OperandTypes.Variable:
+                                switch (opr.Variable.Location)
+                                {
+                                    case ZVariableLocation.Global:
+                                        sb.Append(opr.Variable.ToInfoDumpFormat());
+                                        break;
+                                    case ZVariableLocation.Local:
+                                        sb.Append(opr.Variable.ToInfoDumpFormat());
+                                        break;
+                                    case ZVariableLocation.Stack:
+                                        sb.Append(sb.Append(opr.Variable.ToInfoDumpFormat()));
+                                        break;
+                                }
+                                break;
+                            case OperandTypes.LargeConstant:
+                                sb.Append($"#{opr.Constant:x4}");
+                                break;
+                            case OperandTypes.SmallConstant:
+                                sb.Append($"#{opr.Constant:x2}");
+                                break;
+                            default:
+                                throw new InvalidOperationException();
+                        }
+                        sb.Append(' ');
+                    }
                 }
             }
 
@@ -125,7 +133,7 @@ namespace ZMachine
                 }
             }
 
-            return sb.ToString();
+            return sb.ToString().TrimEnd();
         }
 
         /// <summary>

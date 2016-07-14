@@ -428,7 +428,7 @@ namespace ZMachine.Instructions
                     {
 
                         case OperandTypes.Variable:
-                            sb.Append($" {new ZVariable((byte)opr.Constant):x2}");
+                            sb.Append($" {new ZVariable((byte)opr.Variable.Value):x2}");
                             break;
                         case OperandTypes.LargeConstant:
                             sb.Append($" {new ZVariable((byte)opr.Constant):x2}");
