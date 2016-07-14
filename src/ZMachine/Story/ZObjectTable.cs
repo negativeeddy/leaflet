@@ -27,6 +27,7 @@ namespace ZMachine.Story
             const int OBJECT_DEF_SIZE = 9;
             int currentAddress = loadAddress;
 
+            // Load default property values
             for (int i = 0; i < 31; i++)
             {
                 ZObject.DefaultProperties[i] = data.GetWord(currentAddress + i * 2);
@@ -36,8 +37,8 @@ namespace ZMachine.Story
             ZObject first = new ZObject(data, currentAddress, 1);
             Objects.Add(first);
 
-            int firstPropList = first.PropertyAddress;
-            int objectCount = -(currentAddress - first.PropertyAddress) / OBJECT_DEF_SIZE;
+            int firstPropList = first.PropertyTableAddress;
+            int objectCount = -(currentAddress - first.PropertyTableAddress) / OBJECT_DEF_SIZE;
 
             for (int i = 1; i < objectCount; i++)
             {

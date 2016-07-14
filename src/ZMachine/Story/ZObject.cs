@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,7 +50,7 @@ namespace ZMachine.Story
             set { _bytes[BaseAddress + ChildIDOffset] = (byte)value; }
         }
 
-        public int PropertyAddress { get { return (int)_bytes.GetWord(BaseAddress + PropertyAddressOffset); } }
+        public int PropertyTableAddress { get { return (int)_bytes.GetWord(BaseAddress + PropertyAddressOffset); } }
 
         public override string ToString()
         {
@@ -60,50 +61,132 @@ namespace ZMachine.Story
         {
             StringBuilder sb = new StringBuilder();
             sb.Append($"{ID}. Attributes: ");
-            foreach(var bit in Attributes.GetBits())
+            foreach (var bit in Attributes.GetBits())
             {
-                sb.Append(((int)bit).ToString());
+                sb.Append((31 - (int)bit).ToString());    // TODO: Is printing wrong or is bit labels backwards?
                 sb.Append(',');
             }
             sb.AppendLine();
 
             sb.AppendLine($"   Parent object:  {ParentID}  Sibling object: {SiblingID}  Child object:  {ChildID}");
-            sb.AppendLine($"   Property address: {PropertyAddress:x4}");
+            sb.AppendLine($"   Property address: {PropertyTableAddress:x4}");
 
             sb.AppendLine($"       Description: \"{this.ShortName}\"");
             sb.AppendLine("        Properties:");
-            //  [23] 64 ae
-            //[22] 77
-            //[18] 44 09
-            //[12] 4c 01
+            foreach (var prop in CustomProperties)
+            {
+                sb.Append($"        [{prop.ID}] ");
+                foreach (byte b in prop.Data)
+                {
+                    sb.Append($"{b:x2}  ");
+                }
+                sb.AppendLine();
+            }
             return sb.ToString();
         }
 
-        ObjectProperty[] Properties
+        public int ShortNameLengthInBytes
         {
-            get
-            {
-                var p = new ObjectProperty(new ArraySegment<byte>(_bytes, PropertyAddress, 100));
-                return new ObjectProperty[] { p };
-            }
+            get { return (int)_bytes[PropertyTableAddress]; }
         }
 
         public string ShortName
         {
             get
             {
-                int currentIndex = PropertyAddress;
-                int length = _bytes[PropertyAddress];
+                return NameBuilder?.ToString() ?? UNNAMED_OBJECT_NAME;
+            }
+        }
+
+        private ZStringBuilder NameBuilder
+        {
+            get
+            {
+                int currentIndex = PropertyTableAddress;
+                int length = ShortNameLengthInBytes;
                 currentIndex++;
                 if (length > 0)
                 {
                     var zb = new ZStringBuilder(_bytes, currentIndex, length);
-                    return zb.ToString();
+                    NameLengthInBytes = zb.LengthInBytes;
+                    return zb;
                 }
                 else
                 {
-                    return UNNAMED_OBJECT_NAME;
+                    return null;
                 }
+            }
+        }
+        private int NameLengthInBytes { get; set; }
+
+        public uint GetPropertyValue(int propertyID)
+        {
+            var prop = CustomProperties.FirstOrDefault(p => p.ID == propertyID);
+            if (prop != null)
+            {
+                var data = prop.Data;
+
+                if (data.Count == 1)
+                {
+                    return data[0];
+                }
+                else if (data.Count == 2)
+                {
+                    return data.GetWord(0);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Cannot get property value. It has {data.Count} bytes");
+                }
+            }
+            else
+            {
+                // return default property value
+                return DefaultProperties[propertyID];
+            }
+        }
+
+        public void SetPropertyValue(int propertyID, int value)
+        {
+            var prop = CustomProperties.FirstOrDefault(p => p.ID == propertyID);
+            if (prop != null)
+            {
+                var data = prop.Data;
+
+                if (data.Count == 1)
+                {
+                    data[0] = (byte)value;
+                }
+                else if (data.Count == 2)
+                {
+                    data.SetWord((ushort)value, 0);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Cannot set property value. It has {data.Count} bytes");
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException($"Cannot set property value. Object {ID} does not have property {propertyID} bytes");
+            }
+        }
+
+        public ZObjectProperty[] CustomProperties
+        {
+            get
+            {
+                int propertyAddress = PropertyTableAddress + 1 + NameLengthInBytes;
+                var properties = new List<ZObjectProperty>();
+                var prop = new ZObjectProperty(_bytes, propertyAddress);
+                while (prop.ID != 0)
+                {
+                    properties.Add(prop);
+                    propertyAddress += prop.LengthInBytes;
+                    prop = new ZObjectProperty(_bytes, propertyAddress);
+
+                }
+                return properties.ToArray();
             }
         }
 
@@ -137,24 +220,7 @@ namespace ZMachine.Story
         /// <param name="set">if true, the attribute is set, else the attribute is cleared</param>
         internal void SetAttribute(BitNumber attributeNumber, bool set)
         {
-                Attributes = Attributes.SetBit(attributeNumber, set);
-        }
-    }
-
-    class ObjectProperty
-    {
-        public int Size;
-        public int LengthInBytes{ get; }
-        public byte[] Data { get; }
-
-        public ObjectProperty(IList<byte> bytes)
-        {
-            byte sizeByte = bytes[0];
-            Console.WriteLine(sizeByte.ToString("x4"));
-            if (sizeByte == 0)
-            {
-                return;
-            }
+            Attributes = Attributes.SetBit(attributeNumber, set);
         }
     }
 }

@@ -53,6 +53,7 @@
     <Compile Include="Memory\WordOverByteArray.cs" />
     <Compile Include="Story\ZDictionary.cs" />
     <Compile Include="Story\ZObject.cs" />
+    <Compile Include="Story\ZObjectProperty.cs" />
     <Compile Include="Story\ZObjectTable.cs" />
     <Compile Include="Instructions\ZOpcode.cs" />
     <Compile Include="Memory\ZStringBuilder.cs" />

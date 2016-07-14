@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -22,18 +23,28 @@ namespace ConsoleHost
             }
             Console.WriteLine($"Gamefile Version {zm.MainMemory.Header.Version}");
 
-            //string output = zm.MainMemory.ObjectTree.DumpObjectTree();
-            //Console.WriteLine(output);
-            Console.WriteLine($"Object tree contains {zm.MainMemory.ObjectTree.Objects.Count} objects");
+            //DumpObjectTree(zm);
 
+            //DumpObjects(zm);
+
+            RunGame(zm);
+        }
+
+        private static void DumpObjectTree(Interpreter zm)
+        {
+            string output = zm.MainMemory.ObjectTree.DumpObjectTree();
+            Console.WriteLine(output);
+            Console.WriteLine($"Object tree contains {zm.MainMemory.ObjectTree.Objects.Count} objects");
+        }
+
+        private static void DumpObjects(Interpreter zm)
+        {
             var objTree = zm.MainMemory.ObjectTree;
-            
-            foreach(var obj in objTree)
+
+            foreach (var obj in objTree)
             {
                 Console.WriteLine(obj.ToFullString());
             }
-
-            //RunGame(zm);
         }
 
         private static void RunGame(Interpreter zm)
@@ -41,7 +52,7 @@ namespace ConsoleHost
             bool showFrames = false;
             while (true)
             {
-                //zm.Print(showFrames);
+                Debug.WriteLine(zm.Print(showFrames));
                 zm.ExecuteCurrentInstruction();
             }
         }
