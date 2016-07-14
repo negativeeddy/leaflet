@@ -129,11 +129,12 @@ namespace ZMachine.Instructions
                         }
                         else if (Form == OpcodeForm.Variable)
                         {
-                            types = new OperandTypes[]
-                            {
+                            types = new OperandTypes[]                           {
                              (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_7, 2),
                              (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 2),
-                            };
+                             (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_3, 2),
+                             (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_1, 2),
+                            }.TakeWhile(t => t != OperandTypes.Omitted).ToArray();
                         }
                         else
                         {
@@ -222,7 +223,7 @@ namespace ZMachine.Instructions
                 {
                     _operands = new List<ZOperand>();
 
-                    int operandAddr = OperandAddress;
+                    int currentOperandAddr = OperandAddress;
 
                     for (int i = 0; i < OperandType.Count; i++)
                     {
@@ -233,26 +234,26 @@ namespace ZMachine.Instructions
                         switch (operandType)
                         {
                             case OperandTypes.Variable:
-                                operand.Variable = new ZVariable(_bytes[operandAddr]);
+                                operand.Variable = new ZVariable(_bytes[currentOperandAddr]);
                                 break;
                             case OperandTypes.LargeConstant:
                                 if (Definition.IsCall && i == 0)
                                 {
-                                    operand.Constant = _bytes.GetWordUnpacked(operandAddr);  // unpack addresses for call routines
+                                    operand.Constant = _bytes.GetWordUnpacked(currentOperandAddr);  // unpack addresses for call routines
                                 }
                                 else if (Definition.Name == "jump")
                                 {
                                     // the value is stored as an unsigned 16 bit offset, but is more useful to use to store
                                     // as a 16-bit absolute value;
-                                    operand.Constant = (ushort)(_bytes.GetWord(operandAddr) + BaseAddress + 1);
+                                    operand.Constant = (ushort)(_bytes.GetWord(currentOperandAddr) + BaseAddress + 1);
                                 }
                                 else
                                 {
-                                    operand.Constant = _bytes.GetWord(operandAddr);
+                                    operand.Constant = _bytes.GetWord(currentOperandAddr);
                                 }
                                 break;
                             case OperandTypes.SmallConstant:
-                                operand.Constant = _bytes[operandAddr];
+                                operand.Constant = _bytes[currentOperandAddr];
                                 break;
                             case OperandTypes.Omitted:
                                 // ignore
@@ -262,7 +263,7 @@ namespace ZMachine.Instructions
 
                         _operands.Add(operand);
 
-                        operandAddr += operand.LengthInBytes;
+                        currentOperandAddr += operand.LengthInBytes;
                     }
                 }
 
@@ -326,7 +327,7 @@ namespace ZMachine.Instructions
         }
 
         /// <summary>
-        /// The absolute address to branch to (if any)
+        /// The absolute address to branch to (if any). If the branch offset is 0
         /// </summary>
         public int BranchToAddress
         {
@@ -335,6 +336,11 @@ namespace ZMachine.Instructions
                 if (!Definition.HasBranch)
                 {
                     throw new InvalidOperationException("Opcode has not branch data");
+                }
+                if (BranchOffset.Offset == 0 || BranchOffset.Offset == 1)
+                {
+                    // spec 4.7.1
+                    return BranchOffset.Offset;
                 }
                 // spec 4.7.2
                 return (BaseAddress + LengthInBytes) + BranchOffset.Offset - 2;

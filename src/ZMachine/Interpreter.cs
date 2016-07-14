@@ -744,7 +744,15 @@ namespace ZMachine
                 if ((branchIfIfOne && branchValue != 0) ||
                     (!branchIfIfOne && branchValue == 0))
                 {
-                    ProgramCounter = opcode.BranchToAddress;
+                    switch(opcode.BranchToAddress)
+                    {
+                        case 0:
+                        case 1:
+                            throw new NotImplementedException("0 & 1 opcode branch not implemented yet");
+                        default:
+                            ProgramCounter = opcode.BranchToAddress;
+                            break;
+                    }
                     return;
                 }
             }

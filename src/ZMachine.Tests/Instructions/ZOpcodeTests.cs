@@ -133,28 +133,30 @@ namespace ZMachine.Instructions.Tests
         // 6d3f:  c1 ab 83 01 00 68       JE              G73,L00,(SP)+ [FALSE] 6d6b
 
         [TestMethod()]
-        public void OpCodeTest_je2()
+        public void OpCodeTest_je_6d3f()
         {
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
 
-            int address = 0x6d3f; // "3b5d: je local3 local2 ?~3b77
-            string expectedStringConversion = "3b5d: je local3 local2 ?~3b77";
-            // 0x61,0x04,0x03,0x58,0x55,0x45
-            // 0110 0001
-            // 0000 0100   var local 3
-            // 0000 0011   var local 2
-            // 0101 1000   branch
-            // 0101 0101
+            int address = 0x6d3f; // je global73 local0 (sp)+ ?~6d6b
+            string expectedStringConversion = "6d3f: je g73 local0 sp ?~6d6b";
+            // 0xc1 0xab 0x83 0x01 0x00 0x68 
+            // 1100 0001   Form = Var, OP_2, opcode 0x01, (has branch)
+            // 1010 1011   op types: VAR, VAR, VAR, omitted
+            ///1010 0111    global 
+            // 0000 0001   var local 1
+            // 0000 0000   sp
+            // 0110 1000   branch 
 
             int expectedOpcode = 0x01;
-            OpcodeForm expectedForm = OpcodeForm.Long;
+            OpcodeForm expectedForm = OpcodeForm.Variable;
             ZOperand[] expectedOperands = new ZOperand[] {
-                                                new ZOperand(OperandTypes.Variable) { Variable = new ZVariable(0x04) },
-                                                new ZOperand(OperandTypes.Variable) { Variable = new ZVariable(0x03) },
+                                                new ZOperand(OperandTypes.Variable) { Variable = new ZVariable(0x83) },
+                                                new ZOperand(OperandTypes.Variable) { Variable = new ZVariable(0x01) },
+                                                new ZOperand(OperandTypes.Variable) { Variable = new ZVariable(0x00) },
             };
             int expectedOperandCount = expectedOperands.Length;
-            int expectedLengthInBytes = 4;
+            int expectedLengthInBytes = 6;
 
             ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
 
@@ -166,11 +168,12 @@ namespace ZMachine.Instructions.Tests
                 expectedLengthInBytes,
                 expectedStringConversion);
 
-            Assert.AreEqual(0x3b77.ToString("x"), zop.BranchToAddress.ToString("x"));
+            Assert.AreEqual(0x6d6b.ToString("x"), zop.BranchToAddress.ToString("x"));
+            Assert.AreEqual(false, zop.BranchOffset.WhenTrue, "Branch direction");
         }
 
         [TestMethod()]
-        public void OpCodeTest_je()
+        public void OpCodeTest_je_3b5d()
         {
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
@@ -354,7 +357,7 @@ namespace ZMachine.Instructions.Tests
                 switch(expectedOperands[i].Type)
                 {
                     case OperandTypes.Variable:
-                        Assert.AreEqual(expectedOperands[i].Variable.Location, zop.Operands[i].Variable.Location, $"Operand{i} VAR location is wrong");
+                        Assert.AreEqual(expectedOperands[i].Variable.Location, zop.Operands[i].Variable.Location, $"Operand{i} VAR has wrong location");
                         Assert.AreEqual(expectedOperands[i].Variable.Value, zop.Operands[i].Variable.Value, $"Operand{i} VAR value is wrong");
                         break;
                     case OperandTypes.LargeConstant:
