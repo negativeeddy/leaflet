@@ -749,6 +749,18 @@ namespace ZMachine
                                                     .FirstOrDefault()?.ID ?? 0;
                     });
                     break;
+                case "set_colour":  // set_colour foreground background
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(op.OperandType.Count == 2);
+                        int foreground = GetOperandValue(opcode.Operands[0]);
+                        int background = GetOperandValue(opcode.Operands[1]);
+
+                        Debug.WriteLine($"Change color to fg 0x{foreground:x}, bg 0x{background:x}");
+
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
                 default:
                     throw new NotImplementedException($"Opcode [{opcode}] not implemented yet");
             }

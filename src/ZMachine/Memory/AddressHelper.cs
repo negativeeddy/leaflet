@@ -123,6 +123,13 @@ namespace ZMachine.Memory
             return (ushort)result;
         }
 
+        public static short FetchBitsSigned(this ushort word, BitNumber high, int length)
+        {
+            var mask = ~(-1 << length);
+            var result = (word >> ((int)high - length + 1)) & mask;
+            return (short)result;
+        }
+
         /// <summary>
         /// Retrieves a subset of the bits in an 8-bit byte
         /// </summary>

@@ -23,7 +23,7 @@ namespace ZMachine.Instructions.Tests
                 bool actualOnTrue = offset.WhenTrue;
                 bool expectedOnTrue = testData.Item3;
                 Assert.AreEqual(expectedOnTrue, actualOnTrue, "Branch on true");
-                ushort actualOffset = offset.Offset;
+                short actualOffset = offset.Offset;
                 ushort expectedOffset = testData.Item2;
                 Assert.AreEqual(expectedOffset, actualOffset);
             }

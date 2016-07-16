@@ -1,34 +1,142 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using ZMachine.Tests;
 
 namespace ZMachine.Instructions.Tests
 {
+    public struct OpcodeData
+    {
+        public int Address;
+        public string Name;
+        public ZOperand[] Operands;
+        public int LengthInBytes;
+        public int? BranchToAddress;
+        public ZVariable Store;
+
+        public bool BranchToOnTrue { get; internal set; }
+    }
     [TestClass()]
     public class ZOpcodeTests
     {
         [TestMethod()]
         public void OpCodeTest_MiniZorkDisassembly()
         {
+            Assert.Inconclusive();
+
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
 
             string[] input = File.ReadAllLines(@"GameFiles\minizork.dasm");
-
-            foreach(string line in input)
+            foreach (var data in input.Select(line => ParseInfoDump(line, zm.MainMemory)))
             {
-                // determine if its a code line
-                var expectedStringConversion = line.Trim();
-                string addressText = expectedStringConversion.Substring(0, 4);
-                int address = Convert.ToInt32(addressText, 16);
-                ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+                ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, data.Address);
 
-                string actualString = zm.ToInfoDumpFormat(zop);
-                Console.WriteLine(actualString);
-                Assert.AreEqual(expectedStringConversion, actualString);
+                CompareOpcodeWithExpectedValues(zop,
+                    data.Name,
+                    data.Operands,
+                    data.LengthInBytes,
+                    data.BranchToAddress,
+                    data.Store
+                    );
             }
+
+        }
+
+        public OpcodeData ParseInfoDump(string opcodeLine, ZMemory memory)
+        {
+            OpcodeData opcodeData = new OpcodeData();
+
+            string tmp = opcodeLine.Substring(1, 4);
+            opcodeData.Address = Convert.ToInt32(tmp, 16);
+            tmp = opcodeLine.Substring(32, 48 - 32).TrimEnd().ToLower();
+            opcodeData.Name = tmp;
+
+            var operandParts = opcodeLine.Substring(48).Split(' ', ',');
+            List<ZOperand> operandList = new List<ZOperand>();
+            for (int i = 0; i < operandParts.Length; i++)
+            {
+                ZOperand zopr = OperandFromString(operandParts[i]);
+
+                if (zopr != null)
+                {
+                    operandList.Add(zopr);
+                }
+                else
+                {
+                    if (operandParts[i][0] == '"')
+                    {
+                        string name = operandParts[i].Substring(1, operandParts[i].Length - 1);
+                        while (operandParts[i].Last() != '"')
+                        {
+                            i++;
+                            name += " " + operandParts[i];
+                        }
+                        name = name.Substring(0, name.Length - 1);
+                        var obj = memory.ObjectTree.Objects.First(o => o.ShortName == name);
+                        int objId = obj.ID;
+                        operandList.Add(new ZOperand(OperandTypes.SmallConstant) { Constant = (byte)objId});
+                    }
+                    if (operandParts[i][0] == '[')
+                    {
+                        if (operandParts[i].Substring(1, 4) == "TRUE") { opcodeData.BranchToOnTrue = true; }
+                        else { opcodeData.BranchToOnTrue = false; }
+
+                        i++;
+
+                        if (operandParts[i] == "RTRUE") { opcodeData.BranchToAddress = 1; }
+                        else if (operandParts[i] == "RFALSE") { opcodeData.BranchToAddress = 0; }
+                        else opcodeData.BranchToAddress = Convert.ToInt32(operandParts[i], 16);
+
+                    }
+                    else if (operandParts[i] == "->")
+                    {
+                        i++;
+                        var tmpopr = OperandFromString(operandParts[i]);
+                        opcodeData.Store = tmpopr.Variable;
+
+                    }
+                }
+
+            }
+
+            opcodeData.Operands = operandList.ToArray();
+
+            return opcodeData;
+        }
+
+        private ZOperand OperandFromString(string zOperand)
+        {
+            if (zOperand[0] == 'L')
+            {
+                int lVal = int.Parse(zOperand.Substring(1));
+                return new ZOperand(OperandTypes.Variable) { Variable = new ZVariable((byte)(1 + lVal)) };
+            }
+            else if (zOperand[0] == 'G')
+            {
+                int gVal = int.Parse(zOperand.Substring(1));
+                return new ZOperand(OperandTypes.Variable) { Variable = new ZVariable((byte)(0x3a + gVal)) };
+            }
+            else if (zOperand[0] == '#')
+            {
+                uint constant = uint.Parse(zOperand.Substring(1));
+                if (constant > 0xff)
+                {
+                    return new ZOperand(OperandTypes.LargeConstant) { Constant = constant };
+                }
+                else
+                {
+                    return new ZOperand(OperandTypes.SmallConstant) { Constant = (byte)constant };
+                }
+            }
+            else if (zOperand.Contains("SP"))
+            {
+                return new ZOperand(OperandTypes.Variable) { Variable = new ZVariable(0x00) };
+            }
+            return null;
         }
 
         [TestMethod]
@@ -96,7 +204,7 @@ namespace ZMachine.Instructions.Tests
             string expectedStringConversion = "5865: print MINI-ZORK I: ";
             // 0xb2
             // 1011 0010 Form = short, OP2, opcode 10010 = 0x12
-            
+
             int expectedOpcode = 0x02;
             OpcodeForm expectedForm = OpcodeForm.Short;
             ZOperand[] expectedOperands = new ZOperand[] { };
@@ -153,11 +261,11 @@ namespace ZMachine.Instructions.Tests
 
 
 
-        // 6d3f:  c1 ab 83 01 00 68       JE              G73,L00,(SP)+ [FALSE] 6d6b
 
         [TestMethod()]
         public void OpCodeTest_je_6d3f()
         {
+            // 6d3f:  c1 ab 83 01 00 68       JE              G73,L00,(SP)+ [FALSE] 6d6b
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
 
@@ -192,6 +300,50 @@ namespace ZMachine.Instructions.Tests
                 expectedStringConversion);
 
             Assert.AreEqual(0x6d6b.ToString("x"), zop.BranchToAddress.ToString("x"));
+            Assert.AreEqual(false, zop.BranchOffset.WhenTrue, "Branch direction");
+        }
+
+        [TestMethod()]
+        public void OpCodeTest_get_sibling_6dbd()
+        {
+            //6dbd:  a1 04 04 bf ab          GET_SIBLING     L03 -> L03 [TRUE] 6d6b
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            int address = 0x6dbd; // get_sibling l03 (sp)+ ?~6d6b
+            string expectedStringConversion = "6d3f: get_sibling local3 ->local3 ?6d6b";
+            // 0xa1 0x04 0x04 0xbf 0xab
+            // 1010 0001   Form = Short, OP_1, opcode 0x01 operand type, VAR
+            // 0000 0100   VAR  3
+            ///0000 0100   STORE 3 
+            // 1011 1111   Branch
+            // 1010 1011   sp
+
+            int expectedOpcode = 1;
+            OpcodeForm expectedForm = OpcodeForm.Short;
+            ZOperand[] expectedOperands = new ZOperand[] {
+                                                new ZOperand(OperandTypes.Variable) { Variable = new ZVariable(0x04) },
+            };
+            int expectedOperandCount = expectedOperands.Length;
+            int expectedLengthInBytes = 5;
+
+            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+
+            CompareOpcodeWithExpectedValues(
+                zop,
+                expectedOpcode,
+                expectedForm,
+                expectedOperands,
+                expectedLengthInBytes,
+                expectedStringConversion);
+
+            Assert.IsTrue(zop.Definition.HasStore);
+            Assert.AreEqual(ZVariableLocation.Local, zop.Store.Location);
+            Assert.AreEqual(3, zop.Store.Value);
+
+
+            Assert.IsTrue(zop.Definition.HasBranch);
+            Assert.AreEqual(0xbfab.ToString("x"), zop.BranchToAddress.ToString("x"));
             Assert.AreEqual(false, zop.BranchOffset.WhenTrue, "Branch direction");
         }
 
@@ -361,6 +513,63 @@ namespace ZMachine.Instructions.Tests
                 expectedStringConversion);
         }
 
+        private void CompareOpcodeWithExpectedValues(ZOpcode zop, string expectedOpcodeName, ZOperand[] expectedOperands,
+                                                        int expectedLengthInBytes, int? branchToAddress, ZVariable store)
+        {
+            Console.WriteLine($"Checking the following opcode: {zop}");
+
+            Assert.AreEqual(expectedOpcodeName, zop.Definition.Name, "Opcode name is wrong");
+
+            // check operands
+            int expectedOperandCount = expectedOperands.Length;
+            Assert.AreEqual(expectedOperandCount, zop.OperandType.Count, "OperandTypes Count is wrong");  // Long form is always 2 operands
+
+            for (int i = 0; i < zop.Operands.Count; i++)
+            {
+                Assert.AreEqual(expectedOperands[i].Type, zop.OperandType[i], $"OperandTypes[{i}] is wrong");
+                switch (expectedOperands[i].Type)
+                {
+                    case OperandTypes.Variable:
+                        Assert.AreEqual(expectedOperands[i].Variable.Location, zop.Operands[i].Variable.Location, $"Operand{i} VAR has wrong location");
+                        Assert.AreEqual(expectedOperands[i].Variable.Value, zop.Operands[i].Variable.Value, $"Operand{i} VAR value is wrong");
+                        break;
+                    case OperandTypes.LargeConstant:
+                    case OperandTypes.SmallConstant:
+                        Assert.AreEqual(expectedOperands[i].Constant, zop.Operands[i].Constant, $"Operand{i} {expectedOperands[i].Type} value is wrong");
+                        break;
+                    case OperandTypes.Omitted:
+                        Assert.Fail("Found an omitted operand. Omitted operands should not be created.");
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Invalid Operand{i} Type detected {expectedOperands[i].Type}");
+                }
+            }
+
+            // check overall length
+            // Assert.AreEqual(expectedLengthInBytes, zop.LengthInBytes, "Length Test");
+
+            // check branch condition
+            if (branchToAddress == null)
+            {
+                Assert.IsFalse(zop.Definition.HasBranch);
+            }
+            else
+            {
+                Assert.IsTrue(zop.Definition.HasBranch, "HasBranch is wrong");
+                Assert.AreEqual(branchToAddress.Value, zop.BranchToAddress, "Branch address wrong");
+            }
+
+            if (store == null)
+            {
+                Assert.IsFalse(zop.Definition.HasStore);
+            }
+            else
+            {
+                Assert.IsTrue(zop.Definition.HasStore);
+                Assert.AreEqual(store.Location, zop.Store.Location);
+                Assert.AreEqual(store.Value, zop.Store.Value);
+            }
+        }
 
         private static void CompareOpcodeWithExpectedValues(ZOpcode zop, int expectedOpcode, OpcodeForm expectedForm, ZOperand[] expectedOperands, int expectedLengthInBytes, string expectedStringConversion)
         {
@@ -377,7 +586,7 @@ namespace ZMachine.Instructions.Tests
             for (int i = 0; i < zop.Operands.Count; i++)
             {
                 Assert.AreEqual(expectedOperands[i].Type, zop.OperandType[i], $"OperandTypes[{i}] is wrong");
-                switch(expectedOperands[i].Type)
+                switch (expectedOperands[i].Type)
                 {
                     case OperandTypes.Variable:
                         Assert.AreEqual(expectedOperands[i].Variable.Location, zop.Operands[i].Variable.Location, $"Operand{i} VAR has wrong location");

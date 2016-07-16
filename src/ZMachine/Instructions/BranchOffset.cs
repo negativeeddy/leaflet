@@ -32,7 +32,7 @@ namespace ZMachine.Instructions
             }
             else
             {
-                Offset = (ushort)(_bytes.GetWord(0) & 0x3fff);  
+                Offset = _bytes.GetWord(0).FetchBitsSigned(BitNumber.Bit_13, 14);
                 LengthInBytes = 2;
             }
         }
@@ -40,7 +40,7 @@ namespace ZMachine.Instructions
         public int LengthInBytes { get; }
 
         public bool WhenTrue { get; }
-        public ushort Offset { get; }
+        public short Offset { get; }
 
         public override string ToString()
         {
