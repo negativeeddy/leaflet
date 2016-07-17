@@ -28,6 +28,12 @@ namespace ZMachine.Story
 
         public int BaseAddress { get; }
         public int ID { get; }
+
+        /// <summary>
+        /// A bitmask indicating whether an object has an attribute (1) or does not (0).
+        /// The mask is backwards so that bit 0 is the most significant bit, and bit 31
+        /// is the least significant bit
+        /// </summary>
         private uint Attributes
         {
             get { return _bytes.GetDWord(BaseAddress); }
@@ -141,6 +147,7 @@ namespace ZMachine.Story
             }
             else
             {
+                Debug.WriteLine($"Default property used for prop {propertyID}. Value = {DefaultProperties[propertyID]}");
                 // return default property value
                 return DefaultProperties[propertyID];
             }
@@ -207,10 +214,10 @@ namespace ZMachine.Story
         /// </summary>
         /// <param name="attributeNumber">the bit of the attribute to check (0-31)</param>
         /// <returns>true if the object has the atttribute set</returns>
-        internal bool HasAttribute(BitNumber attributeNumber)
+        public bool HasAttribute(BitNumber attributeNumber)
         {
-
-            return Attributes.FetchBits(attributeNumber, 1) == 1;
+            // must flip the bit number because the Attributes are in reverse significant bit order
+            return Attributes.FetchBits((BitNumber)(31-(int)attributeNumber), 1) == 1;
         }
 
         /// <summary>
@@ -220,7 +227,8 @@ namespace ZMachine.Story
         /// <param name="set">if true, the attribute is set, else the attribute is cleared</param>
         internal void SetAttribute(BitNumber attributeNumber, bool set)
         {
-            Attributes = Attributes.SetBit(attributeNumber, set);
+            // must flip the bit number because the Attributes are in reverse significant bit order
+            Attributes = Attributes.SetBit((BitNumber)(31 - (int)attributeNumber), set);
         }
     }
 }

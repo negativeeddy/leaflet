@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using ZMachine.Tests;
+using ZMachine.Memory;
 
 namespace ZMachine.Story.Tests
 {
@@ -175,5 +176,39 @@ namespace ZMachine.Story.Tests
 
         }
 
+        [TestMethod]
+        public void HasAttributeTest()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            var objTree = zm.MainMemory.ObjectTree;
+
+            var data = new Tuple<int, BitNumber, bool>[]  // Tuple<objId, attribute, result>
+            {
+                new Tuple<int, BitNumber,bool>(169,BitNumber.Bit_0,false),
+                new Tuple<int, BitNumber,bool>(169,BitNumber.Bit_11,true),
+                new Tuple<int, BitNumber,bool>(169,BitNumber.Bit_10,false),
+                new Tuple<int, BitNumber,bool>(169,BitNumber.Bit_29,true),
+                new Tuple<int, BitNumber,bool>(169,BitNumber.Bit_28,true),
+                new Tuple<int, BitNumber,bool>(169,BitNumber.Bit_31,false),
+
+                new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_0,false),
+                new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_4,true),
+                new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_5,false),
+                new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_10,false),
+                new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_17,true),
+                new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_28,false),
+                new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_31,false),
+            };
+
+            foreach (var item in data)
+            {
+                var obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
+                bool expected = item.Item3;
+                bool actual = obj.HasAttribute(item.Item2);
+                Assert.AreEqual(expected, actual, $"Error on {obj.ToString()} attribute {item.Item2}");
+            }
+        }
     }
 }
