@@ -170,7 +170,6 @@ Jump to 6D6B
 [6D87] 11
 Got property 10 of small mailbox
 Default value
-
 [6D8B] 0
 [6DBD] 1
 [6DC2] C
@@ -208,7 +207,6 @@ Got property 10 of small mailbox
 Default value
 [6DDC] 0
 [6DE0] A
-
 [6DE4] 0
 [6DE7] 0
 call 6E30
@@ -328,6 +326,7 @@ call 3BE4
 [3C11] 1
 [3C16] C
 [3C01] 5
+===================
 [3C05] 0
 [3C08] F
 [3C0C] 1

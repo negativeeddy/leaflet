@@ -154,7 +154,7 @@ namespace ZMachine.Instructions
             new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_227"), HasStore = false, HasBranch = false, Name ="put_prop" ,} ,
             new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_228"), HasStore = false, HasBranch = false, Name ="sread" ,} ,  // v1
             //new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_228"), HasStore = false, HasBranch = false, Name ="sread" ,} ,  // v4
-            //new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_228"), HasStore = true,  HasBranch = false, Name ="sread" ,} ,  // v5
+            //new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_228"), HasStore = true,  HasBranch = false, Name ="aread" ,} ,  // v5
             new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_229"), HasStore = false, HasBranch = false, Name ="print_char" ,} ,
             new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_230"), HasStore = false, HasBranch = false, Name ="print_num" ,} ,
 

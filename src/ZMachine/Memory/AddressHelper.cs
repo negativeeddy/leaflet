@@ -9,6 +9,18 @@ namespace ZMachine.Memory
 {
     public static class AddressHelper
     {
+        public static int IndexOf<T>(this T[] array, T value) where T : IComparable
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i].CompareTo(value) == 0)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
         public static uint UnpackAddress(ushort address)
         {
             return (uint)(address * 2); // unpack for v1-3
