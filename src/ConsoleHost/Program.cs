@@ -49,10 +49,8 @@ namespace ConsoleHost
 
         private static void RunGame(Interpreter zm)
         {
-            bool showFrames = false;
             while (true)
             {
-                Debug.WriteLine(zm.Print(showFrames));
                 zm.ExecuteCurrentInstruction();
             }
         }

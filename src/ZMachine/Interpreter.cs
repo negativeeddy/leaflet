@@ -237,6 +237,8 @@ namespace ZMachine
         public void ExecuteCurrentInstruction()
         {
             ZOpcode opcode = new ZOpcode(MainMemory.Bytes, ProgramCounter);
+            Debug.WriteLine(opcode.ToString());
+
             switch (opcode.Definition.Name)
             {
                 case "call":
@@ -680,7 +682,9 @@ namespace ZMachine
                         var obj = MainMemory.ObjectTree.GetObject(objID);
                         Debug.Assert(obj != null);
 
-                        return (int)obj.GetPropertyValue(propertyID);
+                        int value = (int)obj.GetPropertyValue(propertyID);
+                        Debug.WriteLine($"Getting property {propertyID} of {obj.ShortName} (found 0x{value:x})");
+                        return value;
                     });
                     break;
                 case "put_prop":    // put_prop object property value
@@ -786,8 +790,16 @@ namespace ZMachine
 
         void Handle_Call(ZOpcode opcode)
         {
-            uint callAddress = opcode.Operands[0].Constant;
+            int callAddress = GetOperandValue(opcode.Operands[0]);
+          
+            if (opcode.Operands[0].Type == OperandTypes.Variable)
+            {
+                // unpack the address
+                callAddress = (int)AddressHelper.UnpackAddress((ushort)callAddress);
+            }
+
             int nextInstruction = ProgramCounter += opcode.LengthInBytes;
+            Debug.WriteLine($"call 0x{callAddress:x}");
             if (callAddress == 0)
             {
                 SetVariable(opcode.Store, 0);
@@ -795,7 +807,7 @@ namespace ZMachine
             }
             else
             {
-                LoadNewFrame((int)callAddress, nextInstruction, opcode.Store, opcode.Operands.Skip(1).ToArray());
+                LoadNewFrame(callAddress, nextInstruction, opcode.Store, opcode.Operands.Skip(1).ToArray());
             }
         }
 
@@ -868,6 +880,7 @@ namespace ZMachine
                         case 1:
                             throw new NotImplementedException("0 & 1 opcode branch not implemented yet");
                         default:
+                            Debug.WriteLine($"jump to 0x{opcode.BranchToAddress:x}");
                             ProgramCounter = opcode.BranchToAddress;
                             break;
                     }

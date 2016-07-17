@@ -46,6 +46,13 @@ namespace ZMachine.Story.Tests
             Assert.AreEqual(o2.ParentID, 140);
             Assert.AreEqual(o2.PropertyTableAddress, 0x0bac);
 
+            o2 = zm.MainMemory.ObjectTree.Objects[29];
+            Assert.AreEqual("you", o2.ShortName);
+            Assert.AreEqual(30, o2.ID);
+            Assert.AreEqual(0, o2.ParentID);
+            Assert.AreEqual(0, o2.SiblingID);
+            Assert.AreEqual(0, o2.ChildID);
+
             o2 = zm.MainMemory.ObjectTree.Objects[26];
             Assert.AreEqual(o2.ShortName, ZObject.UNNAMED_OBJECT_NAME);
             Assert.AreEqual(o2.ID, 27);
@@ -74,7 +81,7 @@ namespace ZMachine.Story.Tests
                 new Tuple<int, int,bool>(113,113,false),    // both are nasty knife
             };
 
-            foreach(var item in data)
+            foreach (var item in data)
             {
                 bool isValid = objTree.IsValidChild(item.Item1, item.Item2);
                 Assert.AreEqual(item.Item3, isValid, $"{item.Item1} is not valid parent of {item.Item2}");
