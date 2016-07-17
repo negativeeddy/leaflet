@@ -210,5 +210,61 @@ namespace ZMachine.Story.Tests
                 Assert.AreEqual(expected, actual, $"Error on {obj.ToString()} attribute {item.Item2}");
             }
         }
+        [TestMethod]
+        public void SetAttributeTest()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            var objTree = zm.MainMemory.ObjectTree;
+
+            var data = new Tuple<int, BitNumber>[]  // Tuple<objId, attribute, result>
+            {
+                new Tuple<int, BitNumber>(169,BitNumber.Bit_0),
+                new Tuple<int, BitNumber>(169,BitNumber.Bit_11),
+                new Tuple<int, BitNumber>(169,BitNumber.Bit_10),
+                new Tuple<int, BitNumber>(169,BitNumber.Bit_29),
+                new Tuple<int, BitNumber>(169,BitNumber.Bit_28),
+                new Tuple<int, BitNumber>(169,BitNumber.Bit_31),
+
+            };
+
+            foreach (var item in data)
+            {
+                // set the bit
+                var obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
+                obj.SetAttribute(item.Item2, true);
+
+                bool actual = obj.HasAttribute(item.Item2);
+                Assert.AreEqual(true, actual, $"Error setting attribute on {obj.ToString()} attribute {item.Item2}");
+
+                // clear the bit
+                obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
+                obj.SetAttribute(item.Item2, false);
+
+                obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
+                actual = obj.HasAttribute(item.Item2);
+                Assert.AreEqual(false, actual, $"Error on {obj.ToString()} attribute {item.Item2}");
+
+                // set the bit
+                obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
+                obj.SetAttribute(item.Item2, true);
+
+
+                obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
+                actual = obj.HasAttribute(item.Item2);
+                Assert.AreEqual(true, actual, $"Error on {obj.ToString()} attribute {item.Item2}");
+
+                // clear the bit
+                obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
+                obj.SetAttribute(item.Item2, false);
+
+                obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
+                actual = obj.HasAttribute(item.Item2);
+                Assert.AreEqual(false, actual, $"Error on {obj.ToString()} attribute {item.Item2}");
+
+
+            }
+        }
     }
 }

@@ -225,7 +225,7 @@ namespace ZMachine.Story
         /// </summary>
         /// <param name="attributeNumber">the bit of the attribute to change (0-31)</param>
         /// <param name="set">if true, the attribute is set, else the attribute is cleared</param>
-        internal void SetAttribute(BitNumber attributeNumber, bool set)
+        public void SetAttribute(BitNumber attributeNumber, bool set)
         {
             // must flip the bit number because the Attributes are in reverse significant bit order
             Attributes = Attributes.SetBit((BitNumber)(31 - (int)attributeNumber), set);
