@@ -200,6 +200,14 @@ namespace ZMachine.Story.Tests
                 new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_17,true),
                 new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_28,false),
                 new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_31,false),
+
+                new Tuple<int, BitNumber,bool>(167,BitNumber.Bit_9,true),
+                new Tuple<int, BitNumber,bool>(167,BitNumber.Bit_11,true),
+                new Tuple<int, BitNumber,bool>(167,BitNumber.Bit_18,true),
+                new Tuple<int, BitNumber,bool>(167,BitNumber.Bit_10,false),
+                new Tuple<int, BitNumber,bool>(167,BitNumber.Bit_17,false),
+                new Tuple<int, BitNumber,bool>(167,BitNumber.Bit_28,false),
+                new Tuple<int, BitNumber,bool>(167,BitNumber.Bit_31,false),
             };
 
             foreach (var item in data)
@@ -262,8 +270,6 @@ namespace ZMachine.Story.Tests
                 obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
                 actual = obj.HasAttribute(item.Item2);
                 Assert.AreEqual(false, actual, $"Error on {obj.ToString()} attribute {item.Item2}");
-
-
             }
         }
     }
