@@ -126,7 +126,7 @@ namespace ZMachine.Memory
         public static short FetchBitsSigned(this ushort word, BitNumber high, int length)
         {
             var mask = ~(-1 << length);
-            var result = (word >> ((int)high - length + 1)) & mask;
+            var result = ((short)word >> ((int)high - length + 1)) & mask;
             return (short)result;
         }
 

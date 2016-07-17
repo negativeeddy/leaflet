@@ -78,7 +78,7 @@ namespace ZMachine.Instructions.Tests
                         name = name.Substring(0, name.Length - 1);
                         var obj = memory.ObjectTree.Objects.First(o => o.ShortName == name);
                         int objId = obj.ID;
-                        operandList.Add(new ZOperand(OperandTypes.SmallConstant) { Constant = (byte)objId});
+                        operandList.Add(new ZOperand(OperandTypes.SmallConstant) { Constant = (byte)objId });
                     }
                     if (operandParts[i][0] == '[')
                     {
@@ -306,12 +306,12 @@ namespace ZMachine.Instructions.Tests
         [TestMethod()]
         public void OpCodeTest_get_sibling_6dbd()
         {
-            //6dbd:  a1 04 04 bf ab          GET_SIBLING     L03 -> L03 [TRUE] 6d6b
+            // 6dbd:  a1 04 04 bf ab          GET_SIBLING     L03 -> L03 [TRUE] 6d6b
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
 
             int address = 0x6dbd; // get_sibling l03 (sp)+ ?~6d6b
-            string expectedStringConversion = "6d3f: get_sibling local3 ->local3 ?6d6b";
+            string expectedStringConversion = "6dbd: get_sibling local3 ->local3 ?6d6b";
             // 0xa1 0x04 0x04 0xbf 0xab
             // 1010 0001   Form = Short, OP_1, opcode 0x01 operand type, VAR
             // 0000 0100   VAR  3
@@ -343,8 +343,8 @@ namespace ZMachine.Instructions.Tests
 
 
             Assert.IsTrue(zop.Definition.HasBranch);
-            Assert.AreEqual(0xbfab.ToString("x"), zop.BranchToAddress.ToString("x"));
-            Assert.AreEqual(false, zop.BranchOffset.WhenTrue, "Branch direction");
+            Assert.AreEqual(0x6d6b.ToString("x"), zop.BranchToAddress.ToString("x"));
+            Assert.AreEqual(true, zop.BranchOffset.WhenTrue, "Branch direction");
         }
 
         [TestMethod()]

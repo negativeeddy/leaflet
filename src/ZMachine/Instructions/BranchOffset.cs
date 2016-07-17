@@ -15,7 +15,6 @@ namespace ZMachine.Instructions
 
             Debug.Assert(_bytes.Count == 2);
 
-            byte b = _bytes[0];
             if (_bytes[0].FetchBits(BitNumber.Bit_7, 1) == 0)
             {
                 WhenTrue = false;
@@ -32,15 +31,22 @@ namespace ZMachine.Instructions
             }
             else
             {
-                Offset = _bytes.GetWord(0).FetchBitsSigned(BitNumber.Bit_13, 14);
+                Offset = _bytes.GetWord(0).FetchBits(BitNumber.Bit_13, 14);
                 LengthInBytes = 2;
+
+                // branch is actually 14-bit number, check for the negative bit
+                if ((Offset & 0x2000) == 0x2000)
+                {
+                    Offset -= 0x4000;
+                }
             }
+
         }
 
         public int LengthInBytes { get; }
 
         public bool WhenTrue { get; }
-        public short Offset { get; }
+        public int Offset { get; }
 
         public override string ToString()
         {

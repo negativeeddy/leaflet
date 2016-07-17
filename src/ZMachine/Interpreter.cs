@@ -230,7 +230,7 @@ namespace ZMachine
 
             }
             ZOpcode opcode = new ZOpcode(MainMemory.Bytes, ProgramCounter);
-            sb.AppendLine(opcode.ToString());
+            sb.Append(opcode.ToString());
             return sb.ToString();
         }
 

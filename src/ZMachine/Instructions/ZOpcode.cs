@@ -341,7 +341,9 @@ namespace ZMachine.Instructions
                     return BranchOffset.Offset;
                 }
                 // spec 4.7.2
-                return (BaseAddress + LengthInBytes) + BranchOffset.Offset - 2;
+                int newAddress = (BaseAddress + LengthInBytes) + BranchOffset.Offset - 2;
+
+                return newAddress;
             }
         }
 
