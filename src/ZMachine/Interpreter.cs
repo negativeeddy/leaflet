@@ -876,9 +876,11 @@ namespace ZMachine
                 {
                     switch (opcode.BranchToAddress)
                     {
+                        // An offset of 0 means "return false from the current routine", and 1 means "return true from the current routine" (spec 4.7.1)
                         case 0:
                         case 1:
-                            throw new NotImplementedException("0 & 1 opcode branch not implemented yet");
+                            Handle_Return(opcode, (ushort)opcode.BranchToAddress);
+                            break;
                         default:
                             Debug.WriteLine($"jump to 0x{opcode.BranchToAddress:x}");
                             ProgramCounter = opcode.BranchToAddress;
