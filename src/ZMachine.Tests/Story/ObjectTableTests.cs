@@ -136,5 +136,44 @@ namespace ZMachine.Story.Tests
                 Assert.AreEqual(item.expected, item.actual);
             }
         }
+
+        [TestMethod]
+        public void InsertObjectTest()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            var objTree = zm.MainMemory.ObjectTree;
+
+            var youId = 30;
+            var westOfHouseId = 46;
+
+            var youObj = objTree.GetObject(youId);
+            var westOfHouseObj = objTree.GetObject(westOfHouseId);
+
+            // verify initial values
+            Assert.AreEqual(0, youObj.ParentID);
+            Assert.AreEqual(0, youObj.SiblingID);
+            Assert.AreEqual(0, youObj.ChildID);
+
+            Assert.AreEqual(27, westOfHouseObj.ParentID);
+            Assert.AreEqual(0, westOfHouseObj.SiblingID);
+            Assert.AreEqual(82, westOfHouseObj.ChildID);
+
+            objTree.ReparentObject(youId, westOfHouseId);
+
+            youObj = objTree.GetObject(youId);
+            westOfHouseObj = objTree.GetObject(westOfHouseId);
+
+            Assert.AreEqual(westOfHouseId, youObj.ParentID);
+            Assert.AreEqual(82, youObj.SiblingID);
+            Assert.AreEqual(0, youObj.ChildID);
+
+            Assert.AreEqual(27, westOfHouseObj.ParentID);
+            Assert.AreEqual(0, westOfHouseObj.SiblingID);
+            Assert.AreEqual(youId, westOfHouseObj.ChildID);
+
+        }
+
     }
 }

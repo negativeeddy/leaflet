@@ -112,7 +112,7 @@ namespace ZMachine.Story
         /// </summary>
         /// <param name="objectID">the Id of the object whose child to find</param>
         /// <returns>the Id of the child, 0 if there is no child</returns>
-        internal int GetChild(int objectID)
+        public int GetChild(int objectID)
         {
             return Objects.FirstOrDefault(o => o.ID == objectID).ChildID;
         }
@@ -122,7 +122,7 @@ namespace ZMachine.Story
         /// </summary>
         /// <param name="objectID">the Id of the object whose child to find</param>
         /// <returns>the Id of the child, 0 if there is no child</returns>
-        internal int GetSiblingId(int objectID)
+        public int GetSiblingId(int objectID)
         {
             return Objects.FirstOrDefault(o => o.ID == objectID).SiblingID;
         }
@@ -132,7 +132,7 @@ namespace ZMachine.Story
         /// </summary>
         /// <param name="objectID">the Id of the object whose child to find</param>
         /// <returns>the Id of the child, 0 if there is no child</returns>
-        internal int GetParent(int objectID)
+        public int GetParent(int objectID)
         {
             return Objects.FirstOrDefault(o => o.ID == objectID).ParentID;
         }
@@ -151,7 +151,7 @@ namespace ZMachine.Story
             return Objects.First(o => o.ID == objectID);
         }
 
-        internal void ReparentObject(int objectID, int newParentID)
+        public void ReparentObject(int objectID, int newParentID)
         {
             Debug.Assert(objectID != 0, "Invalid object ID");
             Debug.Assert(objectID != newParentID, "objectID and newParentID must be different");
@@ -178,9 +178,14 @@ namespace ZMachine.Story
 
             // set the object to be the first child of the new parent
             ZObject newParent = GetObject(newParentID);
-            newParent.ChildID = objectID;
-            // set the object sibling to the new parents previous first child
+            // save off the parents current first child (to be the new sibling of the moved object)
             int newSiblingID = newParent.ChildID;
+
+            // change the new parents first child
+            newParent.ChildID = objectID;
+
+            movingObject.ParentID = newParentID;
+
             movingObject.SiblingID = newSiblingID;
         }
 
