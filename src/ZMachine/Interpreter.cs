@@ -755,7 +755,7 @@ namespace ZMachine
                 case "set_colour":  // set_colour foreground background
                     ExecInstruction(opcode, op =>
                     {
-                        throw new NotImplementedException();
+                        throw new NotImplementedException("set_colour not implemented yet");
                         Debug.Assert(op.OperandType.Count == 2);
                         int foreground = GetOperandValue(opcode.Operands[0]);
                         int background = GetOperandValue(opcode.Operands[1]);
@@ -834,7 +834,11 @@ namespace ZMachine
             IList<byte> textBuffer = new ArraySegment<byte>(MainMemory.Bytes, textBufferIdx + 1, txtBufferSize + 1);
 
             string input = Console.ReadLine();
-            input = input.Substring(0, txtBufferSize).ToLower();
+            if (input.Length > txtBufferSize)
+            {
+                // trim the input down to the buffer size
+                input = input.Substring(0, txtBufferSize).ToLower();
+            }
 
             for (int i = 0; i < input.Length; i++)
             {
@@ -845,36 +849,34 @@ namespace ZMachine
 
 
             int parseBufferIdx = GetOperandValue(op.Operands[1]);
+            int maxWordsParsed = MainMemory.Bytes[parseBufferIdx];
             int parseBufferSize = 4 * maxWordsParsed;   // each parsed word takes 4 bytes
                                                         // 0 - dictionary index of the word
                                                         // 1 - number of letters in the word
                                                         // 4 - offset of the word in text buffer from textBufferIdx
             IList<byte> parseBuffer = new ArraySegment<byte>(MainMemory.Bytes, parseBufferIdx, parseBufferSize);
-            int maxWordsParsed = parseBuffer[0];
 
             string[] words = SplitInput(input).ToArray();
             int wordsToParse = Math.Min(maxWordsParsed, words.Length);
             parseBuffer[1] = (byte)wordsToParse;
-            for(int i=0; i< wordsToParse; i++)
+            for (int i = 0; i < wordsToParse; i++)
             {
                 string word = words[i];
                 int dIndex = MainMemory.Dictionary.Words.IndexOf(word);
                 if (dIndex != -1)
                 {
                     parseBuffer.SetWord((ushort)dIndex, 4 * i);
-                    parseBuffer[4 * i+2] = (byte)word.Length;
-                    parseBuffer[4 * i+3] = (byte)dIndex;
+                    parseBuffer[4 * i + 2] = (byte)word.Length;
+                    parseBuffer[4 * i + 3] = (byte)dIndex;
                 }
                 else
                 {
-
-
                     parseBuffer[4 * i] = 0;
                 }
+            }
 
-                throw new NotImplementedException("READ not fully implemented yet");
+            return UNUSED_RETURN_VALUE;
         }
-
         /// <summary>
         /// Split an input string into words as described in spec 13.6.1
         /// First, the text is broken up into words. Spaces divide up words and are otherwise
@@ -885,7 +887,7 @@ namespace ZMachine
         /// </summary>
         /// <param name="input">the string to split</param>
         /// <returns>an array of words</returns>
-        private IEnumerable<string> SplitInput(string input)
+        public IEnumerable<string> SplitInput(string input)
         {
             var spaceSplit = input.Split(' ');
             foreach (var word in spaceSplit)
@@ -899,11 +901,10 @@ namespace ZMachine
                     {
                         yield return word.Substring(startIndex, idx);
                         yield return ",";
-                        startIndex += idx + 2;
+                        startIndex = idx + 1;
                         idx = word.IndexOf(',', startIndex);
                     }
                     while (idx != -1);
-                    yield return word.Substring(startIndex);
                 }
                 else
                 {
