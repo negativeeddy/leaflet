@@ -144,18 +144,34 @@ namespace ZMachine
         /// <returns></returns>
         public ushort ReadVariable(ZVariable variable, bool inPlace = false)
         {
+            ushort value;
             switch (variable.Location)
             {
                 case ZVariableLocation.Global:
-                    return MainMemory.GlobalVariables[variable.Value];
+                    value = MainMemory.GlobalVariables[variable.Value];
+                    DebugOutput($"<= ReadVariable(0x{value:x2} <= G{variable.Value})", DebugLevel.Diagnostic);
+                    break;
                 case ZVariableLocation.Local:
-                    return CurrentRoutineFrame.Locals[variable.Value];
+                    value = CurrentRoutineFrame.Locals[variable.Value];
+                    DebugOutput($"<= ReadVariable(0x{value:x2} <= L{variable.Value})", DebugLevel.Diagnostic);
+                    break;
                 case ZVariableLocation.Stack:
                     var varStack = CurrentRoutineFrame.EvaluationStack;
-                    return inPlace ? varStack.Peek() : varStack.Pop();
+                    if (inPlace)
+                    {
+                        value = varStack.Peek();
+                        DebugOutput($"<= ReadVariable(0x{value:x2} <= StackPeek)", DebugLevel.Diagnostic);
+                    }
+                    else
+                    {
+                        value = varStack.Pop();
+                        DebugOutput($"<= ReadVariable(0x{value:x2} <= StackPop)", DebugLevel.Diagnostic);
+                    }
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(variable.Location));
             }
+            return value;
         }
 
         /// <summary>
@@ -171,20 +187,36 @@ namespace ZMachine
             {
                 case ZVariableLocation.Global:
                     MainMemory.GlobalVariables[variable.Value] = value;
+                    DebugOutput($"=> SetVariable(0x{value:x2} => G{variable.Value})", DebugLevel.Diagnostic);
                     break;
                 case ZVariableLocation.Local:
                     CurrentRoutineFrame.Locals[variable.Value] = value;
+                    DebugOutput($"=> SetVariable(0x{value:x2} => L{variable.Value})", DebugLevel.Diagnostic);
                     break;
                 case ZVariableLocation.Stack:
                     var varStack = CurrentRoutineFrame.EvaluationStack;
                     if (inPlace)
                     {
+                        DebugOutput($"=> SetVariable(popstack first)", DebugLevel.Diagnostic);
+
                         varStack.Pop();
                     }
                     varStack.Push(value);
+                    DebugOutput($"=> SetVariable(0x{value:x2} => stackPush)", DebugLevel.Diagnostic);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(variable.Location));
+            }
+        }
+
+        enum DebugLevel { Off, Informational, Verbose, Diagnostic };
+        private DebugLevel currentDebugOutputLevel = DebugLevel.Informational;
+
+        private void DebugOutput(string output, DebugLevel level = DebugLevel.Informational)
+        {
+            if (level <= currentDebugOutputLevel)
+            {
+                Debug.WriteLine(output);
             }
         }
 
@@ -822,6 +854,7 @@ namespace ZMachine
             // put the return value wherever the oldFrame required
             SetVariable(oldFrame.Store, (ushort)returnValue);
 
+            Debug.WriteLine($"return  {returnValue:x}->{oldFrame.Store}");
             // update the instruction counter
             ProgramCounter = oldFrame.ReturnAddress;
         }
@@ -830,7 +863,14 @@ namespace ZMachine
         {
             Debug.Assert(op.OperandType.Count == 2);
             int textBufferIdx = GetOperandValue(op.Operands[0]);
+            int parseBufferIdx = GetOperandValue(op.Operands[1]);
+
+            // copy the input to the text buffer
             int txtBufferSize = MainMemory.Bytes[textBufferIdx];
+            if (txtBufferSize < 3)
+            {
+                throw new InvalidOperationException($"Text input buffer to small ({txtBufferSize} bytes)");
+            }
             IList<byte> textBuffer = new ArraySegment<byte>(MainMemory.Bytes, textBufferIdx + 1, txtBufferSize + 1);
 
             string input = Console.ReadLine();
@@ -847,32 +887,42 @@ namespace ZMachine
             textBuffer[input.Length] = 0;   // terminate text buffer with 0
 
 
+            // parse the input
 
-            int parseBufferIdx = GetOperandValue(op.Operands[1]);
             int maxWordsParsed = MainMemory.Bytes[parseBufferIdx];
-            int parseBufferSize = 4 * maxWordsParsed;   // each parsed word takes 4 bytes
-                                                        // 0 - dictionary index of the word
-                                                        // 1 - number of letters in the word
-                                                        // 4 - offset of the word in text buffer from textBufferIdx
+            int parseBufferSize = 4 * maxWordsParsed + 2;   // each parsed word takes 4 bytes
+                                                            // 0 - dictionary index of the word
+                                                            // 1 - number of letters in the word
+                                                            // 4 - offset of the word in text buffer from textBufferIdx
+            if (parseBufferSize < 6)
+            {
+                throw new InvalidOperationException($"Text input buffer to small ({parseBufferSize} bytes)");
+            }
             IList<byte> parseBuffer = new ArraySegment<byte>(MainMemory.Bytes, parseBufferIdx, parseBufferSize);
 
             string[] words = SplitInput(input).ToArray();
             int wordsToParse = Math.Min(maxWordsParsed, words.Length);
             parseBuffer[1] = (byte)wordsToParse;
+
+            int lastfoundWordIndex = 0;
             for (int i = 0; i < wordsToParse; i++)
             {
                 string word = words[i];
-                int dIndex = MainMemory.Dictionary.Words.IndexOf(word);
+                int dIndex = MainMemory.Dictionary.AddressOf(word);
                 if (dIndex != -1)
                 {
-                    parseBuffer.SetWord((ushort)dIndex, 4 * i);
-                    parseBuffer[4 * i + 2] = (byte)word.Length;
-                    parseBuffer[4 * i + 3] = (byte)dIndex;
+                    parseBuffer.SetWord((ushort)dIndex, 4 * i + 2);
                 }
                 else
                 {
-                    parseBuffer[4 * i] = 0;
+                    parseBuffer.SetWord(0, 4 * i + 2);
                 }
+
+                parseBuffer[4 * i + 4] = (byte)word.Length;
+
+                int foundIndex = input.IndexOf(word, lastfoundWordIndex);
+                lastfoundWordIndex = word.Length;
+                parseBuffer[4 * i + 5] = (byte)(foundIndex + 1);
             }
 
             return UNUSED_RETURN_VALUE;

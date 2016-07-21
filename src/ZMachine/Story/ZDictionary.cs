@@ -13,6 +13,10 @@ namespace ZMachine.Story
     public class ZDictionary
     {
         private char[] _separators;
+        private byte _entryLength;
+        private byte[] _bytes;
+        private int _baseAddress;
+        private int _entryBaseAddress;
 
         public char[] Separators
         {
@@ -20,18 +24,13 @@ namespace ZMachine.Story
             private set { _separators = value; }
         }
 
-        private string[] _words;
+        public string[] Words { get; private set; }
 
-        public string[] Words
+        public ZDictionary(byte[] bytes, int address)
         {
-            get { return _words; }
-            private set { _words = value; }
-        }
-
-        public ZDictionary(byte[] memory, int address)
-        {
-
-            Load(memory, address);
+            _baseAddress = address;
+            _bytes = bytes;
+            Load();
         }
 
         public ZDictionary() : base()
@@ -43,23 +42,23 @@ namespace ZMachine.Story
         /// </summary>
         /// <param name="data">an array of bytes</param>
         /// <param name="baseAddress">the index of the beginning of the dictionary in the data array</param>
-        private void Load(byte[] data, int baseAddress)
+        private void Load()
         {
-            int currentAddress = baseAddress;
-            byte numberOfSeparators = data[currentAddress];
+            int currentAddress = _baseAddress;
+            byte numberOfSeparators = _bytes[currentAddress];
             currentAddress++;
 
-            LoadWordSeparators(data, numberOfSeparators, currentAddress);
+            LoadWordSeparators(_bytes, numberOfSeparators, currentAddress);
             currentAddress += numberOfSeparators;
 
-            int _entryLength = data[currentAddress];
+            _entryLength = _bytes[currentAddress];
             currentAddress++;
 
-            int _entryCount = data.GetWord(currentAddress);
+            int _entryCount = _bytes.GetWord(currentAddress);
             currentAddress += 2;
 
-            int _entryBaseAddress = currentAddress;
-            ArraySegment<byte> entryBytes = new ArraySegment<byte>(data, _entryBaseAddress, _entryLength * _entryCount);
+            _entryBaseAddress = currentAddress;
+            ArraySegment<byte> entryBytes = new ArraySegment<byte>(_bytes, _entryBaseAddress, _entryLength * _entryCount);
             LoadEntries(entryBytes, _entryCount, _entryLength);
         }
 
@@ -84,6 +83,20 @@ namespace ZMachine.Story
             {
                 Separators[i] = (char)data[address + i];
             }
+        }
+
+        internal int IndexOf(string word)
+        {
+            if (word.Length > 6)
+            {
+                word = word.Substring(0, 6);
+            }
+            return Words.IndexOf(word);
+        }
+
+        internal int AddressOf(string word)
+        {
+            return IndexOf(word) * _entryLength + _entryBaseAddress;
         }
     }
 }
