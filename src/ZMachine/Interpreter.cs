@@ -149,23 +149,23 @@ namespace ZMachine
             {
                 case ZVariableLocation.Global:
                     value = MainMemory.GlobalVariables[variable.Value];
-                    DebugOutput($"<= ReadVariable(0x{value:x2} <= G{variable.Value})", DebugLevel.Diagnostic);
+                    DebugOutput($"  <= ReadVariable(0x{value:x2} <= G{variable.Value})", DebugLevel.Diagnostic);
                     break;
                 case ZVariableLocation.Local:
                     value = CurrentRoutineFrame.Locals[variable.Value];
-                    DebugOutput($"<= ReadVariable(0x{value:x2} <= L{variable.Value})", DebugLevel.Diagnostic);
+                    DebugOutput($"  <= ReadVariable(0x{value:x2} <= L{variable.Value})", DebugLevel.Diagnostic);
                     break;
                 case ZVariableLocation.Stack:
                     var varStack = CurrentRoutineFrame.EvaluationStack;
                     if (inPlace)
                     {
                         value = varStack.Peek();
-                        DebugOutput($"<= ReadVariable(0x{value:x2} <= StackPeek)", DebugLevel.Diagnostic);
+                        DebugOutput($"  <= ReadVariable(0x{value:x2} <= StackPeek)", DebugLevel.Diagnostic);
                     }
                     else
                     {
                         value = varStack.Pop();
-                        DebugOutput($"<= ReadVariable(0x{value:x2} <= StackPop)", DebugLevel.Diagnostic);
+                        DebugOutput($"  <= ReadVariable(0x{value:x2} <= StackPop)", DebugLevel.Diagnostic);
                     }
                     break;
                 default:
@@ -187,22 +187,22 @@ namespace ZMachine
             {
                 case ZVariableLocation.Global:
                     MainMemory.GlobalVariables[variable.Value] = value;
-                    DebugOutput($"=> SetVariable(0x{value:x2} => G{variable.Value})", DebugLevel.Diagnostic);
+                    DebugOutput($"  => SetVariable(0x{value:x2} => G{variable.Value})", DebugLevel.Diagnostic);
                     break;
                 case ZVariableLocation.Local:
                     CurrentRoutineFrame.Locals[variable.Value] = value;
-                    DebugOutput($"=> SetVariable(0x{value:x2} => L{variable.Value})", DebugLevel.Diagnostic);
+                    DebugOutput($"  => SetVariable(0x{value:x2} => L{variable.Value})", DebugLevel.Diagnostic);
                     break;
                 case ZVariableLocation.Stack:
                     var varStack = CurrentRoutineFrame.EvaluationStack;
                     if (inPlace)
                     {
-                        DebugOutput($"=> SetVariable(popstack first)", DebugLevel.Diagnostic);
+                        DebugOutput($"  => SetVariable(popstack first)", DebugLevel.Diagnostic);
 
                         varStack.Pop();
                     }
                     varStack.Push(value);
-                    DebugOutput($"=> SetVariable(0x{value:x2} => stackPush)", DebugLevel.Diagnostic);
+                    DebugOutput($"  => SetVariable(0x{value:x2} => stackPush)", DebugLevel.Diagnostic);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(variable.Location));
@@ -265,10 +265,12 @@ namespace ZMachine
             return sb.ToString();
         }
 
+        private int instructionCount = 0;
+
         public void ExecuteCurrentInstruction()
         {
             ZOpcode opcode = new ZOpcode(MainMemory.Bytes, ProgramCounter);
-            Debug.WriteLine(opcode.ToString());
+            DebugOutput($"0x{instructionCount++:x4} {opcode}");
 
             switch (opcode.Definition.Name)
             {
@@ -714,7 +716,7 @@ namespace ZMachine
                         Debug.Assert(obj != null);
 
                         int value = (int)obj.GetPropertyValue(propertyID);
-                        Debug.WriteLine($"Getting property {propertyID} of {obj.ShortName} (found 0x{value:x})");
+                        DebugOutput($"  Getting property {propertyID} of {obj.ShortName} (found 0x{value:x})");
                         return value;
                     });
                     break;
@@ -792,7 +794,7 @@ namespace ZMachine
                         int foreground = GetOperandValue(opcode.Operands[0]);
                         int background = GetOperandValue(opcode.Operands[1]);
 
-                        Debug.WriteLine($"Change color to fg 0x{foreground:x}, bg 0x{background:x}");
+                        DebugOutput($"  Change color to fg 0x{foreground:x}, bg 0x{background:x}");
 
                         return UNUSED_RETURN_VALUE;
                     });
@@ -854,7 +856,7 @@ namespace ZMachine
             // put the return value wherever the oldFrame required
             SetVariable(oldFrame.Store, (ushort)returnValue);
 
-            Debug.WriteLine($"return  {returnValue:x}->{oldFrame.Store}");
+            DebugOutput($"  return  {returnValue:x}->{oldFrame.Store}");
             // update the instruction counter
             ProgramCounter = oldFrame.ReturnAddress;
         }
@@ -1022,7 +1024,7 @@ namespace ZMachine
                             Handle_Return(opcode, (ushort)opcode.BranchToAddress);
                             break;
                         default:
-                            Debug.WriteLine($"jump to 0x{opcode.BranchToAddress:x}");
+                            DebugOutput($"  jump to 0x{opcode.BranchToAddress:x}");
                             ProgramCounter = opcode.BranchToAddress;
                             break;
                     }
