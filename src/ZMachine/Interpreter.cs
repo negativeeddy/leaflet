@@ -428,6 +428,8 @@ namespace ZMachine
                 case "pull":    // pull (variable)
                     ExecInstruction(opcode, op =>
                     {
+                        Debug.Assert(true, "Implementation of 'pull' is unclear. Check this when it gets executed");
+                        // pull stack -> (result)
                         Debug.Assert(op.OperandType.Count == 1);
                         var actualZVar = GetDereferencedFirstZVar(op);
                         int value = ReadVariable(actualZVar, true);
