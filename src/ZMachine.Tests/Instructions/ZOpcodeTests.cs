@@ -41,7 +41,7 @@ namespace ZMachine.Instructions.Tests
 
             foreach (var instruction in query)
             {
-                Assert.AreEqual(instruction.address, zm.ProgramCounter, $"Instruction {instruction.index:x} address is 0x{zm.ProgramCounter:x} instead of 0x{instruction.address:x}");
+                Assert.AreEqual(instruction.address, zm.ProgramCounter, $"Instruction 0x{instruction.index:x4} address is 0x{zm.ProgramCounter:x} instead of 0x{instruction.address:x}");
                 zm.ExecuteCurrentInstruction();
             }
         }
