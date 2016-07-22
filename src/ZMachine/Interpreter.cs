@@ -18,15 +18,12 @@ namespace ZMachine
         {
             MainMemory = new ZMemory(storyStream);
             FrameStack = new Stack<Routine>();
-            //ProgramCounter = (int)MainMemory.Header.PCStart;
-
             LoadNewFrame(MainMemory.Header.PCStart - 1, 0, null);
         }
 
         public int ProgramCounter { get; set; }
         public ZMemory MainMemory { get; set; }
 
-        public ZProcessor Processor { get; set; }
         public Stack<Routine> FrameStack { get; set; }
 
         public string ToInfoDumpFormat(ZOpcode zop)
