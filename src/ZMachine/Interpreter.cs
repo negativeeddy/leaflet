@@ -363,7 +363,7 @@ namespace ZMachine
                     ExecInstruction(opcode, op => GetOperandValue(op.Operands[0]) == 0 ? 1 : 0);
                     break;
                 case "jl":  // jl a b ?(label)
-                    ExecInstruction(opcode, op => (short)GetOperandValue(op.Operands[0]) < (short)GetOperandValue(op.Operands[0]) ? 1 : 0);
+                    ExecInstruction(opcode, op => (short)GetOperandValue(op.Operands[0]) < (short)GetOperandValue(op.Operands[1]) ? 1 : 0);
                     break;
                 case "jg":  // jg a b ?(label)
                     ExecInstruction(opcode, op =>

@@ -30,7 +30,6 @@ namespace ZMachine.Instructions.Tests
 
             string[] input = File.ReadAllLines(@"GameFiles\minizork.dasm");
 
-            int i = 0;
             var query = from line in input
                         where line.StartsWith("0x") // only the instruction lines
                         let lineparts = line.Split(' ')
