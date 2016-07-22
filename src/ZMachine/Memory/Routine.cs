@@ -45,12 +45,18 @@ namespace ZMachine.Memory
             this.ReturnAddress = returnAddress;
             Store = returnStore;
 
-            int count = bytes[routineAddress];
-            Locals = bytes.GetWords(routineAddress + 1, count);
+            int localVariableCount = bytes[routineAddress];
 
-            for(int i=0; i<localInitValues.Count; i++)
+            // initialize locals from the routine definition
+            Locals = bytes.GetWords(routineAddress + 1, localVariableCount);
+
+            // update locals with any provided arguments
+            for (int i = 0; i < localInitValues.Count; i++)
             {
-                Locals[i] = localInitValues[i];
+                if (i < localInitValues.Count)
+                {
+                    Locals[i] = localInitValues[i];
+                }
             }
         }
 
@@ -58,7 +64,7 @@ namespace ZMachine.Memory
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("Locals ");
-            for(int i=0; i<Locals.Count; i++)
+            for (int i = 0; i < Locals.Count; i++)
             {
                 sb.Append("local");
                 sb.Append(i);
@@ -69,7 +75,7 @@ namespace ZMachine.Memory
             sb.AppendLine();
 
             sb.Append("Stack");
-            foreach(var item in EvaluationStack)
+            foreach (var item in EvaluationStack)
             {
                 sb.Append(item.ToString());
                 sb.Append(' ');

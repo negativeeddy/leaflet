@@ -267,7 +267,8 @@ namespace ZMachine
         public void ExecuteCurrentInstruction()
         {
             ZOpcode opcode = new ZOpcode(MainMemory.Bytes, ProgramCounter);
-            DebugOutput($"0x{instructionCount++:x4} {opcode}");
+            DebugOutput($"0x{instructionCount:x4} {opcode}");
+            instructionCount++;
 
             switch (opcode.Definition.Name)
             {
@@ -428,6 +429,8 @@ namespace ZMachine
                 case "pull":    // pull (variable)
                     ExecInstruction(opcode, op =>
                     {
+                        Debug.Assert(true, "Implementation of 'pull' is unclear. Check this when it gets executed");
+                        // pull stack -> (result)
                         Debug.Assert(op.OperandType.Count == 1);
                         var actualZVar = GetDereferencedFirstZVar(op);
                         int value = ReadVariable(actualZVar, true);
@@ -459,6 +462,7 @@ namespace ZMachine
                 case "inc_chk":    // inc_chk (variable) value ?(label)
                     ExecInstruction(opcode, op =>
                     {
+                        // Increment variable, and branch if now greater than value
                         Debug.Assert(op.OperandType.Count == 2);
 
                         // do the increment
@@ -469,12 +473,13 @@ namespace ZMachine
 
                         // do the compare
                         short compareVal = (short)GetOperandValue(op.Operands[1]);
-                        return value == compareVal ? 1 : 0;
+                        return value > compareVal ? 1 : 0;
                     });
                     break;
-                case "dec_chk":    // inc_chk (variable) value ?(label)
+                case "dec_chk":    // dec_chk (variable) value ?(label)
                     ExecInstruction(opcode, op =>
                     {
+                        // Decrement variable, and branch if it is now less than the given value
                         Debug.Assert(op.OperandType.Count == 2);
 
                         // do the decrement
@@ -485,7 +490,7 @@ namespace ZMachine
 
                         // do the compare
                         short compareVal = (short)GetOperandValue(op.Operands[1]);
-                        return value == compareVal ? 1 : 0;
+                        return value < compareVal ? 1 : 0;
                     });
                     break;
                 case "jin":    // jin obj1 obj2 ?(label)
@@ -596,7 +601,7 @@ namespace ZMachine
                         Debug.Assert(op.OperandType.Count == 1);
                         // Print(signed) number in decimal.
                         int val = GetOperandValue(opcode.Operands[0]);
-                        Console.Write(val.ToString("N"));
+                        Console.Write(val);
                         return UNUSED_RETURN_VALUE;
                     });
                     break;
@@ -833,14 +838,15 @@ namespace ZMachine
             }
 
             int nextInstruction = ProgramCounter += opcode.LengthInBytes;
-            Debug.WriteLine($"call 0x{callAddress:x}");
             if (callAddress == 0)
             {
+                DebugOutput($"  call 0x{callAddress:x} NOP/return false");
                 SetVariable(opcode.Store, 0);
                 ProgramCounter = nextInstruction;
             }
             else
             {
+                DebugOutput($"  call 0x{callAddress:x}");
                 LoadNewFrame(callAddress, nextInstruction, opcode.Store, opcode.Operands.Skip(1).ToArray());
             }
         }
