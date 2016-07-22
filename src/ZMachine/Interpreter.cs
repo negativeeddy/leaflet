@@ -476,6 +476,7 @@ namespace ZMachine
                 case "dec_chk":    // dec_chk (variable) value ?(label)
                     ExecInstruction(opcode, op =>
                     {
+                        // Decrement variable, and branch if it is now less than the given value
                         Debug.Assert(op.OperandType.Count == 2);
 
                         // do the decrement
@@ -486,7 +487,7 @@ namespace ZMachine
 
                         // do the compare
                         short compareVal = (short)GetOperandValue(op.Operands[1]);
-                        return value == compareVal ? 1 : 0;
+                        return value < compareVal ? 1 : 0;
                     });
                     break;
                 case "jin":    // jin obj1 obj2 ?(label)
