@@ -273,7 +273,6 @@ namespace ZMachine
         {
             ZOpcode opcode = CurrentInstruction;
             DebugOutput($"0x{instructionCount:x4} {opcode}");
-            instructionCount++;
 
             switch (opcode.Definition.Name)
             {
@@ -816,9 +815,22 @@ namespace ZMachine
                 case "sread": // sread text parse
                     ExecInstruction(opcode, op => HandleRead(op));
                     break;
+                case "push":  // push value
+                    ExecInstruction(opcode, op =>
+                    {
+                        // Pushes value onto the game stack.
+                        Debug.Assert(op.OperandType.Count == 1);
+
+                        ushort value = (ushort)GetOperandValue(op.Operands[0]);
+                        CurrentRoutineFrame.EvaluationStack.Push(value);
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
                 default:
                     throw new NotImplementedException($"Opcode [{opcode}] not implemented yet");
             }
+
+            instructionCount++;
         }
 
         private ZVariable GetDereferencedFirstZVar(ZOpcode opcode)
