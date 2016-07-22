@@ -114,7 +114,6 @@ namespace ZMachine.Story
                 if (length > 0)
                 {
                     var zb = new ZStringBuilder(_bytes, currentIndex, length);
-                    NameLengthInBytes = zb.LengthInBytes;
                     return zb;
                 }
                 else
@@ -123,11 +122,13 @@ namespace ZMachine.Story
                 }
             }
         }
-        private int NameLengthInBytes { get; set; }
+        private int NameLengthInBytes { get { return NameBuilder.LengthInBytes; } }
 
         public uint GetPropertyValue(int propertyID)
         {
-            var prop = CustomProperties.FirstOrDefault(p => p.ID == propertyID);
+            var props = CustomProperties;
+
+            var prop = props.FirstOrDefault(p => p.ID == propertyID);
             if (prop != null)
             {
                 var data = prop.Data;
@@ -147,9 +148,10 @@ namespace ZMachine.Story
             }
             else
             {
-                Debug.WriteLine($"Default property used for prop {propertyID}. Value = {DefaultProperties[propertyID]}");
                 // return default property value
-                return DefaultProperties[propertyID];
+                ushort value = DefaultProperties[propertyID];
+                Debug.WriteLine($"  Default property used for prop {propertyID}. Value = {value}");
+                return value;
             }
         }
 

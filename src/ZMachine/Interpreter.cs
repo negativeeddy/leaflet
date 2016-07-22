@@ -267,7 +267,8 @@ namespace ZMachine
         public void ExecuteCurrentInstruction()
         {
             ZOpcode opcode = new ZOpcode(MainMemory.Bytes, ProgramCounter);
-            DebugOutput($"0x{instructionCount++:x4} {opcode}");
+            DebugOutput($"0x{instructionCount:x4} {opcode}");
+            instructionCount++;
 
             switch (opcode.Definition.Name)
             {
@@ -600,7 +601,7 @@ namespace ZMachine
                         Debug.Assert(op.OperandType.Count == 1);
                         // Print(signed) number in decimal.
                         int val = GetOperandValue(opcode.Operands[0]);
-                        Console.Write(val.ToString("N"));
+                        Console.Write(val);
                         return UNUSED_RETURN_VALUE;
                     });
                     break;
@@ -837,14 +838,15 @@ namespace ZMachine
             }
 
             int nextInstruction = ProgramCounter += opcode.LengthInBytes;
-            Debug.WriteLine($"call 0x{callAddress:x}");
             if (callAddress == 0)
             {
+                DebugOutput($"  call 0x{callAddress:x} NOP/return false");
                 SetVariable(opcode.Store, 0);
                 ProgramCounter = nextInstruction;
             }
             else
             {
+                DebugOutput($"  call 0x{callAddress:x}");
                 LoadNewFrame(callAddress, nextInstruction, opcode.Store, opcode.Operands.Skip(1).ToArray());
             }
         }

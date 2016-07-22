@@ -10,6 +10,23 @@ namespace ZMachine.Story.Tests
     public class ObjectTableTests
     {
         [TestMethod]
+        public void  ObjectPropertyValuesWorkWithoutCheckingNameFirst()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            var objTree = zm.MainMemory.ObjectTree;
+            int objID = 0xa7;
+            int propertyID = 0x0a;
+
+            var obj = zm.MainMemory.ObjectTree.GetObject(objID);
+            Assert.IsNotNull(obj, "No object found");
+
+            int value = (int)obj.GetPropertyValue(propertyID);
+            Assert.AreEqual(0, value);
+        }
+
+        [TestMethod]
         public void ObjectTableVerificationTest()
         {
             string filename = @"GameFiles\minizork.z3";
