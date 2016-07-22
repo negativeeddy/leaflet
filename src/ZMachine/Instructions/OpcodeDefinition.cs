@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace ZMachine.Instructions
 {
     public struct OpcodeDefinition
     {
+        /// <summary>
+        /// Whether the opcode takes indirect variable references - spec 6.3.4
+        /// </summary>
         public bool UsesIndirection;
         public bool IsCall;
         public string Name;

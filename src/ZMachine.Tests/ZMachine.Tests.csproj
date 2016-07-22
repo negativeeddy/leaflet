@@ -56,7 +56,6 @@
     <Compile Include="Instructions\ZOpcodeDefinitionTests.cs" />
     <Compile Include="Instructions\ZOpcodeTests.cs" />
     <Compile Include="Memory\AddressHelperTests.cs" />
-    <Compile Include="Memory\RoutineTests.cs" />
     <Compile Include="Story\InputTests.cs" />
     <Compile Include="Story\ObjectTableTests.cs" />
     <Compile Include="Story\DictionaryTests.cs" />

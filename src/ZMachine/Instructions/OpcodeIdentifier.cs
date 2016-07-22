@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ZMachine.Instructions
 {
+    /// <summary>
+    /// This class provides a unique identifier for an opcode made up
+    /// of the operand count and the opcode number
+    /// </summary>
     public class OpcodeIdentifier
     {
         public OperandCountType OperandCount;

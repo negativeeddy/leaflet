@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ZMachine.Instructions
+﻿namespace ZMachine.Instructions
 {
     public enum OpcodeForm
     {
@@ -13,5 +7,4 @@ namespace ZMachine.Instructions
         Variable,
         Extended
     };
-
 }

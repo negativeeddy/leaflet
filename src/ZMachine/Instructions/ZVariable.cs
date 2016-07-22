@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZMachine.Memory;
 
 namespace ZMachine.Instructions
 {
@@ -88,6 +83,5 @@ namespace ZMachine.Instructions
                     throw new InvalidOperationException($"Unknown variable location '{Location}'");
             }
         }
-
     }
 }

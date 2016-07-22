@@ -5,7 +5,7 @@ namespace ZMachine.Story
 {
     public class ZHeader
     {
-        //header offsets from http://inform-fiction.org/zmachine/standards/z1point1/sect11.html
+        //header offsets from spec 11.1
         private const int HeaderOffset_Version = 0x00;
         private const int HeaderOffset_Flags1 = 0x01;
         private const int HeaderOffset_ReleaseNumber = 0x02;
@@ -74,6 +74,7 @@ namespace ZMachine.Story
                 return code;
             }
         }
+
         public ushort AbbreviationsTableAddress { get { return _data.GetWord(HeaderOffset_LocationOfAbbreviationsTable); } }
         public ushort Filelength { get { return _data.GetWord(HeaderOffset_Lengthoffile); } }
         public ushort Checksum { get { return _data.GetWord(HeaderOffset_ChecksumOfFile); } }
@@ -85,6 +86,5 @@ namespace ZMachine.Story
         public ushort ScreenWidthUnits { get { return _data.GetWord(HeaderOffset_ScreenwidthInUnits); } }
 
         public byte StandardRevisionNumber { get { return _data[HeaderOffset_Standardrevisionnumber]; } }
-
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ZMachine.Instructions;
 using ZMachine.Memory;
 using ZMachine.Story;
 

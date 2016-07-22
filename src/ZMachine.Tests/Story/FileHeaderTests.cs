@@ -15,7 +15,6 @@ namespace ZMachine.Story.Tests
             var zm = ZMachineLoader.Load(filename);
 
             Assert.AreEqual(3, zm.MainMemory.Header.Version);
-            //Assert.AreEqual(53248, zm.MainMemory.Header.Filelength);
             Assert.AreEqual(34, zm.MainMemory.Header.ReleaseNumber);
             Assert.AreEqual("871124", zm.MainMemory.Header.SerialCode);
             Assert.AreEqual(0x2187, zm.MainMemory.Header.StaticMemoryAddress);

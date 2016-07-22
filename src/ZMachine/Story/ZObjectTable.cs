@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using ZMachine.Memory;
 
 namespace ZMachine.Story
@@ -52,7 +50,6 @@ namespace ZMachine.Story
         /// All of the ZObjects in the machine
         /// </summary>
         public List<ZObject> Objects { get; } = new List<ZObject>(256);
-
 
         public ZObject this[int index]
         {

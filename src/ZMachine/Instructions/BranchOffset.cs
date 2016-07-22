@@ -46,6 +46,7 @@ namespace ZMachine.Instructions
         public int LengthInBytes { get; }
 
         public bool WhenTrue { get; }
+
         public int Offset { get; }
 
         public override string ToString()
