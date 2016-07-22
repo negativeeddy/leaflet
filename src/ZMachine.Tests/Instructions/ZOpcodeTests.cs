@@ -42,6 +42,8 @@ namespace ZMachine.Instructions.Tests
             foreach (var instruction in query)
             {
                 Assert.AreEqual(instruction.address, zm.ProgramCounter, $"Instruction 0x{instruction.index:x4} address is 0x{zm.ProgramCounter:x} instead of 0x{instruction.address:x}");
+                if (zm.CurrentInstruction.Definition.Name == "sread")
+                    break;
                 zm.ExecuteCurrentInstruction();
             }
         }

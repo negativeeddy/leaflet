@@ -366,7 +366,14 @@ namespace ZMachine
                     ExecInstruction(opcode, op => (short)GetOperandValue(op.Operands[0]) < (short)GetOperandValue(op.Operands[0]) ? 1 : 0);
                     break;
                 case "jg":  // jg a b ?(label)
-                    ExecInstruction(opcode, op => (short)GetOperandValue(op.Operands[0]) > (short)GetOperandValue(op.Operands[0]) ? 1 : 0);
+                    ExecInstruction(opcode, op =>
+                    {
+                        Debug.Assert(opcode.OperandType.Count == 2);
+                        short op0 = (short)GetOperandValue(op.Operands[0]);
+                        short op1 = (short)GetOperandValue(op.Operands[1]);
+                        bool jg = op0 > op1;
+                        return jg ? 1 : 0;
+                    });
                     break;
                 case "jump":    // jump ?(label)
                     int jumpAddress = GetOperandValue(opcode.Operands[0]);
