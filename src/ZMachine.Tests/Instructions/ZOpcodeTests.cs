@@ -25,25 +25,25 @@ namespace ZMachine.Instructions.Tests
         [TestMethod()]
         public void OpCodeTest_MiniZorkDisassembly()
         {
-            Assert.Inconclusive();
-
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
 
             string[] input = File.ReadAllLines(@"GameFiles\minizork.dasm");
-            foreach (var data in input.Select(line => ParseInfoDump(line, zm.MainMemory)))
+
+            int i = 0;
+            var query = from line in input
+                        where line.StartsWith("0x") // only the instruction lines
+                        let lineparts = line.Split(' ')
+                        select new {
+                            index = Convert.ToInt32(lineparts[0], 16),
+                            address = Convert.ToInt32(lineparts[1], 16),
+                        };
+
+            foreach (var instruction in query)
             {
-                ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, data.Address);
-
-                CompareOpcodeWithExpectedValues(zop,
-                    data.Name,
-                    data.Operands,
-                    data.LengthInBytes,
-                    data.BranchToAddress,
-                    data.Store
-                    );
+                Assert.AreEqual(instruction.address, zm.ProgramCounter, $"Instruction {instruction.index:x} address is 0x{zm.ProgramCounter:x} instead of 0x{instruction.address:x}");
+                zm.ExecuteCurrentInstruction();
             }
-
         }
 
         public OpcodeData ParseInfoDump(string opcodeLine, ZMemory memory)

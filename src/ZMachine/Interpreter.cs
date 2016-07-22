@@ -264,9 +264,14 @@ namespace ZMachine
 
         private int instructionCount = 0;
 
+        public ZOpcode CurrentInstruction
+        {
+            get { return new ZOpcode(MainMemory.Bytes, ProgramCounter); }
+        }
+
         public void ExecuteCurrentInstruction()
         {
-            ZOpcode opcode = new ZOpcode(MainMemory.Bytes, ProgramCounter);
+            ZOpcode opcode = CurrentInstruction;
             DebugOutput($"0x{instructionCount:x4} {opcode}");
             instructionCount++;
 
