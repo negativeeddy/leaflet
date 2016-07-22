@@ -46,19 +46,16 @@ namespace ZMachine.Memory
             Store = returnStore;
 
             int localVariableCount = bytes[routineAddress];
+
+            // initialize locals from the routine definition
             Locals = bytes.GetWords(routineAddress + 1, localVariableCount);
 
-            for (int i = 0; i < localVariableCount; i++)
+            // update locals with any provided arguments
+            for (int i = 0; i < localInitValues.Count; i++)
             {
                 if (i < localInitValues.Count)
                 {
-                    // populate local from the arguments
                     Locals[i] = localInitValues[i];
-                }
-                else
-                {
-                    // populate local from default in the routine definition
-                    Locals[i] = _bytes.GetWord(routineAddress + i * 2 + 1);
                 }
             }
         }

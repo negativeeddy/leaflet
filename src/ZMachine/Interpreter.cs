@@ -459,6 +459,7 @@ namespace ZMachine
                 case "inc_chk":    // inc_chk (variable) value ?(label)
                     ExecInstruction(opcode, op =>
                     {
+                        // Increment variable, and branch if now greater than value
                         Debug.Assert(op.OperandType.Count == 2);
 
                         // do the increment
@@ -469,10 +470,10 @@ namespace ZMachine
 
                         // do the compare
                         short compareVal = (short)GetOperandValue(op.Operands[1]);
-                        return value == compareVal ? 1 : 0;
+                        return value > compareVal ? 1 : 0;
                     });
                     break;
-                case "dec_chk":    // inc_chk (variable) value ?(label)
+                case "dec_chk":    // dec_chk (variable) value ?(label)
                     ExecInstruction(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 2);
