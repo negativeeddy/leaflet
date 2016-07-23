@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleHost", "ConsoleHost\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZMachine.Tests", "ZMachine.Tests\ZMachine.Tests.csproj", "{D3615E9E-B528-43AC-B9D9-41FBC1DB0428}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZMachine.Core", "ZMachine.Core\ZMachine.Core.csproj", "{B5788326-DB90-425F-BE62-7A062BF18485}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D3615E9E-B528-43AC-B9D9-41FBC1DB0428}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3615E9E-B528-43AC-B9D9-41FBC1DB0428}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3615E9E-B528-43AC-B9D9-41FBC1DB0428}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5788326-DB90-425F-BE62-7A062BF18485}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5788326-DB90-425F-BE62-7A062BF18485}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5788326-DB90-425F-BE62-7A062BF18485}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5788326-DB90-425F-BE62-7A062BF18485}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using ZMachine.Tests;
+using ZMachine.Tests.TestHelpers;
 
 namespace ZMachine.Instructions.Tests
 {
@@ -19,6 +20,7 @@ namespace ZMachine.Instructions.Tests
 
         public bool BranchToOnTrue { get; internal set; }
     }
+
     [TestClass()]
     public class ZOpcodeTests
     {
@@ -27,6 +29,8 @@ namespace ZMachine.Instructions.Tests
         {
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
+            zm.Input = new InputFeeder(new string[] { "open mailbox" });
+            zm.Output.Subscribe(x => Console.Write(x));
 
             string[] input = File.ReadAllLines(@"GameFiles\minizork.dasm");
 
@@ -41,8 +45,6 @@ namespace ZMachine.Instructions.Tests
             foreach (var instruction in query)
             {
                 Assert.AreEqual(instruction.address, zm.ProgramCounter, $"Instruction 0x{instruction.index:x4} address is 0x{zm.ProgramCounter:x} instead of 0x{instruction.address:x}");
-                if (zm.CurrentInstruction.Definition.Name == "sread")
-                    break;
                 zm.ExecuteCurrentInstruction();
             }
         }
