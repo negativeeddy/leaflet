@@ -354,11 +354,14 @@ namespace ZMachine
                     ExecInstruction(opcode, op =>
                     {
                         // je a b c d ? (label)
+                        Debug.Assert(opcode.OperandType.Count > 1);
+
                         short a = (short)GetOperandValue(op.Operands[0]);
                         for (int i = 1; i < op.Operands.Count; i++)
                         {
                             // is true if the first operand matches any of the others
-                            if (a == GetOperandValue(op.Operands[i]))
+                            short nextOp = (short)GetOperandValue(op.Operands[i]);
+                            if (a == nextOp)
                             {
                                 return 1;
                             }
