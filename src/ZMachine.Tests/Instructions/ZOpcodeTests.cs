@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -32,6 +33,9 @@ namespace ZMachine.Instructions.Tests
             zm.Input = new InputFeeder(new string[] { "open mailbox" });
             zm.Output.Subscribe(x => Console.Write(x));
 
+            ConcurrentQueue<string> diagQueue = new ConcurrentQueue<string>();
+
+            zm.Diagnostics.Subscribe(x => diagQueue.Enqueue(x));
             string[] input = File.ReadAllLines(@"GameFiles\minizork.dasm");
 
             var query = from line in input
@@ -44,6 +48,13 @@ namespace ZMachine.Instructions.Tests
 
             foreach (var instruction in query)
             {
+                if (instruction.address != zm.ProgramCounter)
+                {
+                    foreach(var diagLine in diagQueue.Skip(diagQueue.Count-50))
+                    {
+                        Console.Write(diagLine);
+                    }
+                }
                 Assert.AreEqual(instruction.address, zm.ProgramCounter, $"Instruction 0x{instruction.index:x4} address is 0x{zm.ProgramCounter:x} instead of 0x{instruction.address:x}");
                 zm.ExecuteCurrentInstruction();
             }

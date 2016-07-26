@@ -21,13 +21,15 @@ namespace ZMachine.Story
         private byte SizeByte { get { return _bytes[BaseAddress]; } }
         public int ID { get { return SizeByte.FetchBits(BitNumber.Bit_4, 5); } }
         private int DataLength { get { return SizeByte.FetchBits(BitNumber.Bit_7, 3) + 1; } }
+        public int DataAddress { get { return BaseAddress + 1;} }
+
         public IList<byte> Data
         {
             get
             {
                 Debug.Assert(DataLength >= 0);
                 Debug.Assert(DataLength <= 8);
-                return new ArraySegment<byte>((byte[])_bytes, BaseAddress + 1, DataLength);
+                return new ArraySegment<byte>((byte[])_bytes, DataAddress, DataLength);
             }
         }
     }

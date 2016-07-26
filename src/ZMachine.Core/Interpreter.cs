@@ -785,7 +785,7 @@ namespace ZMachine
                         var obj = MainMemory.ObjectTree.GetObject(objID);
 
                         var prop = obj.CustomProperties.FirstOrDefault(p => p.ID == propertyID);
-                        return prop?.BaseAddress ?? 0;
+                        return prop?.DataAddress ?? 0;
                     });
                     break;
                 case "get_next_prop": // get_next_prop object property -> (result)
