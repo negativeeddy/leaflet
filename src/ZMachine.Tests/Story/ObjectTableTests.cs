@@ -235,6 +235,29 @@ namespace ZMachine.Story.Tests
                 Assert.AreEqual(expected, actual, $"Error on {obj.ToString()} attribute {item.Item2}");
             }
         }
+
+        [TestMethod]
+        public void ObjectPropAddressTest()
+        {
+            string filename = @"GameFiles\minizork.z3";
+            var zm = ZMachineLoader.Load(filename);
+
+            var objTree = zm.MainMemory.ObjectTree;
+
+            var mailbox = zm.MainMemory.ObjectTree.GetObject(167);
+            Assert.AreEqual(mailbox.ShortName, "small mailbox");
+            int objID = 167;
+            int propertyID = 11;
+
+            var obj = zm.MainMemory.ObjectTree.GetObject(objID);
+
+            var prop = obj.CustomProperties.First();
+            Assert.AreEqual(prop.DataAddress, 0x1886);
+
+            prop = obj.CustomProperties.FirstOrDefault(p => p.ID == propertyID);
+            Assert.AreEqual(prop.DataAddress, 0x1891);
+        }
+
         [TestMethod]
         public void SetAttributeTest()
         {

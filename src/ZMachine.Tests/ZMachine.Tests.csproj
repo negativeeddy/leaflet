@@ -87,12 +87,16 @@
     <Compile Include="TestHelpers\ZMachineLoader.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="GameFiles\miniZork_input_mailbox.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="GameFiles\minizork.z3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="GameFiles\miniZork.dasm">
+    <Content Include="GameFiles\minizork_input_walkthrough.txt" />
+    <Content Include="GameFiles\miniZork_opcodes_mailbox.dasm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

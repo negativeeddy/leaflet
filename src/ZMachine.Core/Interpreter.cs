@@ -917,8 +917,9 @@ namespace ZMachine
             if (input.Length > txtBufferSize)
             {
                 // trim the input down to the buffer size
-                input = input.Substring(0, txtBufferSize).ToLower();
+                input = input.Substring(0, txtBufferSize);
             }
+            input = input.ToLower();
 
             for (int i = 0; i < input.Length; i++)
             {

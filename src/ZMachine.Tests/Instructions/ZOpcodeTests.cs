@@ -30,13 +30,13 @@ namespace ZMachine.Instructions.Tests
         {
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
-            zm.Input = new InputFeeder(new string[] { "open mailbox" });
+            zm.Input = new InputFeeder(File.ReadLines(@"GameFiles\miniZork_input_mailbox.txt"));
             zm.Output.Subscribe(x => Console.Write(x));
 
             ConcurrentQueue<string> diagQueue = new ConcurrentQueue<string>();
 
             zm.Diagnostics.Subscribe(x => diagQueue.Enqueue(x));
-            string[] input = File.ReadAllLines(@"GameFiles\minizork.dasm");
+            string[] input = File.ReadAllLines(@"GameFiles\miniZork_opcodes_mailbox.dasm");
 
             var query = from line in input
                         where line.StartsWith("0x") // only the instruction lines

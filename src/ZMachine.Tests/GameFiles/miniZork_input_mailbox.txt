@@ -1,0 +1,4 @@
+﻿open mailbox
+read leaflet
+s
+e
