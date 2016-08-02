@@ -80,7 +80,7 @@ namespace ZMachine.Memory
         public static BitNumber[] GetBits(this uint dword)
         {
             List<BitNumber> bits = new List<BitNumber>();
-            for(int i=0; i<32;i++)
+            for(int i=31; i>=0;i--)
             {
                 BitNumber num = (BitNumber)i;
                 if (dword.FetchBits(num, 1) == 1)

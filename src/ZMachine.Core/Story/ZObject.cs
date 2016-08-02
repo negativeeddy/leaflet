@@ -62,6 +62,46 @@ namespace ZMachine.Story
             return $"[{ID:D3}] {ShortName}";
         }
 
+        public string ToLongString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"ID:{ID} Name:{this.ShortName.Replace(' ','_')} Attributes:");
+            foreach (var bit in Attributes.GetBits())
+            {
+                sb.Append((31 - (int)bit).ToString());    // TODO: Is printing wrong or are bit labels backwards?
+                sb.Append(',');
+            }
+
+            // remove the last comma if attributes were added
+            if (sb[sb.Length-1] == ',')
+            {
+                sb.Remove(sb.Length - 1, 1);
+            }
+
+            sb.Append(" ");
+
+            sb.Append($"Parent:{ParentID} Sibling:{SiblingID} Child:{ChildID} ");
+            sb.Append($"PropertyAddr:{PropertyTableAddress:x4} " );
+
+            sb.Append("Properties:");
+            foreach (var prop in CustomProperties.OrderBy(x=>x.ID))
+            {
+                sb.Append($"[{prop.ID}],");
+                foreach (byte b in prop.Data)
+                {
+                    sb.Append($"{b:x2},");
+                }
+            }
+
+            // remove the last comma if custom properties were added
+            if (sb[sb.Length - 1] == ',')
+            {
+                sb.Remove(sb.Length - 1, 1);
+            }
+
+            return sb.ToString();
+        }
+
         public string ToFullString()
         {
             StringBuilder sb = new StringBuilder();
@@ -121,7 +161,7 @@ namespace ZMachine.Story
                 }
             }
         }
-        private int NameLengthInBytes { get { return NameBuilder.LengthInBytes; } }
+        private int NameLengthInBytes { get { return NameBuilder?.LengthInBytes ?? 0; } }
 
         public uint GetPropertyValue(int propertyID)
         {

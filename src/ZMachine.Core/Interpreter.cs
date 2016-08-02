@@ -154,23 +154,23 @@ namespace ZMachine
             {
                 case ZVariableLocation.Global:
                     value = MainMemory.GlobalVariables[variable.Value];
-                    DebugOutput($"  <= ReadVariable(0x{value:x2} <= G{variable.Value})", DebugLevel.Diagnostic);
+                    DebugOutput($"  <= ReadVariable(0x{value:x2} <= G{variable.Value})", DiagnosticsLevel.Diagnostic);
                     break;
                 case ZVariableLocation.Local:
                     value = CurrentRoutineFrame.Locals[variable.Value];
-                    DebugOutput($"  <= ReadVariable(0x{value:x2} <= L{variable.Value})", DebugLevel.Diagnostic);
+                    DebugOutput($"  <= ReadVariable(0x{value:x2} <= L{variable.Value})", DiagnosticsLevel.Diagnostic);
                     break;
                 case ZVariableLocation.Stack:
                     var varStack = CurrentRoutineFrame.EvaluationStack;
                     if (inPlace)
                     {
                         value = varStack.Peek();
-                        DebugOutput($"  <= ReadVariable(0x{value:x2} <= StackPeek)", DebugLevel.Diagnostic);
+                        DebugOutput($"  <= ReadVariable(0x{value:x2} <= StackPeek)", DiagnosticsLevel.Diagnostic);
                     }
                     else
                     {
                         value = varStack.Pop();
-                        DebugOutput($"  <= ReadVariable(0x{value:x2} <= StackPop)", DebugLevel.Diagnostic);
+                        DebugOutput($"  <= ReadVariable(0x{value:x2} <= StackPop)", DiagnosticsLevel.Diagnostic);
                     }
                     break;
                 default:
@@ -192,34 +192,34 @@ namespace ZMachine
             {
                 case ZVariableLocation.Global:
                     MainMemory.GlobalVariables[variable.Value] = value;
-                    DebugOutput($"  => SetVariable(0x{value:x2} => G{variable.Value})", DebugLevel.Diagnostic);
+                    DebugOutput($"  => SetVariable(0x{value:x2} => G{variable.Value})", DiagnosticsLevel.Diagnostic);
                     break;
                 case ZVariableLocation.Local:
                     CurrentRoutineFrame.Locals[variable.Value] = value;
-                    DebugOutput($"  => SetVariable(0x{value:x2} => L{variable.Value})", DebugLevel.Diagnostic);
+                    DebugOutput($"  => SetVariable(0x{value:x2} => L{variable.Value})", DiagnosticsLevel.Diagnostic);
                     break;
                 case ZVariableLocation.Stack:
                     var varStack = CurrentRoutineFrame.EvaluationStack;
                     if (inPlace)
                     {
-                        DebugOutput($"  => SetVariable(popstack first)", DebugLevel.Diagnostic);
+                        DebugOutput($"  => SetVariable(popstack first)", DiagnosticsLevel.Diagnostic);
 
                         varStack.Pop();
                     }
                     varStack.Push(value);
-                    DebugOutput($"  => SetVariable(0x{value:x2} => stackPush)", DebugLevel.Diagnostic);
+                    DebugOutput($"  => SetVariable(0x{value:x2} => stackPush)", DiagnosticsLevel.Diagnostic);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(variable.Location));
             }
         }
 
-        enum DebugLevel { Off, Informational, Verbose, Diagnostic };
-        private DebugLevel currentDebugOutputLevel = DebugLevel.Informational;
+        public enum DiagnosticsLevel { Off, Informational, Verbose, Diagnostic };
+        public DiagnosticsLevel DiagnosticsOutputLevel = DiagnosticsLevel.Informational;
 
-        private void DebugOutput(string output, DebugLevel level = DebugLevel.Informational)
+        private void DebugOutput(string output, DiagnosticsLevel level = DiagnosticsLevel.Informational)
         {
-            if (level <= currentDebugOutputLevel)
+            if (level <= DiagnosticsOutputLevel)
             {
                 _dbgOut.WriteOutputLine(output);
             }
@@ -277,11 +277,8 @@ namespace ZMachine
             get { return new ZOpcode(MainMemory.Bytes, ProgramCounter); }
         }
 
-        public void ExecuteCurrentInstruction()
+        private void ExecuteOpcode(ZOpcode opcode)
         {
-            ZOpcode opcode = CurrentInstruction;
-            DebugOutput($"0x{instructionCount:x4} {opcode}");
-
             switch (opcode.Definition.Name)
             {
                 case "call":
@@ -311,7 +308,7 @@ namespace ZMachine
                     Handle_Return(opcode, 0);
                     break;
                 case "add":
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         short a = (short)GetOperandValue(op.Operands[0]);
                         short b = (short)GetOperandValue(op.Operands[1]);
@@ -319,7 +316,7 @@ namespace ZMachine
                     });
                     break;
                 case "sub":
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         short a = (short)GetOperandValue(op.Operands[0]);
                         short b = (short)GetOperandValue(op.Operands[1]);
@@ -327,7 +324,7 @@ namespace ZMachine
                     });
                     break;
                 case "mul":
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         short a = (short)GetOperandValue(op.Operands[0]);
                         short b = (short)GetOperandValue(op.Operands[1]);
@@ -335,7 +332,7 @@ namespace ZMachine
                     });
                     break;
                 case "div":
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         short a = (short)GetOperandValue(op.Operands[0]);
                         short b = (short)GetOperandValue(op.Operands[1]);
@@ -343,7 +340,7 @@ namespace ZMachine
                     });
                     break;
                 case "mod":
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         short a = (short)GetOperandValue(op.Operands[0]);
                         short b = (short)GetOperandValue(op.Operands[1]);
@@ -351,7 +348,7 @@ namespace ZMachine
                     });
                     break;
                 case "je":
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         // je a b c d ? (label)
                         Debug.Assert(opcode.OperandType.Count > 1);
@@ -370,13 +367,13 @@ namespace ZMachine
                     });
                     break;
                 case "jz":  // jz a ?(label)
-                    ExecInstruction(opcode, op => GetOperandValue(op.Operands[0]) == 0 ? 1 : 0);
+                    Handle_Opcode(opcode, op => GetOperandValue(op.Operands[0]) == 0 ? 1 : 0);
                     break;
                 case "jl":  // jl a b ?(label)
-                    ExecInstruction(opcode, op => (short)GetOperandValue(op.Operands[0]) < (short)GetOperandValue(op.Operands[1]) ? 1 : 0);
+                    Handle_Opcode(opcode, op => (short)GetOperandValue(op.Operands[0]) < (short)GetOperandValue(op.Operands[1]) ? 1 : 0);
                     break;
                 case "jg":  // jg a b ?(label)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(opcode.OperandType.Count == 2);
                         short op0 = (short)GetOperandValue(op.Operands[0]);
@@ -390,7 +387,7 @@ namespace ZMachine
                     ProgramCounter = jumpAddress;
                     break;
                 case "loadb":   // loadb array byte-index -> (result)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         int arrayAddress = GetOperandValue(op.Operands[0]);
                         int byteIndex = GetOperandValue(op.Operands[1]);
@@ -398,7 +395,7 @@ namespace ZMachine
                     });
                     break;
                 case "loadw":   // loadw array word-index -> (result)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         int arrayAddress = GetOperandValue(op.Operands[0]);
                         int wordIndex = GetOperandValue(op.Operands[1]);
@@ -408,7 +405,7 @@ namespace ZMachine
                     });
                     break;
                 case "storeb":  // storeb array byte-index value
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         int arrayAddress = GetOperandValue(op.Operands[0]);
                         int byteIndex = GetOperandValue(op.Operands[1]);
@@ -418,7 +415,7 @@ namespace ZMachine
                     });
                     break;
                 case "storew":  // storew array word-index value
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         int arrayAddress = GetOperandValue(op.Operands[0]);
                         int wordIndex = GetOperandValue(op.Operands[1]);
@@ -430,7 +427,7 @@ namespace ZMachine
                     });
                     break;
                 case "load":    // load (variable) -> (result)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 1);
                         var actualZVar = GetDereferencedFirstZVar(op);
@@ -439,7 +436,7 @@ namespace ZMachine
                     });
                     break;
                 case "store":   // store (variable) value
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 2);
                         var actualZVar = GetDereferencedFirstZVar(op);
@@ -449,7 +446,7 @@ namespace ZMachine
                     });
                     break;
                 case "pull":    // pull (variable)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(true, "Implementation of 'pull' is unclear. Check this when it gets executed");
                         // pull stack -> (result)
@@ -460,7 +457,7 @@ namespace ZMachine
                     });
                     break;
                 case "inc":    // inc (variable)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 1);
                         var actualZVar = GetDereferencedFirstZVar(op);
@@ -471,7 +468,7 @@ namespace ZMachine
                     });
                     break;
                 case "dec":    // dec (variable)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 1);
                         var actualZVar = GetDereferencedFirstZVar(op);
@@ -482,24 +479,24 @@ namespace ZMachine
                     });
                     break;
                 case "inc_chk":    // inc_chk (variable) value ?(label)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         // Increment variable, and branch if now greater than value
                         Debug.Assert(op.OperandType.Count == 2);
 
                         // do the increment
                         var actualZVar = GetDereferencedFirstZVar(op);
-                        ushort value = ReadVariable(actualZVar, true);
-                        value++;
-                        SetVariable(actualZVar, value, true);
+                        ushort variableValue = ReadVariable(actualZVar, true);
+                        variableValue++;
+                        SetVariable(actualZVar, variableValue, true);
 
                         // do the compare
-                        short compareVal = (short)GetOperandValue(op.Operands[1]);
-                        return value > compareVal ? 1 : 0;
+                        short value = (short)GetOperandValue(op.Operands[1]);
+                        return variableValue > value ? 1 : 0;
                     });
                     break;
                 case "dec_chk":    // dec_chk (variable) value ?(label)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         // Decrement variable, and branch if it is now less than the given value
                         Debug.Assert(op.OperandType.Count == 2);
@@ -516,7 +513,7 @@ namespace ZMachine
                     });
                     break;
                 case "jin":    // jin obj1 obj2 ?(label)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 2);
 
@@ -527,7 +524,7 @@ namespace ZMachine
                     });
                     break;
                 case "get_child":    // get_child object -> (result) ?(label)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 1);
 
@@ -536,7 +533,7 @@ namespace ZMachine
                     });
                     break;
                 case "get_sibling":    // get_sibling object -> (result) ?(label)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 1);
 
@@ -545,7 +542,7 @@ namespace ZMachine
                     });
                     break;
                 case "get_parent":    // get_parent object -> (result)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 1);
 
@@ -554,7 +551,7 @@ namespace ZMachine
                     });
                     break;
                 case "insert_obj":  // insert_obj object destination
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 2);
                         int objectId = GetOperandValue(op.Operands[0]);
@@ -564,7 +561,7 @@ namespace ZMachine
                     });
                     break;
                 case "print":   // print <literal-string>
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 0);
                         Debug.Assert(op.Definition.HasText == true);
@@ -574,7 +571,7 @@ namespace ZMachine
                     });
                     break;
                 case "print_obj":   // print_obj object
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 1);
                         // takes an object number and prints its short name
@@ -585,7 +582,7 @@ namespace ZMachine
                     });
                     break;
                 case "print_addr":  // print_addr byte-address-of-string"
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 1);
                         // Print (Z-encoded) string at given byte address
@@ -596,7 +593,7 @@ namespace ZMachine
                     });
                     break;
                 case "print_paddr":  // print_paddr packed-address-of-string
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 1);
                         // Print (Z-encoded) string at given byte address
@@ -607,7 +604,7 @@ namespace ZMachine
                     });
                     break;
                 case "print_ret":  // print_ret <literal-string>
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 0);
                         Debug.Assert(op.Definition.HasText == true);
@@ -618,7 +615,7 @@ namespace ZMachine
                     });
                     break;
                 case "print_num":  // print_num value
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 1);
                         // Print(signed) number in decimal.
@@ -628,7 +625,7 @@ namespace ZMachine
                     });
                     break;
                 case "print_char":  // print_char output-character-code
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 1);
                         // Print a ZSCII character
@@ -639,7 +636,7 @@ namespace ZMachine
                     });
                     break;
                 case "new_line":  // new_line
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 0);
                         _stdOut.WriteOutputLine();
@@ -647,7 +644,7 @@ namespace ZMachine
                     });
                     break;
                 case "test":    // "test bitmap flags ? (label)"
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 2);
                         // Jump if all of the flags in bitmap are set(i.e. if bitmap & flags == flags).
@@ -658,7 +655,7 @@ namespace ZMachine
                     });
                     break;
                 case "test_attr": // test_attr object attribute ?(label)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 2);
                         // Jump if object has attribute.
@@ -670,7 +667,7 @@ namespace ZMachine
                     });
                     break;
                 case "set_attr": // set_attr object attribute
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 2);
                         // Make object have the attribute numbered attribute.
@@ -683,7 +680,7 @@ namespace ZMachine
                     });
                     break;
                 case "clear_attr": // clear_attr object attribute
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 2);
                         // Make object not have the attribute numbered attribute.
@@ -696,7 +693,7 @@ namespace ZMachine
                     });
                     break;
                 case "and": // and a b -> (result)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 2);
                         // Bitwise AND
@@ -706,7 +703,7 @@ namespace ZMachine
                     });
                     break;
                 case "or": // or a b -> (result)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 2);
                         // Bitwise OR
@@ -716,7 +713,7 @@ namespace ZMachine
                     });
                     break;
                 case "pop": // pop
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 0);
                         // Throws away the top item on the stack. (This was useful 
@@ -728,7 +725,7 @@ namespace ZMachine
                 case "catch":
                     throw new NotImplementedException($"TODO: catch instruction not yet implemented");
                 case "get_prop": // get_prop object property -> (result)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 2);
                         // Read property from object (resulting in the default value if it had no such
@@ -745,7 +742,7 @@ namespace ZMachine
                     });
                     break;
                 case "put_prop":    // put_prop object property value
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 3);
                         // Writes the given value to the given property of the given object. 
@@ -762,19 +759,18 @@ namespace ZMachine
                     });
                     break;
                 case "get_prop_len":    // get_prop_len property-address -> (result)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 1);
-                        // Writes the given value to the given property of the given object. 
-                        // If the property does not exist for that object, the interpreter should halt with a suitable error message.
+                        // Get length of property data (in bytes) for the given object's property.
                         int propAddr = GetOperandValue(opcode.Operands[0]);
 
-                        ZObjectProperty prop = new ZObjectProperty(MainMemory.Bytes, propAddr);
-                        return prop.LengthInBytes;
+                        ZObjectProperty prop = new ZObjectProperty(MainMemory.Bytes, propAddr-1);
+                        return prop.DataLength;
                     });
                     break;
                 case "get_prop_addr":   // get_prop_addr object property -> (result)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 2);
                         // Get the byte address (in dynamic memory) of the property data for the 
@@ -789,7 +785,7 @@ namespace ZMachine
                     });
                     break;
                 case "get_next_prop": // get_next_prop object property -> (result)
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         Debug.Assert(op.OperandType.Count == 1);
                         int objID = GetOperandValue(opcode.Operands[0]);
@@ -811,7 +807,7 @@ namespace ZMachine
                     });
                     break;
                 case "set_colour":  // set_colour foreground background
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         throw new NotImplementedException("set_colour not implemented yet");
                         Debug.Assert(op.OperandType.Count == 2);
@@ -824,10 +820,10 @@ namespace ZMachine
                     });
                     break;
                 case "sread": // sread text parse
-                    ExecInstruction(opcode, op => HandleRead(op));
+                    Handle_Opcode(opcode, op => HandleRead(op));
                     break;
                 case "push":  // push value
-                    ExecInstruction(opcode, op =>
+                    Handle_Opcode(opcode, op =>
                     {
                         // Pushes value onto the game stack.
                         Debug.Assert(op.OperandType.Count == 1);
@@ -840,8 +836,40 @@ namespace ZMachine
                 default:
                     throw new NotImplementedException($"Opcode [{opcode}] not implemented yet");
             }
+        }
 
+        public void ExecuteCurrentInstruction()
+        {
+            // run the current instruction
+            ZOpcode opcode = CurrentInstruction;
+            DebugOutput($"0x{instructionCount:x4} {opcode}");
+            ExecuteOpcode(opcode);
+
+            // move to the next instruction
             instructionCount++;
+
+            // After the instruction is executed, output diagnostic information
+            if (DiagnosticsOutputLevel >= DiagnosticsLevel.Verbose)
+            {
+                if (CurrentRoutineFrame != null)
+                {
+                    DebugOutput($"current_locals {CurrentRoutineFrame.Locals.ConcatToString(' ', val => $"{val:x4}")}"
+                            , DiagnosticsLevel.Verbose);
+                    DebugOutput($"current_globals {MainMemory.GlobalVariables.ConcatToString(' ', val => $"{val:x4}")}"
+                            , DiagnosticsLevel.Verbose);
+                    DebugOutput($"current_stack {CurrentRoutineFrame.EvaluationStack.ConcatToString(' ', val => $"{val:x4}")}"
+                            , DiagnosticsLevel.Verbose);
+                }
+            }
+
+            if (DiagnosticsOutputLevel >= DiagnosticsLevel.Diagnostic)
+            {
+                ZObject mailbox = MainMemory.ObjectTree.GetObject(167);
+                foreach (var obj in MainMemory.ObjectTree.Objects)
+                {
+                    DebugOutput("object " + obj.ToLongString(), DiagnosticsLevel.Diagnostic);
+                }
+            }
         }
 
         private ZVariable GetDereferencedFirstZVar(ZOpcode opcode)
@@ -1026,7 +1054,7 @@ namespace ZMachine
         /// functionality). If the opcode has a Store location, the return value from the handler
         /// will be put there. If the opcode is a branch, the return value is also used to determine
         /// whether the branch will happen</param>
-        private void ExecInstruction(ZOpcode opcode, Func<ZOpcode, int> handler)
+        private void Handle_Opcode(ZOpcode opcode, Func<ZOpcode, int> handler)
         {
             int result = handler(opcode);
 

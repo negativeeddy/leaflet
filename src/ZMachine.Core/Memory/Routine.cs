@@ -62,6 +62,7 @@ namespace ZMachine.Memory
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"Frame start at: {FirstInstructionAddress:x4}");
             sb.Append("Locals ");
             for (int i = 0; i < Locals.Count; i++)
             {

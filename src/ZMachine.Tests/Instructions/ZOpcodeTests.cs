@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using ZMachine.Story;
 using ZMachine.Tests;
 using ZMachine.Tests.TestHelpers;
 
@@ -32,31 +33,94 @@ namespace ZMachine.Instructions.Tests
             var zm = ZMachineLoader.Load(filename);
             zm.Input = new InputFeeder(File.ReadLines(@"GameFiles\miniZork_input_mailbox.txt"));
             zm.Output.Subscribe(x => Console.Write(x));
+            zm.DiagnosticsOutputLevel = Interpreter.DiagnosticsLevel.Verbose;
 
             ConcurrentQueue<string> diagQueue = new ConcurrentQueue<string>();
 
-            zm.Diagnostics.Subscribe(x => diagQueue.Enqueue(x));
-            string[] input = File.ReadAllLines(@"GameFiles\miniZork_opcodes_mailbox.dasm");
-
-            var query = from line in input
-                        where line.StartsWith("0x") // only the instruction lines
-                        let lineparts = line.Split(' ')
-                        select new {
-                            index = Convert.ToInt32(lineparts[0], 16),
-                            address = Convert.ToInt32(lineparts[1], 16),
-                        };
-
-            foreach (var instruction in query)
+            try
             {
-                if (instruction.address != zm.ProgramCounter)
+                zm.Diagnostics.Subscribe(x => Debug.Write(x));// diagQueue.Enqueue(x));
+                string[] input = File.ReadAllLines(@"GameFiles\miniZork_opcodes_mailbox.dasm");
+
+                var instructionBlocks = input.BufferUntil(x => x.StartsWith("0x"));
+
+
+                int index = -1; // keep track of the last instruction index
+                foreach (var block in instructionBlocks)
                 {
-                    foreach(var diagLine in diagQueue.Skip(diagQueue.Count-50))
+                    // validate the instruction index and address from the first line
+                    var addressParts = block.First().Split(' ').Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+
+                    index = Convert.ToInt32(addressParts[0], 16);
+                    int address = Convert.ToInt32(addressParts[1], 16);
+
+                    Assert.AreEqual(address, zm.ProgramCounter, $"Instruction 0x{index:x4} address is 0x{zm.ProgramCounter:x} instead of 0x{address:x}");
+
+                    zm.ExecuteCurrentInstruction();
+
+                    // validate the rest of the requirements after the instruction is executed
+                    foreach (string validation in block.Skip(1))
                     {
-                        Console.Write(diagLine);
+                        string[] parts = validation.Split(' ').Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+                        var currentFrame = zm.FrameStack.Peek();
+
+                        switch (parts[0])
+                        {
+                            case "current_globals":  // validate the current local variables
+                                Assert.AreEqual(parts.Length - 1, zm.MainMemory.GlobalVariables.Count,
+                                    $"Global variable count is wrong after executing instruction x{index:x4}");
+
+                                // zip the two together and return true if any have a mismatch when correlated
+                                var compareGlobals = parts.Skip(1).Zip(zm.MainMemory.GlobalVariables, (expected, actual) =>
+                                                                                expected != actual.ToString("x4"));
+                                Assert.IsFalse(compareGlobals.Any(x => x), $"Global don't match after executing instruction 0x{index:x4}");
+                                break;
+                            case "current_locals":  // validate the current local variables
+                                Assert.AreEqual(parts.Length - 1, currentFrame.Locals.Count,
+                                    $"Local variable count is wrong after executing instruction x{index:x4}");
+
+                                // zip the two together and return true if any have a mismatch when correlated
+                                var compareLocals = parts.Skip(1).Zip(currentFrame.Locals, (expected, actual) =>
+                                                                                expected != actual.ToString("x4"));
+                                Assert.IsFalse(compareLocals.Any(x => x), $"Locals don't match after executing instruction 0x{index:x4}");
+                                break;
+                            case "current_stack":  // validate the current local variables
+                                Assert.AreEqual(parts.Length - 1, currentFrame.EvaluationStack.Count,
+                                    $"Local variable count is wrong at instruction x{index:x4}");
+
+                                // zip the two together and return true if any have a mismatch when correlated
+                                var compareStackVars = parts.Skip(1).Zip(currentFrame.EvaluationStack, (expected, actual) =>
+                                                                                expected != actual.ToString("x4"));
+                                Assert.IsFalse(compareStackVars.Any(x => x), $"Stack doesn't match after executing instruction 0x{index:x4}");
+                                break;
+                            case "object":
+                                // object ID:63 Name:large_bag Attributes:11,6 Parent:112 Sibling:0 Child:0 PropertyAddr:0f88 Properties:[18],3f,78,[17],29,48,[16],f4,f3
+                                int id = int.Parse(parts[1].Split(':')[1]);
+                                ZObject obj = zm.MainMemory.ObjectTree.GetObject(id);
+                                string expectedObj = obj.ToLongString();
+                                string actualObj = validation.Substring(7);
+                                Assert.AreEqual(expectedObj, actualObj, $"object {id} is invalid after instruction 0x{index:x4}");
+                                break;
+                            default:
+                                break;
+                        }
                     }
+
                 }
-                Assert.AreEqual(instruction.address, zm.ProgramCounter, $"Instruction 0x{instruction.index:x4} address is 0x{zm.ProgramCounter:x} instead of 0x{instruction.address:x}");
-                zm.ExecuteCurrentInstruction();
+            }
+            finally
+            {
+                DumpDiagQueue(diagQueue);
+            }
+        }
+
+
+
+        private static void DumpDiagQueue(ConcurrentQueue<string> diagQueue)
+        {
+            foreach (var diagLine in diagQueue.Skip(diagQueue.Count - 50))
+            {
+                Console.Write(diagLine);
             }
         }
 

@@ -20,7 +20,7 @@ namespace ZMachine.Story
         // one, plus the property number (spec 12.4.1)
         private byte SizeByte { get { return _bytes[BaseAddress]; } }
         public int ID { get { return SizeByte.FetchBits(BitNumber.Bit_4, 5); } }
-        private int DataLength { get { return SizeByte.FetchBits(BitNumber.Bit_7, 3) + 1; } }
+        public int DataLength { get { return SizeByte.FetchBits(BitNumber.Bit_7, 3) + 1; } }
         public int DataAddress { get { return BaseAddress + 1;} }
 
         public IList<byte> Data

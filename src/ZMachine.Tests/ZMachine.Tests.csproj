@@ -73,6 +73,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Infrastructure\StringExtensionTests.cs" />
     <Compile Include="Instructions\BranchOffsetTests.cs" />
     <Compile Include="Instructions\ZOpcodeDefinitionTests.cs" />
     <Compile Include="Instructions\ZOpcodeTests.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Story\FileHeaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Memory\ZStringBuilderTests.cs" />
+    <Compile Include="TestHelpers\EnumerableExtensions.cs" />
     <Compile Include="TestHelpers\InputFeeder.cs" />
     <Compile Include="TestHelpers\ZMachineLoader.cs" />
   </ItemGroup>

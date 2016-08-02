@@ -18,6 +18,7 @@ namespace ConsoleHost
             zm.Input = new ConsoleInput();
             zm.Output.Subscribe(x => Console.Write(x));
             zm.Diagnostics.Subscribe(x => Debug.Write(x));
+            zm.DiagnosticsOutputLevel = Interpreter.DiagnosticsLevel.Verbose;
 
             string filename = @"GameFiles\minizork.z3";
             using (var stream = File.OpenRead(filename))
