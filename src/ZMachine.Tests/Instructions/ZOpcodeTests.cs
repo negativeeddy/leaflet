@@ -59,7 +59,7 @@ namespace ZMachine.Instructions.Tests
                     zm.ExecuteCurrentInstruction();
 
                     // validate the rest of the requirements after the instruction is executed
-                    foreach (string validation in block.Skip(1))
+                    foreach (string validation in block.Skip(1).Where(x=>!string.IsNullOrWhiteSpace(x)))
                     {
                         string[] parts = validation.Split(' ').Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
                         var currentFrame = zm.FrameStack.Peek();

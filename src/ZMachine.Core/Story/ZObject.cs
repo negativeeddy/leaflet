@@ -187,8 +187,10 @@ namespace ZMachine.Story
             }
             else
             {
-                // return default property value
-                ushort value = DefaultProperties[propertyID];
+                // When the game attempts to read the value of property n for an object which 
+                // does not provide property n, the n-th entry in this table is the resulting 
+                // value. spec 12.2
+                ushort value = DefaultProperties[propertyID-1];
                 Debug.WriteLine($"  Default property used for prop {propertyID}. Value = {value}");
                 return value;
             }
