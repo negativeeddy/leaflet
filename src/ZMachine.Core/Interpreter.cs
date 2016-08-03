@@ -353,17 +353,11 @@ namespace ZMachine
                         // je a b c d ? (label)
                         Debug.Assert(opcode.OperandType.Count > 1);
 
-                        short a = (short)GetOperandValue(op.Operands[0]);
-                        for (int i = 1; i < op.Operands.Count; i++)
-                        {
-                            // is true if the first operand matches any of the others
-                            short nextOp = (short)GetOperandValue(op.Operands[i]);
-                            if (a == nextOp)
-                            {
-                                return 1;
-                            }
-                        }
-                        return 0;   // didn't match so don't branch
+                        // force evalution of all operands in case there is a stack pop
+                        short[] operands = op.Operands.Select(o => (short)GetOperandValue(o)).ToArray();
+
+                        bool match = operands.Skip(1).Any(x => x == operands[0]);
+                        return match ? 1 : 0;
                     });
                     break;
                 case "jz":  // jz a ?(label)
