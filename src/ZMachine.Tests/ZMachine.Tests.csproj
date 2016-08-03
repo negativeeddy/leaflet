@@ -97,7 +97,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="GameFiles\minizork_input_walkthrough.txt" />
+    <Content Include="GameFiles\minizork_input_walkthrough.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="GameFiles\miniZork_opcodes_mailbox.dasm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -109,6 +111,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="GameFiles\miniZork_opcodes_walkthrough.dasm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

@@ -27,11 +27,29 @@ namespace ZMachine.Instructions.Tests
     public class ZOpcodeTests
     {
         [TestMethod()]
-        public void OpCodeTest_MiniZorkDisassembly()
+        public void WalkthroughTestMiniZork_Mailbox()
         {
-            string filename = @"GameFiles\minizork.z3";
-            var zm = ZMachineLoader.Load(filename);
-            zm.Input = new InputFeeder(File.ReadLines(@"GameFiles\miniZork_input_mailbox.txt"));
+            ValidateGameWalkThrough(
+                @"GameFiles\minizork.z3",
+                @"GameFiles\miniZork_input_mailbox.txt",
+                @"GameFiles\miniZork_opcodes_mailbox.dasm"
+            );
+        }
+
+        [TestMethod()]
+        public void WalkthoughTestMiniZork_Walkthrough()
+        {
+            ValidateGameWalkThrough(
+                @"GameFiles\minizork.z3",
+                @"GameFiles\miniZork_input_walkthrough.txt",
+                @"GameFiles\miniZork_opcodes_walkthrough.dasm"
+            );
+        }
+
+        public void ValidateGameWalkThrough(string gameFile, string inputFile, string expectedOutput)
+        {
+            var zm = ZMachineLoader.Load(gameFile);
+            zm.Input = new InputFeeder(File.ReadLines(inputFile));
             zm.Output.Subscribe(x => Console.Write(x));
             zm.DiagnosticsOutputLevel = Interpreter.DiagnosticsLevel.Verbose;
 
@@ -40,7 +58,7 @@ namespace ZMachine.Instructions.Tests
             try
             {
                 zm.Diagnostics.Subscribe(x => Debug.Write(x));// diagQueue.Enqueue(x));
-                string[] input = File.ReadAllLines(@"GameFiles\miniZork_opcodes_mailbox.dasm");
+                string[] input = File.ReadAllLines(expectedOutput);
 
                 var instructionBlocks = input.BufferUntil(x => x.StartsWith("0x"));
 
@@ -59,7 +77,7 @@ namespace ZMachine.Instructions.Tests
                     zm.ExecuteCurrentInstruction();
 
                     // validate the rest of the requirements after the instruction is executed
-                    foreach (string validation in block.Skip(1).Where(x=>!string.IsNullOrWhiteSpace(x)))
+                    foreach (string validation in block.Skip(1).Where(x => !string.IsNullOrWhiteSpace(x)))
                     {
                         string[] parts = validation.Split(' ').Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
                         var currentFrame = zm.FrameStack.Peek();

@@ -3,7 +3,7 @@ E
 E
 N
 W
-U (into the tree)
+U
 GET EGG
 D
 S
@@ -16,16 +16,14 @@ GET LAMP AND SWORD
 E
 U
 LIGHT 
-LAMP
 GET ROPE AND KNIFE
 D
 W
-MOVE RUG (under it is a trapdoor)
-OPEN 
-TRAPDOOR
-D (someboyd slams the trapdoor shut)
+MOVE RUG
+OPEN TRAPDOOR
+D
 N
-KILL TROLL WITH SWORD (till he dies)
+KILL TROLL WITH SWORD
 DROP SWORD
 S
 S
