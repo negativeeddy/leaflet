@@ -598,15 +598,12 @@ namespace ZMachine
                     });
                     break;
                 case "print_ret":  // print_ret <literal-string>
-                    Handle_Opcode(opcode, op =>
-                    {
-                        Debug.Assert(op.OperandType.Count == 0);
-                        Debug.Assert(op.Definition.HasText == true);
-                        // Print the quoted (literal) Z-encoded string, then print
-                        // a new-line and then return true (i.e., 1). 
-                        _stdOut.WriteOutputLine(opcode.Text);
-                        return 1;
-                    });
+                    Debug.Assert(opcode.OperandType.Count == 0);
+                    Debug.Assert(opcode.Definition.HasText == true);
+                    // Print the quoted (literal) Z-encoded string, then print
+                    // a new-line and then return true (i.e., 1). 
+                    _stdOut.WriteOutputLine(opcode.Text);
+                    Handle_Return(opcode, 1);
                     break;
                 case "print_num":  // print_num value
                     Handle_Opcode(opcode, op =>
@@ -759,7 +756,7 @@ namespace ZMachine
                         // Get length of property data (in bytes) for the given object's property.
                         int propAddr = GetOperandValue(opcode.Operands[0]);
 
-                        ZObjectProperty prop = new ZObjectProperty(MainMemory.Bytes, propAddr-1);
+                        ZObjectProperty prop = new ZObjectProperty(MainMemory.Bytes, propAddr - 1);
                         return prop.DataLength;
                     });
                     break;
