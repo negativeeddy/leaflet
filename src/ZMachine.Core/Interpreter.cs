@@ -839,6 +839,11 @@ namespace ZMachine
             // move to the next instruction
             instructionCount++;
 
+            OutputDiagnosticData();
+        }
+
+        private void OutputDiagnosticData()
+        {
             // After the instruction is executed, output diagnostic information
             if (DiagnosticsOutputLevel >= DiagnosticsLevel.Verbose)
             {
@@ -851,14 +856,19 @@ namespace ZMachine
                     DebugOutput($"current_stack {CurrentRoutineFrame.EvaluationStack.ConcatToString(' ', val => $"{val:x4}")}"
                             , DiagnosticsLevel.Verbose);
                 }
-            }
 
-            if (DiagnosticsOutputLevel >= DiagnosticsLevel.Diagnostic)
-            {
-                ZObject mailbox = MainMemory.ObjectTree.GetObject(167);
-                foreach (var obj in MainMemory.ObjectTree.Objects)
+                if (DiagnosticsOutputLevel >= DiagnosticsLevel.Diagnostic)
                 {
-                    DebugOutput("object " + obj.ToLongString(), DiagnosticsLevel.Diagnostic);
+                    //ZObject mailbox = MainMemory.ObjectTree.GetObject(167);
+                    //foreach (var obj in MainMemory.ObjectTree.Objects)
+                    //{
+                    //    DebugOutput("object " + obj.ToLongString(), DiagnosticsLevel.Diagnostic);
+                    //}
+
+                    int address = 0x1daf;
+                    int numBytes = 20;
+                    var byteString = MainMemory.Bytes.Skip(address).Take(numBytes).Aggregate("", (str, val) => str += $" {val:x2}");
+                    DebugOutput($"memory_dump {address:x4}{byteString}");
                 }
             }
         }
@@ -944,7 +954,7 @@ namespace ZMachine
             {
                 textBuffer[i] = (byte)input[i];   // copy to text buffer
             }
-            textBuffer[input.Length] = 0;   // terminate text buffer with 0
+            textBuffer[input.Length + 1] = 0;   // terminate text buffer with 0
 
 
             // parse the input

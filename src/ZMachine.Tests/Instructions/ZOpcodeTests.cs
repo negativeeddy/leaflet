@@ -51,8 +51,7 @@ namespace ZMachine.Instructions.Tests
             var zm = ZMachineLoader.Load(gameFile);
             zm.Input = new InputFeeder(File.ReadLines(inputFile));
             zm.Output.Subscribe(x => Console.Write(x));
-            zm.DiagnosticsOutputLevel = Interpreter.DiagnosticsLevel.Verbose;
-
+            zm.DiagnosticsOutputLevel = Interpreter.DiagnosticsLevel.Diagnostic;
             ConcurrentQueue<string> diagQueue = new ConcurrentQueue<string>();
 
             try
@@ -118,6 +117,16 @@ namespace ZMachine.Instructions.Tests
                                 string expectedObj = obj.ToLongString();
                                 string actualObj = validation.Substring(7);
                                 Assert.AreEqual(expectedObj, actualObj, $"object {id} is invalid after instruction 0x{index:x4}");
+                                break;
+                            case "memory_dump":
+                                int memoryAddress = Convert.ToInt32(parts[1], 16);
+                                byte[] bytesExpected = parts.Skip(2).Select(x => Convert.ToByte(x, 16)).ToArray();
+                                byte[] bytesActual = zm.MainMemory.Bytes.Skip(memoryAddress).Take(bytesExpected.Length).ToArray();
+
+                                for (int i = 0; i < bytesActual.Length; i++)
+                                {
+                                    Assert.AreEqual(bytesExpected[i], bytesActual[i], $"Memory location 0x{memoryAddress + 1:x4} is wrong");
+                                }
                                 break;
                             default:
                                 break;
