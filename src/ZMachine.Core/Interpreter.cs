@@ -869,6 +869,11 @@ namespace ZMachine
                     int numBytes = 20;
                     var byteString = MainMemory.Bytes.Skip(address).Take(numBytes).Aggregate("", (str, val) => str += $" {val:x2}");
                     DebugOutput($"memory_dump {address:x4}{byteString}");
+
+                    address = 0x1ae5;
+                    numBytes = 20;
+                    byteString = MainMemory.Bytes.Skip(address).Take(numBytes).Aggregate("", (str, val) => str += $" {val:x2}");
+                    DebugOutput($"memory_dump {address:x4}{byteString}");
                 }
             }
         }
@@ -1009,10 +1014,9 @@ namespace ZMachine
         /// <returns>an array of words</returns>
         public IEnumerable<string> SplitInput(string input)
         {
-            var spaceSplit = input.Split(' ');
+            var spaceSplit = input.Split(' ').Select(x=>x.Trim()).Where(x=>!string.IsNullOrWhiteSpace(x));
             foreach (var word in spaceSplit)
             {
-
                 if (word.Contains(","))
                 {
                     int startIndex = 0;

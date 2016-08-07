@@ -25,8 +25,33 @@ namespace ZMachine.Tests.Story
             actualOutput = interpreter.SplitInput(input).ToArray();
             CompareStringArrays(expectedOutput, actualOutput);
 
+            input = "open   mailbox";
+            expectedOutput = new string[] { "open", "mailbox" };
+            actualOutput = interpreter.SplitInput(input).ToArray();
+            CompareStringArrays(expectedOutput, actualOutput);
+
             input = "onething";
             expectedOutput = new string[] { "onething" };
+            actualOutput = interpreter.SplitInput(input).ToArray();
+            CompareStringArrays(expectedOutput, actualOutput);
+
+            input = "light\r\n";
+            expectedOutput = new string[] { "light" };
+            actualOutput = interpreter.SplitInput(input).ToArray();
+            CompareStringArrays(expectedOutput, actualOutput);
+
+            input = " light\r\n";
+            expectedOutput = new string[] { "light" };
+            actualOutput = interpreter.SplitInput(input).ToArray();
+            CompareStringArrays(expectedOutput, actualOutput);
+
+            input = "light ";
+            expectedOutput = new string[] { "light" };
+            actualOutput = interpreter.SplitInput(input).ToArray();
+            CompareStringArrays(expectedOutput, actualOutput);
+
+            input = " light ";
+            expectedOutput = new string[] { "light" };
             actualOutput = interpreter.SplitInput(input).ToArray();
             CompareStringArrays(expectedOutput, actualOutput);
 
