@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using ZMachine.Core.Memory;
 using ZMachine.Story;
 using ZMachine.Tests;
 using ZMachine.Tests.TestHelpers;
@@ -52,6 +53,10 @@ namespace ZMachine.Instructions.Tests
             zm.Input = new InputFeeder(File.ReadLines(inputFile));
             zm.Output.Subscribe(x => Console.Write(x));
             zm.DiagnosticsOutputLevel = Interpreter.DiagnosticsLevel.Diagnostic;
+
+            var randData = new ShimRandomNumberGenerator();
+            zm.RandomNumberGenerator = (IRandomNumberGenerator)randData;
+
             ConcurrentQueue<string> diagQueue = new ConcurrentQueue<string>();
 
             try
@@ -72,6 +77,14 @@ namespace ZMachine.Instructions.Tests
                     int address = Convert.ToInt32(addressParts[1], 16);
 
                     Assert.AreEqual(address, zm.ProgramCounter, $"Instruction 0x{index:x4} address is 0x{zm.ProgramCounter:x} instead of 0x{address:x}");
+
+                    // check if a random number was generated before executing the instruction
+                    string nextLine = block.Skip(1).FirstOrDefault();
+                    if (nextLine!= null && nextLine.StartsWith("random_generated"))
+                    {
+                        int nextRand = Convert.ToInt32(nextLine.Split(' ')[1], 16);
+                        randData.NextRandomNumberToGenerate = nextRand;
+                    }
 
                     zm.ExecuteCurrentInstruction();
 

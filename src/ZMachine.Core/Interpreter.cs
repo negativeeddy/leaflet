@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using ZMachine.Core.IO;
+using ZMachine.Core.Memory;
 using ZMachine.Instructions;
 using ZMachine.Memory;
 using ZMachine.Story;
@@ -21,6 +22,9 @@ namespace ZMachine
         public IObservable<string> Diagnostics { get { return _dbgOut.Print; } }
 
         private const int UNUSED_RETURN_VALUE = -1;
+
+        public IRandomNumberGenerator RandomNumberGenerator { get; set; } 
+            = new ZRandomNumberGenerator();
 
         public void LoadStory(Stream storyStream)
         {
@@ -824,6 +828,14 @@ namespace ZMachine
                         return UNUSED_RETURN_VALUE;
                     });
                     break;
+                case "random":  // random range -> (result)
+                    Handle_Opcode(opcode, op =>
+                    {
+                        // Returns a uniformly random number between 1 and range.                 Debug.Assert(op.OperandType.Count == 1);
+                        ushort range = (ushort)GetOperandValue(op.Operands[0]);
+                        return RandomNumberGenerator.GetNext(range);
+                    });
+                    break;
                 default:
                     throw new NotImplementedException($"Opcode [{opcode}] not implemented yet");
             }
@@ -1014,7 +1026,7 @@ namespace ZMachine
         /// <returns>an array of words</returns>
         public IEnumerable<string> SplitInput(string input)
         {
-            var spaceSplit = input.Split(' ').Select(x=>x.Trim()).Where(x=>!string.IsNullOrWhiteSpace(x));
+            var spaceSplit = input.Split(' ').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x));
             foreach (var word in spaceSplit)
             {
                 if (word.Contains(","))

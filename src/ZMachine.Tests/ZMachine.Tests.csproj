@@ -86,6 +86,7 @@
     <Compile Include="Memory\ZStringBuilderTests.cs" />
     <Compile Include="TestHelpers\EnumerableExtensions.cs" />
     <Compile Include="TestHelpers\InputFeeder.cs" />
+    <Compile Include="TestHelpers\ShimRandomNumberGenerator.cs" />
     <Compile Include="TestHelpers\ZMachineLoader.cs" />
   </ItemGroup>
   <ItemGroup>
