@@ -26,11 +26,17 @@ namespace ZMachine
         public IRandomNumberGenerator RandomNumberGenerator { get; set; } 
             = new ZRandomNumberGenerator();
 
+        /// <summary>
+        /// Loads a story and sets of the interpreter to run it
+        /// </summary>
+        /// <param name="storyStream"></param>
         public void LoadStory(Stream storyStream)
         {
             MainMemory = new ZMemory(storyStream);
             FrameStack = new Stack<Routine>();
             LoadNewFrame(MainMemory.Header.PCStart - 1, 0, null);
+
+            IsRunning = true;
         }
 
         public int ProgramCounter { get; set; }
@@ -831,18 +837,33 @@ namespace ZMachine
                 case "random":  // random range -> (result)
                     Handle_Opcode(opcode, op =>
                     {
+                        Debug.Assert(op.OperandType.Count == 1);
                         // Returns a uniformly random number between 1 and range.                 Debug.Assert(op.OperandType.Count == 1);
                         ushort range = (ushort)GetOperandValue(op.Operands[0]);
                         return RandomNumberGenerator.GetNext(range);
                     });
+                    break;
+                case "quit":  // quit
+                    Debug.Assert(opcode.OperandType.Count == 0);
+                    Quit();
                     break;
                 default:
                     throw new NotImplementedException($"Opcode [{opcode}] not implemented yet");
             }
         }
 
+        private void Quit()
+        {
+            IsRunning = false;
+        }
+
         public void ExecuteCurrentInstruction()
         {
+            if (!IsRunning)
+            {
+                throw new InvalidOperationException("Interpreter is not running");
+            }
+
             // run the current instruction
             ZOpcode opcode = CurrentInstruction;
             DebugOutput($"0x{instructionCount:x4} {opcode}");
@@ -907,6 +928,8 @@ namespace ZMachine
                 return FrameStack.Peek();
             }
         }
+
+        public bool IsRunning { get; private set; }
 
         void Handle_Call(ZOpcode opcode)
         {

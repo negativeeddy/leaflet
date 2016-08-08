@@ -53,7 +53,7 @@ namespace ConsoleHost
 
         private static void RunGame(Interpreter zm)
         {
-            while (true)
+            while (zm.IsRunning)
             {
                 zm.ExecuteCurrentInstruction();
             }
