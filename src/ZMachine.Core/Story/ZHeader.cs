@@ -1,7 +1,6 @@
-﻿using System;
-using ZMachine.Memory;
+﻿using NegativeEddy.Leaflet.Memory;
 
-namespace ZMachine.Story
+namespace NegativeEddy.Leaflet.Story
 {
     public class ZHeader
     {

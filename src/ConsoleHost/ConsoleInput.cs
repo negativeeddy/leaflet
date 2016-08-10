@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZMachine.Core.IO;
+using NegativeEddy.Leaflet.IO;
 
-namespace ConsoleHost
+namespace NegativeEddy.Leaflet.ConsoleHost
 {
     class ConsoleInput : IZInput
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ZMachine.Core.IO
+namespace NegativeEddy.Leaflet.IO
 {
     public interface IZOutput
     {

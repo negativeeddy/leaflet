@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ZMachine.Tests.TestHelpers
+namespace NegativeEddy.Leaflet.TestHelpers
 {
     public static class EnumerableExtensions
     {

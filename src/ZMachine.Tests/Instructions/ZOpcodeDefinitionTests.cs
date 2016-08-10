@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace ZMachine.Instructions.Tests
+namespace NegativeEddy.Leaflet.Instructions.Tests
 {
     [TestClass()]
     public class ZOpcodeDefinitionTests

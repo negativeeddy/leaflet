@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZMachine;
-using ZMachine.Memory;
 
-namespace ConsoleHost
+namespace NegativeEddy.Leaflet.ConsoleHost
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var zm = new ZMachine.Interpreter();
+            var zm = new Interpreter();
             zm.Input = new ConsoleInput();
             zm.Output.Subscribe(x => Console.Write(x));
             zm.Diagnostics.Subscribe(x => Debug.Write(x));

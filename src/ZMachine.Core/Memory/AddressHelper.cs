@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace ZMachine.Memory
+namespace NegativeEddy.Leaflet.Memory
 {
     public static class AddressHelper
     {

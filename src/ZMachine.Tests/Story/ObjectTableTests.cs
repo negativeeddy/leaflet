@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
-using ZMachine.Tests;
-using ZMachine.Memory;
+using NegativeEddy.Leaflet.Memory;
+using NegativeEddy.Leaflet.TestHelpers;
 
-namespace ZMachine.Story.Tests
+namespace NegativeEddy.Leaflet.Story.Tests
 {
     [TestClass]
     public class ObjectTableTests

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using ZMachine.Instructions;
+using NegativeEddy.Leaflet.Instructions;
 
-namespace ZMachine.Memory
+namespace NegativeEddy.Leaflet.Memory
 {
     /// <summary>
     /// Represents a single routine and its current state (evaluation stack, 

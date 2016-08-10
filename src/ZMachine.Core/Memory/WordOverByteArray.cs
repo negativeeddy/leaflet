@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace ZMachine.Memory
+namespace NegativeEddy.Leaflet.Memory
 {
     /// <summary>
     /// An array which is constructed from a section of a byte array

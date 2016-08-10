@@ -7,8 +7,8 @@
     <ProjectGuid>{5F284B24-9D4E-431C-9E59-B71BF6E7E3B4}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConsoleHost</RootNamespace>
-    <AssemblyName>ConsoleHost</AssemblyName>
+    <RootNamespace>NegativeEddy.Leaflet.ConsoleHost</RootNamespace>
+    <AssemblyName>NegativeEddy.Leaflet.ConsoleHost</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

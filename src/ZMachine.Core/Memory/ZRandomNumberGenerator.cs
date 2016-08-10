@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NegativeEddy.Leaflet.Core.Memory;
+using System;
 
-namespace ZMachine.Core.Memory
+namespace NegativeEddy.Leaflet.Memory
 {
     class ZRandomNumberGenerator : IRandomNumberGenerator
     {

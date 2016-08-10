@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace ZMachine.Memory
+namespace NegativeEddy.Leaflet.Memory
 {
     public class ZStringBuilder
     {

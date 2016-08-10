@@ -1,8 +1,8 @@
-﻿using System;
+﻿using NegativeEddy.Leaflet.IO;
+using System;
 using System.Collections.Generic;
-using ZMachine.Core.IO;
 
-namespace ZMachine.Tests.TestHelpers
+namespace NegativeEddy.Leaflet.TestHelpers
 {
     class InputFeeder : IZInput
     {

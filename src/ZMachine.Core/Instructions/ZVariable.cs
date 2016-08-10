@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZMachine.Instructions
+namespace NegativeEddy.Leaflet.Instructions
 {
     public enum ZVariableLocation { Stack, Local, Global }
 

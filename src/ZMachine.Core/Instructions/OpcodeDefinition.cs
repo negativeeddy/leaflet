@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace ZMachine.Instructions
+namespace NegativeEddy.Leaflet.Instructions
 {
     public struct OpcodeDefinition
     {

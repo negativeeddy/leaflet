@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ZMachine.Tests.Infrastructure
+namespace NegativeEddy.Leaflet.Tests.Infrastructure
 {
     [TestClass]
     public class StringExtensionTests

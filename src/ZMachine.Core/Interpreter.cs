@@ -4,13 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using ZMachine.Core.IO;
-using ZMachine.Core.Memory;
-using ZMachine.Instructions;
-using ZMachine.Memory;
-using ZMachine.Story;
+using NegativeEddy.Leaflet.Core.Memory;
+using NegativeEddy.Leaflet.Instructions;
+using NegativeEddy.Leaflet.Memory;
+using NegativeEddy.Leaflet.Story;
+using NegativeEddy.Leaflet.IO;
 
-namespace ZMachine
+namespace NegativeEddy.Leaflet
 {
     public class Interpreter
     {

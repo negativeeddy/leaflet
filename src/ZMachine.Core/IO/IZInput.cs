@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reactive;
 
-namespace ZMachine.Core.IO
+namespace NegativeEddy.Leaflet.IO
 {
     public interface IZInput
     {

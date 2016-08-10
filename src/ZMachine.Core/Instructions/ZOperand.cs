@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace ZMachine.Instructions
+namespace NegativeEddy.Leaflet.Instructions
 {
     /// <summary>
     /// Operands reference either a Constant value or a Variable

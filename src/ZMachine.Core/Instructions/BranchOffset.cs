@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using ZMachine.Memory;
+using NegativeEddy.Leaflet.Memory;
 
-namespace ZMachine.Instructions
+namespace NegativeEddy.Leaflet.Instructions
 {
     public class BranchOffset
     {

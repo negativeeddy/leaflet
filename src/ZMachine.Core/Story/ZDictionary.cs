@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using ZMachine.Memory;
+using NegativeEddy.Leaflet.Memory;
 
-namespace ZMachine.Story
+namespace NegativeEddy.Leaflet.Story
 {
     /// <summary>
     /// Implements the ZMachine dictionary from ZSpec 1.0 section 13.1, 

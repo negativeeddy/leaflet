@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ZMachine.Core.Memory
+namespace NegativeEddy.Leaflet.Core.Memory
 {
     public interface IRandomNumberGenerator
     {

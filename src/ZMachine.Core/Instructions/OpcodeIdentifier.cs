@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZMachine.Instructions
+namespace NegativeEddy.Leaflet.Instructions
 {
     /// <summary>
     /// This class provides a unique identifier for an opcode made up

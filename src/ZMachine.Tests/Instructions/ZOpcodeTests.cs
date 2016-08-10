@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using ZMachine.Core.Memory;
-using ZMachine.Story;
-using ZMachine.Tests;
-using ZMachine.Tests.TestHelpers;
+using NegativeEddy.Leaflet.Core.Memory;
+using NegativeEddy.Leaflet.Story;
+using NegativeEddy.Leaflet.TestHelpers;
+using NegativeEddy.Leaflet.Memory;
 
-namespace ZMachine.Instructions.Tests
+namespace NegativeEddy.Leaflet.Instructions.Tests
 {
     public struct OpcodeData
     {

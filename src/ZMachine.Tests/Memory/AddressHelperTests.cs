@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ZMachine.Memory.Tests
+namespace NegativeEddy.Leaflet.Memory.Tests
 {
     [TestClass()]
     public class AddressHelperTests

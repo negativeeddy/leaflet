@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ZMachine.Memory;
-using ZMachine.Story;
+using NegativeEddy.Leaflet.Story;
 
-namespace ZMachine
+namespace NegativeEddy.Leaflet.Memory
 {
     public class ZMemory
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ZMachine.Tests;
+using NegativeEddy.Leaflet.TestHelpers;
 
-namespace ZMachine.Memory.Tests
+namespace NegativeEddy.Leaflet.Memory.Tests
 {
     [TestClass]
     public class ZStringBuilderTests

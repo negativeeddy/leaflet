@@ -1,4 +1,4 @@
-﻿namespace ZMachine.Memory
+﻿namespace NegativeEddy.Leaflet.Memory
 {
     public class PackedAddress
     {

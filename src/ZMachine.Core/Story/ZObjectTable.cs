@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using ZMachine.Memory;
+using NegativeEddy.Leaflet.Memory;
 
-namespace ZMachine.Story
+namespace NegativeEddy.Leaflet.Story
 {
     public class ZObjectTable : IEnumerable<ZObject>
     {

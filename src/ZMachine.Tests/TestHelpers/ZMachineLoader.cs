@@ -1,7 +1,8 @@
-﻿using System;
+﻿using NegativeEddy.Leaflet;
+using System;
 using System.IO;
 
-namespace ZMachine.Tests
+namespace NegativeEddy.Leaflet.TestHelpers
 {
     public class ZMachineLoader
     {

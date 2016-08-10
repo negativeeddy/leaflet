@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleHost", "ConsoleHost\ConsoleHost.csproj", "{5F284B24-9D4E-431C-9E59-B71BF6E7E3B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZMachine.Tests", "ZMachine.Tests\ZMachine.Tests.csproj", "{D3615E9E-B528-43AC-B9D9-41FBC1DB0428}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZMachine.Core", "ZMachine.Core\ZMachine.Core.csproj", "{B5788326-DB90-425F-BE62-7A062BF18485}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5F284B24-9D4E-431C-9E59-B71BF6E7E3B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F284B24-9D4E-431C-9E59-B71BF6E7E3B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F284B24-9D4E-431C-9E59-B71BF6E7E3B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F284B24-9D4E-431C-9E59-B71BF6E7E3B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3615E9E-B528-43AC-B9D9-41FBC1DB0428}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3615E9E-B528-43AC-B9D9-41FBC1DB0428}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3615E9E-B528-43AC-B9D9-41FBC1DB0428}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3615E9E-B528-43AC-B9D9-41FBC1DB0428}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5788326-DB90-425F-BE62-7A062BF18485}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5788326-DB90-425F-BE62-7A062BF18485}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5788326-DB90-425F-BE62-7A062BF18485}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5788326-DB90-425F-BE62-7A062BF18485}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

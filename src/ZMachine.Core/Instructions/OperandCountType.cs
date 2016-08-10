@@ -1,4 +1,4 @@
-﻿namespace ZMachine.Instructions
+﻿namespace NegativeEddy.Leaflet.Instructions
 {
     public enum OperandCountType {
         OP0,
