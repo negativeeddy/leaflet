@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reactive.Linq;
 
-namespace NegativeEddy.Leaflet.ConsoleHost
+namespace NegativeEddy.Leaflet.CoreConsoleHost
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var zm = new Interpreter();
             zm.Input = new ConsoleInput();
@@ -27,23 +26,6 @@ namespace NegativeEddy.Leaflet.ConsoleHost
             //DumpObjects(zm);
 
             RunGame(zm);
-        }
-
-        private static void DumpObjectTree(Interpreter zm)
-        {
-            string output = zm.MainMemory.ObjectTree.DumpObjectTree();
-            Console.WriteLine(output);
-            Console.WriteLine($"Object tree contains {zm.MainMemory.ObjectTree.Objects.Count} objects");
-        }
-
-        private static void DumpObjects(Interpreter zm)
-        {
-            var objTree = zm.MainMemory.ObjectTree;
-
-            foreach (var obj in objTree)
-            {
-                Console.WriteLine(obj.ToFullString());
-            }
         }
 
         private static void RunGame(Interpreter zm)

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NegativeEddy.Leaflet.Tests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NegativeEddy.Leaflet", "NegativeEddy.Leaflet\NegativeEddy.Leaflet.csproj", "{B5788326-DB90-425F-BE62-7A062BF18485}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NegativeEddy.Leaflet.CoreConsoleHost", "NegativeEddy.Leaflet.CoreConsoleHost\NegativeEddy.Leaflet.CoreConsoleHost.xproj", "{029B2C84-94E3-49EC-B8B1-04781319CFEA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{B5788326-DB90-425F-BE62-7A062BF18485}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5788326-DB90-425F-BE62-7A062BF18485}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5788326-DB90-425F-BE62-7A062BF18485}.Release|Any CPU.Build.0 = Release|Any CPU
+		{029B2C84-94E3-49EC-B8B1-04781319CFEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{029B2C84-94E3-49EC-B8B1-04781319CFEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{029B2C84-94E3-49EC-B8B1-04781319CFEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{029B2C84-94E3-49EC-B8B1-04781319CFEA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
