@@ -847,6 +847,20 @@ namespace NegativeEddy.Leaflet
                     Debug.Assert(opcode.OperandType.Count == 0);
                     Quit();
                     break;
+                case "save":
+                    Handle_Opcode(opcode, op =>
+                    {
+                        _stdOut.WriteOutputLine("I'm sorry, Dave. I'm afraid I can't do that.");
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
+                case "restore":
+                    Handle_Opcode(opcode, op =>
+                    {
+                        _stdOut.WriteOutputLine("I'm sorry, Dave. I'm afraid I can't do that.");
+                        return UNUSED_RETURN_VALUE;
+                    });
+                    break;
                 default:
                     throw new NotImplementedException($"Opcode [{opcode}] not implemented yet");
             }
