@@ -15,7 +15,7 @@ namespace NegativeEddy.Leaflet.ConsoleHost
             zm.Diagnostics.Subscribe(x => Debug.Write(x));
             zm.DiagnosticsOutputLevel = Interpreter.DiagnosticsLevel.Verbose;
 
-            string filename = @"GameFiles\minizork.z3";
+            string filename = Path.Combine("GameFiles", "minizork.z3");
             using (var stream = File.OpenRead(filename))
             {
                 zm.LoadStory(stream);
