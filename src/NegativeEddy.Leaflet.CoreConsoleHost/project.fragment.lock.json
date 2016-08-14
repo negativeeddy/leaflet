@@ -5,13 +5,13 @@
       "type": "project",
       "framework": ".NETStandard,Version=v1.4",
       "compile": {
-        "bin/Debug/NegativeEddy.Leaflet.dll": {}
+        "bin/Release/NegativeEddy.Leaflet.dll": {}
       },
       "runtime": {
-        "bin/Debug/NegativeEddy.Leaflet.dll": {}
+        "bin/Release/NegativeEddy.Leaflet.dll": {}
       },
       "contentFiles": {
-        "bin/Debug/NegativeEddy.Leaflet.pdb": {
+        "bin/Release/NegativeEddy.Leaflet.pdb": {
           "buildAction": "None",
           "codeLanguage": "any",
           "copyToOutput": true
