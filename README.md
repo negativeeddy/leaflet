@@ -1,3 +1,5 @@
+[buildStatus]: https://negativeeddy.visualstudio.com/_apis/public/build/definitions/fbd60a39-1131-4c5f-88db-aaa29ecd29aa/4/badge
+
 # leaflet
 Leaflet is my experimental implementation of the [Infocom Z-Machine spec](http://inform-fiction.org/zmachine/index.html) - aka "a Zork interpreter" - aka "30 year old tech built with modern tools"
 
@@ -30,6 +32,11 @@ The project structure is currently as follows:
 ### NegativeEddy.Leaflet.Tests.dll
 - Unit tests for NegativeEddy.Leaflet.dll
  
+-----
+## Build Status
+
+![buildStatus]
+
 -----------
 
 The tools directory contains a copy of [Ztools](http://inform-fiction.org/zmachine/ztools.html) for Windows and some info dumps of minizork.z3 using those tools. These dumps are used to debug and validate the interpreter.
