@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <AssemblyName>NegativeEddy.Leaflet.CoreConsoleHost</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>NegativeEddy.Leaflet.CoreConsoleHost</PackageId>
+    <RuntimeIdentifiers>win10-x64;osx.10.11-x64;rhel.7.2-x64;ubuntu.14.04-x64</RuntimeIdentifiers>
+    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="GameFiles\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <ProjectReference Include="..\NegativeEddy.Leaflet\NegativeEddy.Leaflet.csproj" />
+  </ItemGroup>
+
+</Project>
