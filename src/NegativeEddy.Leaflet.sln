@@ -1,15 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.12
+VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NegativeEddy.Leaflet.ConsoleHost", "NegativeEddy.Leaflet.ConsoleHost\NegativeEddy.Leaflet.ConsoleHost.csproj", "{5F284B24-9D4E-431C-9E59-B71BF6E7E3B4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NegativeEddy.Leaflet.Tests", "NegativeEddy.Leaflet.Tests\NegativeEddy.Leaflet.Tests.csproj", "{D3615E9E-B528-43AC-B9D9-41FBC1DB0428}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NegativeEddy.Leaflet", "NegativeEddy.Leaflet\NegativeEddy.Leaflet.csproj", "{B5788326-DB90-425F-BE62-7A062BF18485}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NegativeEddy.Leaflet.CoreConsoleHost", "NegativeEddy.Leaflet.CoreConsoleHost\NegativeEddy.Leaflet.CoreConsoleHost.csproj", "{029B2C84-94E3-49EC-B8B1-04781319CFEA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NegativeEddy.Leaflet", "NegativeEddy.Leaflet\NegativeEddy.Leaflet.csproj", "{B096D0FB-9E76-478F-B624-5552FE69AB6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,16 +25,19 @@ Global
 		{D3615E9E-B528-43AC-B9D9-41FBC1DB0428}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3615E9E-B528-43AC-B9D9-41FBC1DB0428}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3615E9E-B528-43AC-B9D9-41FBC1DB0428}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B5788326-DB90-425F-BE62-7A062BF18485}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B5788326-DB90-425F-BE62-7A062BF18485}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B5788326-DB90-425F-BE62-7A062BF18485}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B5788326-DB90-425F-BE62-7A062BF18485}.Release|Any CPU.Build.0 = Release|Any CPU
 		{029B2C84-94E3-49EC-B8B1-04781319CFEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{029B2C84-94E3-49EC-B8B1-04781319CFEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{029B2C84-94E3-49EC-B8B1-04781319CFEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{029B2C84-94E3-49EC-B8B1-04781319CFEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B096D0FB-9E76-478F-B624-5552FE69AB6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B096D0FB-9E76-478F-B624-5552FE69AB6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B096D0FB-9E76-478F-B624-5552FE69AB6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B096D0FB-9E76-478F-B624-5552FE69AB6F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {129C10EE-4362-4032-9972-84D577F373C5}
 	EndGlobalSection
 EndGlobal
