@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.0.9-alpha</Version>
+    <RepositoryUrl>https://github.com/negativeeddy/leaflet</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/negativeeddy/leaflet</PackageProjectUrl>
+    <Copyright>2016</Copyright>
+    <IncludeSymbols>True</IncludeSymbols>
+    <Description>An experimental implementation of the Infocom Z-Machine spec - aka "a Zork interpreter" - aka "30 year old tech built with modern tools"</Description>
   </PropertyGroup>
 
   <ItemGroup>
