@@ -866,7 +866,7 @@ namespace NegativeEddy.Leaflet
             }
         }
 
-        private void Quit()
+        public void Quit()
         {
             IsRunning = false;
         }
