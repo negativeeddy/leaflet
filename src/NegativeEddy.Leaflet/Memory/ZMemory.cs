@@ -10,17 +10,25 @@ namespace NegativeEddy.Leaflet.Memory
     {
         public byte[] Bytes { get; }
 
+        public ZMemory(byte[] gameMemory)
+        {
+            byte[] tmp = new byte[gameMemory.Length];
+            gameMemory.CopyTo(tmp, 0);
+
+            // update the global zstringbuilder table with the text abbreviations
+            ZStringBuilder.AbbreviationTable = TextAbbreviations;
+        }
+
         public ZMemory(Stream gameMemory)
         {
             Bytes = new byte[gameMemory.Length];
             gameMemory.Read(Bytes, 0, Bytes.Length);
 
-            Header = new ZHeader(Bytes);
-
+            // update the global zstringbuilder table with the text abbreviations
             ZStringBuilder.AbbreviationTable = TextAbbreviations;
         }
 
-        public ZHeader Header { get; }
+        public ZHeader Header => new ZHeader(Bytes);
 
         public ArraySegment<byte> StaticMemory
         {
