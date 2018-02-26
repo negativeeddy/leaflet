@@ -1,15 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NegativeEddy.Leaflet.Core.Memory;
-using NegativeEddy.Leaflet.Memory;
 using NegativeEddy.Leaflet.TestHelpers;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NegativeEddy.Leaflet.Tests.Memory
 {

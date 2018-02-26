@@ -1,10 +1,10 @@
-﻿using System;
+﻿using NegativeEddy.Leaflet.Instructions;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 using System.Text;
-using NegativeEddy.Leaflet.Instructions;
-using Newtonsoft.Json;
 
 namespace NegativeEddy.Leaflet.Memory
 {
@@ -29,6 +29,7 @@ namespace NegativeEddy.Leaflet.Memory
         public IList<ushort> Locals { get; }
         public Stack<ushort> EvaluationStack { get; } = new Stack<ushort>();
 
+        [NonSerialized]
         [JsonIgnore]
         public int FirstInstructionAddress
         {
