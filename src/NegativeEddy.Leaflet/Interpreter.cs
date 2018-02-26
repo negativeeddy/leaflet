@@ -9,6 +9,8 @@ using NegativeEddy.Leaflet.Instructions;
 using NegativeEddy.Leaflet.Memory;
 using NegativeEddy.Leaflet.Story;
 using NegativeEddy.Leaflet.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
 
 namespace NegativeEddy.Leaflet
 {
@@ -23,7 +25,7 @@ namespace NegativeEddy.Leaflet
 
         private const int UNUSED_RETURN_VALUE = -1;
 
-        public IRandomNumberGenerator RandomNumberGenerator { get; set; } 
+        public IRandomNumberGenerator RandomNumberGenerator { get; set; }
             = new ZRandomNumberGenerator();
 
         /// <summary>
@@ -37,6 +39,66 @@ namespace NegativeEddy.Leaflet
             LoadNewFrame(MainMemory.Header.PCStart - 1, 0, null);
 
             IsRunning = true;
+        }
+
+        public void LoadState(Dictionary<string, object> state)
+        {
+            var bytes = (byte[])state["zmMain"];
+            MainMemory = new ZMemory(bytes);
+            ZStringBuilder.AbbreviationTable = MainMemory.TextAbbreviations;
+            FrameStack = (Stack<Routine>)state["zmStack"];
+            foreach (var frame in FrameStack)
+            {
+                // fix up the frame pointers to main memory
+                frame.Bytes = bytes;
+            }
+            ProgramCounter = (int)state["zmPC"];
+
+            IsRunning = true;
+        }
+
+        public void ReadState(Stream stream)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            try
+            {
+                Dictionary<string, object> state = (Dictionary<string, object>)formatter.Deserialize(stream);
+                LoadState(state);
+            }
+            catch (SerializationException e)
+            {
+                DebugOutput("Failed to deserialize. Reason: " + e.Message);
+                throw;
+            }
+        }
+
+        public Dictionary<string, object> GetState()
+        {
+            var state = new Dictionary<string, object>();
+            state["zmMain"] = MainMemory.Bytes;
+            foreach (var frame in FrameStack)
+            {
+                // clear pointer to main memory to prevent circular references
+                frame.Bytes = null;
+            }
+            state["zmStack"] = FrameStack;
+            state["zmPC"] = ProgramCounter;
+            return state;
+        }
+
+        public void WriteState(MemoryStream stream)
+        {
+            var state = GetState();
+            BinaryFormatter formatter = new BinaryFormatter();
+            try
+            {
+                formatter.Serialize(stream, state);
+            }
+            catch (SerializationException e)
+            {
+                DebugOutput("Failed to serialize. Reason: " + e.Message);
+                throw;
+            }
         }
 
         public int ProgramCounter { get; set; }

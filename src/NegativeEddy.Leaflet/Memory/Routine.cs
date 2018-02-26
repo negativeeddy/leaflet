@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 using System.Text;
 using NegativeEddy.Leaflet.Instructions;
+using Newtonsoft.Json;
 
 namespace NegativeEddy.Leaflet.Memory
 {
@@ -9,9 +12,11 @@ namespace NegativeEddy.Leaflet.Memory
     /// Represents a single routine and its current state (evaluation stack, 
     /// return address, local variables, etc)
     /// </summary>
-    public class Routine
+    [Serializable]
+    public class Routine : ISerializable
     {
-        private readonly IList<byte> _bytes;
+        [JsonIgnore]
+        public IList<byte> Bytes { get; set; }
         private readonly int _baseAddress;
 
         public int ReturnAddress { get; } = -1;
@@ -24,10 +29,16 @@ namespace NegativeEddy.Leaflet.Memory
         public IList<ushort> Locals { get; }
         public Stack<ushort> EvaluationStack { get; } = new Stack<ushort>();
 
+        [JsonIgnore]
         public int FirstInstructionAddress
         {
             // first instruction starts after the local count, then after the local words.
             get { return _baseAddress + 1 + Locals.Count * 2; }
+        }
+
+        public Routine()
+        {
+
         }
 
         /// <summary>
@@ -39,7 +50,7 @@ namespace NegativeEddy.Leaflet.Memory
         public Routine(IList<byte> bytes, int routineAddress, int returnAddress, ZVariable returnStore, IList<ushort> localInitValues)
         {
             Debug.Assert(routineAddress % 2 == 0, "A routine is required to begin at an address in memory which can be represented by a packed address (spec 5.1)");
-            _bytes = bytes;
+            Bytes = bytes;
             _baseAddress = routineAddress;
             this.ReturnAddress = returnAddress;
             Store = returnStore;
@@ -85,6 +96,24 @@ namespace NegativeEddy.Leaflet.Memory
             sb.AppendLine($"Resume at: {ReturnAddress:x4}");
 
             return sb.ToString();
+        }
+
+        public Routine(SerializationInfo info, StreamingContext context)
+        {
+            _baseAddress = info.GetInt32(nameof(_baseAddress));
+            ReturnAddress = info.GetInt32(nameof(ReturnAddress));
+            Store = (ZVariable)info.GetValue(nameof(Store), typeof(ZVariable));
+            Locals = (List<ushort>)info.GetValue(nameof(Locals), typeof(List<ushort>));
+            EvaluationStack = (Stack<ushort>)info.GetValue(nameof(EvaluationStack), typeof(Stack<ushort>));
+        }
+
+        void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(_baseAddress), _baseAddress);
+            info.AddValue(nameof(ReturnAddress), ReturnAddress);
+            info.AddValue(nameof(Store), Store);
+            info.AddValue(nameof(Locals), new List<ushort>(Locals));
+            info.AddValue(nameof(EvaluationStack), EvaluationStack);
         }
     }
 }

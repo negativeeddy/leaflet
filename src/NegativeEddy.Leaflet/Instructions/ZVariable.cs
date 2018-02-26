@@ -4,6 +4,7 @@ namespace NegativeEddy.Leaflet.Instructions
 {
     public enum ZVariableLocation { Stack, Local, Global }
 
+    [Serializable]
     public class ZVariable
     {
         /// <summary>

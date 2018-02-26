@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.0.9-alpha</Version>
+    <Version>0.0.12-alpha</Version>
     <RepositoryUrl>https://github.com/negativeeddy/leaflet</RepositoryUrl>
     <PackageProjectUrl>https://github.com/negativeeddy/leaflet</PackageProjectUrl>
     <Copyright>2016</Copyright>
@@ -12,6 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
     <PackageReference Include="System.Reactive.Linq" Version="3.1.1" />
   </ItemGroup>
 

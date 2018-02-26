@@ -14,6 +14,7 @@ namespace NegativeEddy.Leaflet.Memory
         {
             byte[] tmp = new byte[gameMemory.Length];
             gameMemory.CopyTo(tmp, 0);
+            Bytes = tmp;
 
             // update the global zstringbuilder table with the text abbreviations
             ZStringBuilder.AbbreviationTable = TextAbbreviations;
