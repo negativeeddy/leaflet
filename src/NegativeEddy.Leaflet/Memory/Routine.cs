@@ -29,7 +29,6 @@ namespace NegativeEddy.Leaflet.Memory
         public IList<ushort> Locals { get; }
         public Stack<ushort> EvaluationStack { get; } = new Stack<ushort>();
 
-        [NonSerialized]
         [JsonIgnore]
         public int FirstInstructionAddress
         {
