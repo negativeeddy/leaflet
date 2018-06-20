@@ -8,13 +8,15 @@ namespace NegativeEddy.Leaflet.Memory
 {
     public class ZMemory
     {
-        public byte[] Bytes { get; }
+        private byte[] _bytes;
+
+        public Memory<byte> Bytes => new Memory<byte>(_bytes);
 
         public ZMemory(byte[] gameMemory)
         {
             byte[] tmp = new byte[gameMemory.Length];
             gameMemory.CopyTo(tmp, 0);
-            Bytes = tmp;
+            _bytes = tmp;
 
             // update the global zstringbuilder table with the text abbreviations
             ZStringBuilder.AbbreviationTable = TextAbbreviations;
@@ -22,8 +24,8 @@ namespace NegativeEddy.Leaflet.Memory
 
         public ZMemory(Stream gameMemory)
         {
-            Bytes = new byte[gameMemory.Length];
-            gameMemory.Read(Bytes, 0, Bytes.Length);
+            _bytes = new byte[gameMemory.Length];
+            gameMemory.Read(_bytes, 0, Bytes.Length);
 
             // update the global zstringbuilder table with the text abbreviations
             ZStringBuilder.AbbreviationTable = TextAbbreviations;
@@ -31,19 +33,19 @@ namespace NegativeEddy.Leaflet.Memory
 
         public ZHeader Header => new ZHeader(Bytes);
 
-        public ArraySegment<byte> StaticMemory
+        public ReadOnlyMemory<byte> StaticMemory
         {
-            get { return new ArraySegment<byte>(Bytes, Header.StaticMemoryAddress, Bytes.Length - Header.StaticMemoryAddress); }
+            get { return Bytes.Slice(Header.StaticMemoryAddress, Bytes.Length - Header.StaticMemoryAddress); }
         }
 
-        public ArraySegment<byte> DynamicMemory
+        public Memory<byte> DynamicMemory
         {
-            get { return new ArraySegment<byte>(Bytes, 0, Header.StaticMemoryAddress); }
+            get { return Bytes.Slice(0, Header.StaticMemoryAddress); }
         }
 
-        public ArraySegment<byte> HighMemory
+        public Memory<byte> HighMemory
         {
-            get { return new ArraySegment<byte>(Bytes, Header.HighMemoryAddress, Bytes.Length - Header.HighMemoryAddress); }
+            get { return Bytes.Slice(Header.HighMemoryAddress, Bytes.Length - Header.HighMemoryAddress); }
         }
 
         private ZDictionary _dictionary;
@@ -125,7 +127,7 @@ namespace NegativeEddy.Leaflet.Memory
         {
             get
             {
-                return new WordOverByteArray(Bytes, Header.GlobalVariablesTableAddress, 255-16);
+                return new WordOverByteArray(Bytes, Header.GlobalVariablesTableAddress, 255 - 16);
             }
         }
     }

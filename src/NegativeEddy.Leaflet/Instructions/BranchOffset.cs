@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
 using NegativeEddy.Leaflet.Memory;
 
@@ -6,16 +6,16 @@ namespace NegativeEddy.Leaflet.Instructions
 {
     public class BranchOffset
     {
-        private IList<byte> _bytes;
+        private ReadOnlyMemory<byte> _bytes;
 
-        public BranchOffset(IList<byte> bytes)
+        public BranchOffset(ReadOnlyMemory<byte> bytes)
         {
             _bytes = bytes;
             // implements spec 4.7
 
-            Debug.Assert(_bytes.Count == 2);
-
-            if (_bytes[0].FetchBits(BitNumber.Bit_7, 1) == 0)
+            Debug.Assert(_bytes.Length == 2);
+            var span = _bytes.Span;
+            if (span[0].FetchBits(BitNumber.Bit_7, 1) == 0)
             {
                 WhenTrue = false;
             }
@@ -24,9 +24,9 @@ namespace NegativeEddy.Leaflet.Instructions
                 WhenTrue = true;
             }
 
-            if (_bytes[0].FetchBits(BitNumber.Bit_6, 1) == 1)
+            if (span[0].FetchBits(BitNumber.Bit_6, 1) == 1)
             {
-                Offset = _bytes[0].FetchBits(BitNumber.Bit_5, 6);
+                Offset = span[0].FetchBits(BitNumber.Bit_5, 6);
                 LengthInBytes = 1;
             }
             else

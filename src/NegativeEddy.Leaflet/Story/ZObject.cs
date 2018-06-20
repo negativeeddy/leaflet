@@ -19,9 +19,9 @@ namespace NegativeEddy.Leaflet.Story
         public const string UNNAMED_OBJECT_NAME = "<unnamed>";
         public const int INVALID_ID = 0;
 
-        private readonly byte[] _bytes;
+        private readonly Memory<byte> _bytes;
 
-        public static ZObject InvalidObject = new ZObject(null, 0, ZObject.INVALID_ID);
+       // public static ZObject InvalidObject = new ZObject(null, 0, ZObject.INVALID_ID);
 
         public static ushort[] DefaultProperties { get; set; }
 
@@ -41,18 +41,18 @@ namespace NegativeEddy.Leaflet.Story
 
         public int ParentID
         {
-            get { return _bytes[BaseAddress + ParentIDOffset]; }
-            set { _bytes[BaseAddress + ParentIDOffset] = (byte)value; }
+            get { return _bytes.Span[BaseAddress + ParentIDOffset]; }
+            set { _bytes.Span[BaseAddress + ParentIDOffset] = (byte)value; }
         }
         public int SiblingID
         {
-            get { return _bytes[BaseAddress + SiblingIDOffset]; }
-            set { _bytes[BaseAddress + SiblingIDOffset] = (byte)value; }
+            get { return _bytes.Span[BaseAddress + SiblingIDOffset]; }
+            set { _bytes.Span[BaseAddress + SiblingIDOffset] = (byte)value; }
         }
         public int ChildID
         {
-            get { return _bytes[BaseAddress + ChildIDOffset]; }
-            set { _bytes[BaseAddress + ChildIDOffset] = (byte)value; }
+            get { return _bytes.Span[BaseAddress + ChildIDOffset]; }
+            set { _bytes.Span[BaseAddress + ChildIDOffset] = (byte)value; }
         }
 
         public int PropertyTableAddress { get { return (int)_bytes.GetWord(BaseAddress + PropertyAddressOffset); } }
@@ -87,7 +87,7 @@ namespace NegativeEddy.Leaflet.Story
             foreach (var prop in CustomProperties.OrderBy(x=>x.ID))
             {
                 sb.Append($"[{prop.ID}],");
-                foreach (byte b in prop.Data)
+                foreach (byte b in prop.Data.ToArray())
                 {
                     sb.Append($"{b:x2},");
                 }
@@ -121,7 +121,7 @@ namespace NegativeEddy.Leaflet.Story
             foreach (var prop in CustomProperties)
             {
                 sb.Append($"        [{prop.ID}] ");
-                foreach (byte b in prop.Data)
+                foreach (byte b in prop.Data.ToArray())
                 {
                     sb.Append($"{b:x2}  ");
                 }
@@ -132,7 +132,7 @@ namespace NegativeEddy.Leaflet.Story
 
         public int ShortNameLengthInBytes
         {
-            get { return (int)_bytes[PropertyTableAddress]; }
+            get { return (int)_bytes.Span[PropertyTableAddress]; }
         }
 
         public string ShortName
@@ -172,17 +172,17 @@ namespace NegativeEddy.Leaflet.Story
             {
                 var data = prop.Data;
 
-                if (data.Count == 1)
+                if (data.Length == 1)
                 {
-                    return data[0];
+                    return data.Span[0];
                 }
-                else if (data.Count == 2)
+                else if (data.Length == 2)
                 {
                     return data.GetWord(0);
                 }
                 else
                 {
-                    throw new InvalidOperationException($"Cannot get property value. It has {data.Count} bytes");
+                    throw new InvalidOperationException($"Cannot get property value. It has {data.Length} bytes");
                 }
             }
             else
@@ -203,17 +203,17 @@ namespace NegativeEddy.Leaflet.Story
             {
                 var data = prop.Data;
 
-                if (data.Count == 1)
+                if (data.Length == 1)
                 {
-                    data[0] = (byte)value;
+                    data.Span[0] = (byte)value;
                 }
-                else if (data.Count == 2)
+                else if (data.Length == 2)
                 {
                     data.SetWord((ushort)value, 0);
                 }
                 else
                 {
-                    throw new InvalidOperationException($"Cannot set property value. It has {data.Count} bytes");
+                    throw new InvalidOperationException($"Cannot set property value. It has {data.Length} bytes");
                 }
             }
             else
@@ -245,7 +245,7 @@ namespace NegativeEddy.Leaflet.Story
             DefaultProperties = new ushort[ZOBJECT_ARRAY_SIZE];
         }
 
-        public ZObject(byte[] bytes, int baseAddress, int ID)
+        public ZObject(Memory<byte> bytes, int baseAddress, int ID)
         {
             this.ID = ID;
             _bytes = bytes;

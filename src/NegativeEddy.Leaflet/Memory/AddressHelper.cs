@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace NegativeEddy.Leaflet.Memory
 {
@@ -23,15 +24,40 @@ namespace NegativeEddy.Leaflet.Memory
             return (uint)(address * 2); // unpack for v1-3
         }
 
-        public static uint GetWordUnpacked(this IList<byte> data, int address)
+        public static uint GetWordUnpacked(this ReadOnlyMemory<byte> data, int address)
         {
             ushort word = GetWord(data, address);
             return UnpackAddress(word);
         }
 
-        public static ushort GetWord(this IList<byte> data, int address)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ushort GetWord(this byte[] data, int address)
         {
-            Debug.Assert(address <= data.Count);
+            ReadOnlySpan<byte> span = data.AsSpan();
+            return span.GetWord(address);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ushort GetWord(this ReadOnlyMemory<byte> data, int address)
+        {
+            return data.Span.GetWord(address);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ushort GetWord(this Memory<byte> data, int address)
+        {
+            return ((ReadOnlyMemory<byte>)data).GetWord(address);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ushort GetWord(this Span<byte> data, int address)
+        {
+            return ((ReadOnlySpan<byte>)data).GetWord(address);
+        }
+
+        public static ushort GetWord(this ReadOnlySpan<byte> data, int address)
+        {
+            Debug.Assert(address <= data.Length);
 
             int upper = data[address] << 8;
             int lower = data[address + 1];
@@ -40,18 +66,24 @@ namespace NegativeEddy.Leaflet.Memory
             return (ushort)(uppershort + lowershort);
         }
 
-        public static void SetWord(this IList<byte> data, ushort word, int address)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetWord(this Memory<byte> data, ushort word, int address)
         {
-            Debug.Assert(address + 1 < data.Count);
+            data.Span.SetWord(word, address);
+        }
+
+        public static void SetWord(this Span<byte> data, ushort word, int address)
+        {
+            Debug.Assert(address + 1 < data.Length);
             byte upper = (byte)(word >> 8);
             byte lower = (byte)word;
             data[address] = upper;
             data[address + 1] = lower;
         }
 
-        public static IList<ushort> GetWords(this IList<byte> data, int address, int count)
+        public static IList<ushort> GetWords(this ReadOnlySpan<byte> data, int address, int count)
         {
-            Debug.Assert(address + count <= data.Count);
+            Debug.Assert(address + count <= data.Length);
 
             ushort[] words = new ushort[count];
             for (int i = 0; i < count; i++)
@@ -61,7 +93,19 @@ namespace NegativeEddy.Leaflet.Memory
             return words;
         }
 
-        public static uint GetDWord(this IList<byte> data, int address)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint GetDWord(this Memory<byte> data, int address)
+        {
+            return ((ReadOnlySpan<byte>)data.Span).GetDWord(address);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint GetDWord(this ReadOnlyMemory<byte> data, int address)
+        {
+            return data.Span.GetDWord(address);
+        }
+
+        public static uint GetDWord(this ReadOnlySpan<byte> data, int address)
         {
             return (uint)(data[address] << 24) +
                    (uint)(data[address + 1] << 16) +
@@ -69,18 +113,24 @@ namespace NegativeEddy.Leaflet.Memory
                    (uint)(data[address + 3]);
         }
 
-        public static void SetDWord(this IList<byte> data, uint dword, int address)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetDWord(this Memory<byte> data, uint dword, int address)
+        {
+            data.Span.SetDWord(dword, address);
+        }
+
+        public static void SetDWord(this Span<byte> data, uint dword, int address)
         {
             data[address] = (byte)(dword >> 24);
             data[address + 1] = (byte)(dword >> 16);
             data[address + 2] = (byte)(dword >> 8);
             data[address + 3] = (byte)(dword);
         }
-        
+
         public static BitNumber[] GetBits(this uint dword)
         {
             List<BitNumber> bits = new List<BitNumber>();
-            for(int i=31; i>=0;i--)
+            for (int i = 31; i >= 0; i--)
             {
                 BitNumber num = (BitNumber)i;
                 if (dword.FetchBits(num, 1) == 1)
@@ -91,7 +141,7 @@ namespace NegativeEddy.Leaflet.Memory
             return bits.ToArray();
         }
 
-        public static uint SetBit(this uint dword, BitNumber bit, bool setToOne )
+        public static uint SetBit(this uint dword, BitNumber bit, bool setToOne)
         {
             if (setToOne)
             {
@@ -101,7 +151,7 @@ namespace NegativeEddy.Leaflet.Memory
             {
                 uint mask = ~(1u << (int)bit);
                 return dword & mask;
-           }
+            }
         }
 
         /// <summary>

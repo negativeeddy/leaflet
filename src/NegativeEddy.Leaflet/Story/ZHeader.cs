@@ -1,8 +1,9 @@
 ﻿using NegativeEddy.Leaflet.Memory;
+using System;
 
 namespace NegativeEddy.Leaflet.Story
 {
-    public class ZHeader
+    public struct ZHeader
     {
         //header offsets from spec 11.1
         private const int HeaderOffset_Version = 0x00;
@@ -40,14 +41,14 @@ namespace NegativeEddy.Leaflet.Story
         private const int HeaderOffset_Alphabettableaddress = 0x34;
         private const int HeaderOffset_Headerextensiontableaddress = 0x36;
 
-        private byte[] _data;
+        private ReadOnlyMemory<byte> _data;
 
-        public ZHeader(byte[] _data)
+        public ZHeader(ReadOnlyMemory<byte> _data)
         {
             this._data = _data;
         }
 
-        public byte Version { get { return _data[HeaderOffset_Version]; } }
+        public byte Version { get { return _data.Span[HeaderOffset_Version]; } }
 
         public uint Flags1 { get { return _data.GetDWord(HeaderOffset_Flags1); } }
         public int ReleaseNumber { get { return _data.GetWord(HeaderOffset_ReleaseNumber); } }
@@ -68,7 +69,7 @@ namespace NegativeEddy.Leaflet.Story
                 int end = start + 6;
                 for (int i = start; i < end; i++)
                 {
-                    code += (char)_data[i];
+                    code += (char)_data.Span[i];
                 }
                 return code;
             }
@@ -77,13 +78,13 @@ namespace NegativeEddy.Leaflet.Story
         public ushort AbbreviationsTableAddress { get { return _data.GetWord(HeaderOffset_LocationOfAbbreviationsTable); } }
         public ushort Filelength { get { return _data.GetWord(HeaderOffset_Lengthoffile); } }
         public ushort Checksum { get { return _data.GetWord(HeaderOffset_ChecksumOfFile); } }
-        public byte InterpreterNumber { get { return _data[HeaderOffset_Interpreternumber]; } }
-        public byte InterpreterVersion { get { return _data[HeaderOffset_Interpreterversion]; } }
-        public byte ScreenHeightLines { get { return _data[HeaderOffset_ScreenheightinLines]; } }
-        public byte ScreenWidthChars { get { return _data[HeaderOffset_ScreenwidthInChars]; } }
+        public byte InterpreterNumber { get { return _data.Span[HeaderOffset_Interpreternumber]; } }
+        public byte InterpreterVersion { get { return _data.Span[HeaderOffset_Interpreterversion]; } }
+        public byte ScreenHeightLines { get { return _data.Span[HeaderOffset_ScreenheightinLines]; } }
+        public byte ScreenWidthChars { get { return _data.Span[HeaderOffset_ScreenwidthInChars]; } }
         public ushort ScreenHeightUnits { get { return _data.GetWord(HeaderOffset_ScreenheightInUnits); } }
         public ushort ScreenWidthUnits { get { return _data.GetWord(HeaderOffset_ScreenwidthInUnits); } }
 
-        public byte StandardRevisionNumber { get { return _data[HeaderOffset_Standardrevisionnumber]; } }
+        public byte StandardRevisionNumber { get { return _data.Span[HeaderOffset_Standardrevisionnumber]; } }
     }
 }

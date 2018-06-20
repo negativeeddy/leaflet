@@ -7,30 +7,32 @@ using NegativeEddy.Leaflet.Memory;
 
 namespace NegativeEddy.Leaflet.Instructions
 {
-    public class ZOpcode
+    public struct ZOpcode
     {
         public OpcodeIdentifier Identifier { get { return new OpcodeIdentifier(OperandCount, Opcode); } }
 
         public OpcodeDefinition Definition { get { return OpcodeDefinition.GetKnownOpcode(Identifier); } }
 
-        byte[] _bytes;
+        ReadOnlyMemory<byte> _bytes;
         public int BaseAddress { get; }
 
         /// <summary>
         /// The raw bytes that make up the instruction.
         /// </summary>
-        public IList<byte> Bytes
+        public ReadOnlyMemory<byte> Bytes
         {
             get
             {
-                return new ArraySegment<byte>(_bytes, BaseAddress, LengthInBytes);
+                return _bytes.Slice(BaseAddress, LengthInBytes);
             }
         }
 
-        public ZOpcode(byte[] data, int baseAddress)
+        public ZOpcode(ReadOnlyMemory<byte> data, int baseAddress)
         {
             _bytes = data;
             this.BaseAddress = baseAddress;
+            _operands = null;
+            _textSection = null;
         }
 
         public ushort Opcode
@@ -40,12 +42,12 @@ namespace NegativeEddy.Leaflet.Instructions
                 switch (Form)
                 {
                     case OpcodeForm.Short:
-                        return _bytes[BaseAddress].FetchBits(BitNumber.Bit_3, 4);
+                        return _bytes.Span[BaseAddress].FetchBits(BitNumber.Bit_3, 4);
                     case OpcodeForm.Long:
                     case OpcodeForm.Variable:
-                        return _bytes[BaseAddress].FetchBits(BitNumber.Bit_4, 5);
+                        return _bytes.Span[BaseAddress].FetchBits(BitNumber.Bit_4, 5);
                     case OpcodeForm.Extended:
-                        return _bytes[BaseAddress + 1];
+                        return _bytes.Span[BaseAddress + 1];
                     default:
                         throw new InvalidOperationException();
                 }
@@ -57,11 +59,11 @@ namespace NegativeEddy.Leaflet.Instructions
             get
             {
                 // From the spec section 4.3
-                byte opcodeType = _bytes[BaseAddress].FetchBits(BitNumber.Bit_7, 2);
+                byte opcodeType = _bytes.Span[BaseAddress].FetchBits(BitNumber.Bit_7, 2);
                 switch (opcodeType)
                 {
                     case 0x02:
-                        return _bytes[BaseAddress] == 0xBE ? OpcodeForm.Extended : OpcodeForm.Short;
+                        return _bytes.Span[BaseAddress] == 0xBE ? OpcodeForm.Extended : OpcodeForm.Short;
                     case 0x03:
                         return OpcodeForm.Variable;
                     default:
@@ -77,12 +79,12 @@ namespace NegativeEddy.Leaflet.Instructions
                 switch (Form)
                 {
                     case OpcodeForm.Short:
-                        byte bits = _bytes[BaseAddress].FetchBits(BitNumber.Bit_5, 2);
+                        byte bits = _bytes.Span[BaseAddress].FetchBits(BitNumber.Bit_5, 2);
                         return (bits == 0x03) ? OperandCountType.OP0 : OperandCountType.OP1;
                     case OpcodeForm.Long:
                         return OperandCountType.OP2;
                     case OpcodeForm.Variable:
-                        byte bits2 = _bytes[BaseAddress].FetchBits(BitNumber.Bit_5, 1);
+                        byte bits2 = _bytes.Span[BaseAddress].FetchBits(BitNumber.Bit_5, 1);
                         return (bits2 == 0x00) ? OperandCountType.OP2 : OperandCountType.VAR;
                     case OpcodeForm.Extended:
                         return OperandCountType.VAR;
@@ -106,6 +108,7 @@ namespace NegativeEddy.Leaflet.Instructions
             get
             {
                 OperandTypes[] types;
+                var span = _bytes.Span;
 
                 switch (OperandCount)
                 {
@@ -114,7 +117,7 @@ namespace NegativeEddy.Leaflet.Instructions
                         break;
                     case OperandCountType.OP1:
                         Debug.Assert(Form == OpcodeForm.Short, "Is OP1 only in short form?");
-                        var opType = (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 2);
+                        var opType = (OperandTypes)span[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 2);
                         types = new OperandTypes[] { opType };
                         break;
                     case OperandCountType.OP2:
@@ -122,25 +125,25 @@ namespace NegativeEddy.Leaflet.Instructions
                         {
                             types = new OperandTypes[]
                             {
-                             _bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_6, 1) == 1 ? OperandTypes.SmallConstant : OperandTypes.Variable,
-                             _bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 1) == 1 ? OperandTypes.SmallConstant : OperandTypes.Variable,
+                             span[OperandTypeAddress].FetchBits(BitNumber.Bit_6, 1) == 1 ? OperandTypes.SmallConstant : OperandTypes.Variable,
+                             span[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 1) == 1 ? OperandTypes.SmallConstant : OperandTypes.Variable,
                             };
                         }
                         else if (Form == OpcodeForm.Variable)
                         {
                             types = new OperandTypes[]                           {
-                             (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_7, 2),
-                             (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 2),
-                             (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_3, 2),
-                             (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_1, 2),
+                             (OperandTypes)span[OperandTypeAddress].FetchBits(BitNumber.Bit_7, 2),
+                             (OperandTypes)span[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 2),
+                             (OperandTypes)span[OperandTypeAddress].FetchBits(BitNumber.Bit_3, 2),
+                             (OperandTypes)span[OperandTypeAddress].FetchBits(BitNumber.Bit_1, 2),
                             }.TakeWhile(t => t != OperandTypes.Omitted).ToArray();
                         }
                         else
                         {
                             types = new OperandTypes[]
                             {
-                             _bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_6, 1) == 0 ? OperandTypes.SmallConstant : OperandTypes.Variable,
-                             _bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 1) == 0 ? OperandTypes.SmallConstant : OperandTypes.Variable,
+                             span[OperandTypeAddress].FetchBits(BitNumber.Bit_6, 1) == 0 ? OperandTypes.SmallConstant : OperandTypes.Variable,
+                             span[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 1) == 0 ? OperandTypes.SmallConstant : OperandTypes.Variable,
                             };
                         }
                         break;
@@ -148,22 +151,22 @@ namespace NegativeEddy.Leaflet.Instructions
                     case OperandCountType.EXT:
                         List<OperandTypes> list = new List<OperandTypes>(4);
 
-                        OperandTypes oprType = (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_7, 2);
+                        OperandTypes oprType = (OperandTypes)span[OperandTypeAddress].FetchBits(BitNumber.Bit_7, 2);
                         if (oprType != OperandTypes.Omitted)
                         {
                             list.Add(oprType);
 
-                            oprType = (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 2);
+                            oprType = (OperandTypes)span[OperandTypeAddress].FetchBits(BitNumber.Bit_5, 2);
                             if (oprType != OperandTypes.Omitted)
                             {
                                 list.Add(oprType);
 
-                                oprType = (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_3, 2);
+                                oprType = (OperandTypes)span[OperandTypeAddress].FetchBits(BitNumber.Bit_3, 2);
                                 if (oprType != OperandTypes.Omitted)
                                 {
                                     list.Add(oprType);
 
-                                    oprType = (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_1, 2);
+                                    oprType = (OperandTypes)span[OperandTypeAddress].FetchBits(BitNumber.Bit_1, 2);
                                     if (oprType != OperandTypes.Omitted)
                                     {
                                         list.Add(oprType);
@@ -213,7 +216,7 @@ namespace NegativeEddy.Leaflet.Instructions
             }
         }
 
-        private IList<ZOperand> _operands = null;
+        private IList<ZOperand> _operands;
         public IList<ZOperand> Operands
         {
             get
@@ -233,7 +236,7 @@ namespace NegativeEddy.Leaflet.Instructions
                         switch (operandType)
                         {
                             case OperandTypes.Variable:
-                                operand.Variable = new ZVariable(_bytes[currentOperandAddr]);
+                                operand.Variable = new ZVariable(_bytes.Span[currentOperandAddr]);
                                 break;
                             case OperandTypes.LargeConstant:
                                 if (Definition.IsCall && i == 0)
@@ -252,7 +255,7 @@ namespace NegativeEddy.Leaflet.Instructions
                                 }
                                 break;
                             case OperandTypes.SmallConstant:
-                                operand.Constant = _bytes[currentOperandAddr];
+                                operand.Constant = _bytes.Span[currentOperandAddr];
                                 break;
                             case OperandTypes.Omitted:
                                 // ignore
@@ -308,7 +311,7 @@ namespace NegativeEddy.Leaflet.Instructions
                 Debug.Assert(Definition.HasStore, "instruction does not have a store variable");
                 if (Definition.HasStore)
                 {
-                    return new ZVariable(_bytes[StoreOffsetAddr]);
+                    return new ZVariable(_bytes.Span[StoreOffsetAddr]);
                 }
                 else
                 {
@@ -355,7 +358,7 @@ namespace NegativeEddy.Leaflet.Instructions
             {
                 if (Definition.HasBranch)
                 {
-                    IList<byte> branchData = new ArraySegment<byte>(_bytes, BranchOffsetAddr, 2);
+                    var branchData = _bytes.Slice(BranchOffsetAddr, 2);
                     return new BranchOffset(branchData);
                 }
                 else

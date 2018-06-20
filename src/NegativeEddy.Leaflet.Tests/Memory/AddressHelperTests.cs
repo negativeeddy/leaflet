@@ -84,7 +84,8 @@ namespace NegativeEddy.Leaflet.Memory.Tests
                 int address = input.Item2;
 
                 uint expected = input.Item3;
-                uint actual = data.GetDWord(address);
+                var s = new ReadOnlySpan<byte>(data);
+                uint actual = s.GetDWord(address);
                 Assert.AreEqual(expected, actual, input.ToString());
             }
         }
@@ -110,7 +111,8 @@ namespace NegativeEddy.Leaflet.Memory.Tests
                 // run the indices from the beginning to the end of the array
                 foreach (var input in inputs)
                 {
-                    byte[] testData = (byte[])starterBytes.Clone();
+                    byte[] byteCopy = (byte[])starterBytes.Clone();
+                    var testData = new Memory<byte>(byteCopy);
                     testData.SetDWord(input.Item2, i);
 
                     Console.WriteLine(ArrayToString(testData));
@@ -118,15 +120,16 @@ namespace NegativeEddy.Leaflet.Memory.Tests
                     byte[] expectedResults = input.Item1;
                     for(int testIdx = 0; testIdx < expectedResults.Length; testIdx++)
                     {
-                        Assert.AreEqual(expectedResults[testIdx], testData[testIdx + i], $"i={i}, testIdx={testIdx}");
+                        Assert.AreEqual(expectedResults[testIdx], testData.Span[testIdx + i], $"i={i}, testIdx={testIdx}");
                     }
                 }
             }
         }
 
-        private string ArrayToString(IList<byte> bytes)
+        private string ArrayToString(Memory<byte> bytes)
         {
-            return bytes.Aggregate(string.Empty, (current, b) => current += $"0x{b:x2},", x => x);
+            var array = bytes.ToArray(); // TODO optimize this 
+            return array.Aggregate(string.Empty, (current, b) => current += $"0x{b:x2},", x => x);
         }
 
         [TestMethod()]

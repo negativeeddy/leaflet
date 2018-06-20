@@ -75,7 +75,7 @@ namespace NegativeEddy.Leaflet
         public Dictionary<string, object> GetState()
         {
             var state = new Dictionary<string, object>();
-            state["zmMain"] = MainMemory.Bytes;
+            state["zmMain"] = MainMemory.Bytes.ToArray();
             foreach (var frame in FrameStack)
             {
                 // clear pointer to main memory to prevent circular references
@@ -112,7 +112,7 @@ namespace NegativeEddy.Leaflet
             sb.Append($"{zop.BaseAddress:x4}:  ");
             for (int i = 0; i < zop.LengthInBytes; i++)
             {
-                sb.Append(MainMemory.Bytes[zop.BaseAddress + i].ToString("x2"));
+                sb.Append(MainMemory.Bytes.Span[zop.BaseAddress + i].ToString("x2"));
                 sb.Append(' ');
             }
 
@@ -457,7 +457,7 @@ namespace NegativeEddy.Leaflet
                     {
                         int arrayAddress = GetOperandValue(op.Operands[0]);
                         int byteIndex = GetOperandValue(op.Operands[1]);
-                        return MainMemory.Bytes[arrayAddress + byteIndex];
+                        return MainMemory.Bytes.Span[arrayAddress + byteIndex];
                     });
                     break;
                 case "loadw":   // loadw array word-index -> (result)
@@ -476,7 +476,7 @@ namespace NegativeEddy.Leaflet
                         int arrayAddress = GetOperandValue(op.Operands[0]);
                         int byteIndex = GetOperandValue(op.Operands[1]);
                         byte value = (byte)GetOperandValue(op.Operands[2]);
-                        MainMemory.Bytes[arrayAddress + byteIndex] = value;
+                        MainMemory.Bytes.Span[arrayAddress + byteIndex] = value;
                         return UNUSED_RETURN_VALUE;
                     });
                     break;
@@ -976,12 +976,12 @@ namespace NegativeEddy.Leaflet
 
                     int address = 0x1daf;
                     int numBytes = 20;
-                    var byteString = MainMemory.Bytes.Skip(address).Take(numBytes).Aggregate("", (str, val) => str += $" {val:x2}");
+                    var byteString = MainMemory.Bytes.Slice(address, numBytes).ToArray().Aggregate("", (str, val) => str += $" {val:x2}");
                     DebugOutput($"memory_dump {address:x4}{byteString}");
 
                     address = 0x1ae5;
                     numBytes = 20;
-                    byteString = MainMemory.Bytes.Skip(address).Take(numBytes).Aggregate("", (str, val) => str += $" {val:x2}");
+                    byteString = MainMemory.Bytes.Slice(address, numBytes).ToArray().Aggregate("", (str, val) => str += $" {val:x2}");
                     DebugOutput($"memory_dump {address:x4}{byteString}");
                 }
             }
@@ -1051,12 +1051,12 @@ namespace NegativeEddy.Leaflet
             int parseBufferIdx = GetOperandValue(op.Operands[1]);
 
             // copy the input to the text buffer
-            int txtBufferSize = MainMemory.Bytes[textBufferIdx];
+            int txtBufferSize = MainMemory.Bytes.Span[textBufferIdx];
             if (txtBufferSize < 3)
             {
                 throw new InvalidOperationException($"Text input buffer to small ({txtBufferSize} bytes)");
             }
-            IList<byte> textBuffer = new ArraySegment<byte>(MainMemory.Bytes, textBufferIdx + 1, txtBufferSize + 1);
+            var textBuffer = MainMemory.Bytes.Slice(textBufferIdx + 1, txtBufferSize + 1).Span;
 
             string input = Input.ReadLine();
             if (input.Length > txtBufferSize)
@@ -1075,7 +1075,7 @@ namespace NegativeEddy.Leaflet
 
             // parse the input
 
-            int maxWordsParsed = MainMemory.Bytes[parseBufferIdx];
+            int maxWordsParsed = MainMemory.Bytes.Span[parseBufferIdx];
             int parseBufferSize = 4 * maxWordsParsed + 2;   // each parsed word takes 4 bytes
                                                             // 0 - dictionary index of the word
                                                             // 1 - number of letters in the word
@@ -1084,7 +1084,7 @@ namespace NegativeEddy.Leaflet
             {
                 throw new InvalidOperationException($"Text input buffer to small ({parseBufferSize} bytes)");
             }
-            IList<byte> parseBuffer = new ArraySegment<byte>(MainMemory.Bytes, parseBufferIdx, parseBufferSize);
+            Span<byte> parseBuffer = MainMemory.Bytes.Slice(parseBufferIdx, parseBufferSize).Span;
 
             string[] words = SplitInput(input).ToArray();
             int wordsToParse = Math.Min(maxWordsParsed, words.Length);

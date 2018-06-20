@@ -11,7 +11,7 @@ namespace NegativeEddy.Leaflet.Memory
     /// </summary>
     public class WordOverByteArray : IList<ushort>
     {
-        private IList<byte> _bytes;
+        private Memory<byte> _bytes;
         private int _baseAddress;
 
         /// <summary>
@@ -29,18 +29,18 @@ namespace NegativeEddy.Leaflet.Memory
 
         public bool IsReadOnly { get { return false; } }
 
-        public WordOverByteArray(IList<byte> bytes, int baseAddress, int length)
+        public WordOverByteArray(Memory<byte> bytes, int baseAddress, int length)
         {
-            Debug.Assert(bytes.Count >= baseAddress + length * 2);
+            Debug.Assert(bytes.Length >= baseAddress + length * 2);
             _bytes = bytes;
             _baseAddress = baseAddress;
             _count = length;
         }
 
-        public WordOverByteArray(IList<byte> bytes, int baseAddress)
+        public WordOverByteArray(Memory<byte> bytes, int baseAddress)
         {
-            Debug.Assert(bytes.Count >= _count);
-            _count = (bytes.Count - baseAddress) / 2;
+            Debug.Assert(bytes.Length >= _count);
+            _count = (bytes.Length - baseAddress) / 2;
             _bytes = bytes;
             _baseAddress = baseAddress;
         }

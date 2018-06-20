@@ -133,8 +133,8 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
                                 break;
                             case "memory_dump":
                                 int memoryAddress = Convert.ToInt32(parts[1], 16);
-                                byte[] bytesExpected = parts.Skip(2).Select(x => Convert.ToByte(x, 16)).ToArray();
-                                byte[] bytesActual = zm.MainMemory.Bytes.Skip(memoryAddress).Take(bytesExpected.Length).ToArray();
+                                var bytesExpected = parts.Skip(2).Select(x => Convert.ToByte(x, 16)).ToArray();
+                                var bytesActual = zm.MainMemory.Bytes.Span.Slice(memoryAddress, bytesExpected.Length);
 
                                 for (int i = 0; i < bytesActual.Length; i++)
                                 {

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace NegativeEddy.Leaflet.Story
 {
     public class ZObjectTable : IEnumerable<ZObject>
     {
-        public ZObjectTable(byte[] data, int loadAddress)
+        public ZObjectTable(Memory<byte> data, int loadAddress)
         {
             Load(data, loadAddress);
         }
@@ -19,7 +20,7 @@ namespace NegativeEddy.Leaflet.Story
         /// </summary>
         /// <param name="data"></param>
         /// <param name="loadAddress"></param>
-        private void Load(byte[] data, int loadAddress)
+        private void Load(Memory<byte> data, int loadAddress)
         {
             // v1-3 object size is 9, if v4+ then object size is 14 
             const int OBJECT_DEF_SIZE = 9;

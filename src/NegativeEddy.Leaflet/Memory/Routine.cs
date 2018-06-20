@@ -16,7 +16,7 @@ namespace NegativeEddy.Leaflet.Memory
     public class Routine : ISerializable
     {
         [JsonIgnore]
-        public IList<byte> Bytes { get; set; }
+        public ReadOnlyMemory<byte> Bytes { get; set; }
         private readonly int _baseAddress;
 
         public int ReturnAddress { get; } = -1;
@@ -47,7 +47,7 @@ namespace NegativeEddy.Leaflet.Memory
         /// </summary>
         /// <param name="bytes">bytes representing memory</param>
         /// <param name="routineAddress">the beginning of the Routine's frame in memory</param>
-        public Routine(IList<byte> bytes, int routineAddress, int returnAddress, ZVariable returnStore, IList<ushort> localInitValues)
+        public Routine(ReadOnlyMemory<byte> bytes, int routineAddress, int returnAddress, ZVariable returnStore, IList<ushort> localInitValues)
         {
             Debug.Assert(routineAddress % 2 == 0, "A routine is required to begin at an address in memory which can be represented by a packed address (spec 5.1)");
             Bytes = bytes;
@@ -55,10 +55,11 @@ namespace NegativeEddy.Leaflet.Memory
             this.ReturnAddress = returnAddress;
             Store = returnStore;
 
-            int localVariableCount = bytes[routineAddress];
+            var span = bytes.Span;
+            int localVariableCount = span[routineAddress];
 
             // initialize locals from the routine definition
-            Locals = bytes.GetWords(routineAddress + 1, localVariableCount);
+            Locals = span.GetWords(routineAddress + 1, localVariableCount);
 
             // update locals with any provided arguments
             for (int i = 0; i < localInitValues.Count; i++)
