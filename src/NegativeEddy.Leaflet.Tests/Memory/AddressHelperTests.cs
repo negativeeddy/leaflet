@@ -11,25 +11,25 @@ namespace NegativeEddy.Leaflet.Memory.Tests
         [TestMethod]
         public void SetBitTest()
         {
-            var inputs = new Tuple<uint, BitNumber, uint>[]
+            var inputs = new (uint data, BitNumber bitFlag, uint expectedValue)[]
             {
-                new Tuple<uint,BitNumber,uint>(0x0000u, BitNumber.Bit_0,  0x00000001u),
-                new Tuple<uint,BitNumber,uint>(0x0000u, BitNumber.Bit_31, 0x80000000u),
-                new Tuple<uint,BitNumber,uint>(0x0000u, BitNumber.Bit_5,  0x00000020u),
+                (0x0000u, BitNumber.Bit_0,  0x00000001u),
+                (0x0000u, BitNumber.Bit_31, 0x80000000u),
+                (0x0000u, BitNumber.Bit_5,  0x00000020u),
             };
 
             foreach(var data in inputs)
             {
                 // set  bits
-                uint dword = data.Item1;
-                uint actual = dword.SetBit(data.Item2, true);
-                uint expected = data.Item3;
+                uint dword = data.data;
+                uint actual = dword.SetBit(data.bitFlag, true);
+                uint expected = data.expectedValue;
                 Assert.AreEqual(expected, actual);
 
                 // clear bits
-                dword = ~data.Item1;
-                actual = dword.SetBit(data.Item2, false);
-                expected = ~data.Item3;
+                dword = ~data.data;
+                actual = dword.SetBit(data.bitFlag, false);
+                expected = ~data.expectedValue;
                 Assert.AreEqual(expected, actual);
             }
 
