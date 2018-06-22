@@ -39,29 +39,29 @@ namespace NegativeEddy.Leaflet.Memory.Tests
         [TestMethod()]
         public void GetWordTest()
         {
-            var inputs = new List<Tuple<byte[], int, ushort>>()
+            var inputs = new List<(byte[] data, int address, ushort expectedWord)>()
             {
-                new Tuple<byte[], int, ushort>(new byte[] { 0x01, 0x02, 0x00 }, 0, 0x0102),
-                new Tuple<byte[], int, ushort>(new byte[] { 0x02, 0x01, 0x00 }, 0, 0x0201),
-                new Tuple<byte[], int, ushort>(new byte[] { 0x34, 0x56, 0x00 }, 0, 0x3456),
-                new Tuple<byte[], int, ushort>(new byte[] { 0x77, 0x77, 0x00 }, 0, 0x7777),
-                new Tuple<byte[], int, ushort>(new byte[] { 0x89, 0x89, 0x00 }, 0, 0x8989),
-                new Tuple<byte[], int, ushort>(new byte[] { 0x89, 0x98, 0x00 }, 0, 0x8998),
+                (new byte[] { 0x01, 0x02, 0x00 }, 0, 0x0102),
+                (new byte[] { 0x02, 0x01, 0x00 }, 0, 0x0201),
+                (new byte[] { 0x34, 0x56, 0x00 }, 0, 0x3456),
+                (new byte[] { 0x77, 0x77, 0x00 }, 0, 0x7777),
+                (new byte[] { 0x89, 0x89, 0x00 }, 0, 0x8989),
+                (new byte[] { 0x89, 0x98, 0x00 }, 0, 0x8998),
 
-                new Tuple<byte[], int, ushort>(new byte[] { 0x00, 0x01, 0x02 }, 1, 0x0102),
-                new Tuple<byte[], int, ushort>(new byte[] { 0x00, 0x02, 0x01 }, 1, 0x0201),
-                new Tuple<byte[], int, ushort>(new byte[] { 0x00, 0x34, 0x56 }, 1, 0x3456),
-                new Tuple<byte[], int, ushort>(new byte[] { 0x00, 0x77, 0x77 }, 1, 0x7777),
-                new Tuple<byte[], int, ushort>(new byte[] { 0x00, 0x89, 0x89 }, 1, 0x8989),
-                new Tuple<byte[], int, ushort>(new byte[] { 0x00, 0x89, 0x98 }, 1, 0x8998),
+                (new byte[] { 0x00, 0x01, 0x02 }, 1, 0x0102),
+                (new byte[] { 0x00, 0x02, 0x01 }, 1, 0x0201),
+                (new byte[] { 0x00, 0x34, 0x56 }, 1, 0x3456),
+                (new byte[] { 0x00, 0x77, 0x77 }, 1, 0x7777),
+                (new byte[] { 0x00, 0x89, 0x89 }, 1, 0x8989),
+                (new byte[] { 0x00, 0x89, 0x98 }, 1, 0x8998),
             };
 
             foreach (var input in inputs)
             {
-                byte[] data = input.Item1;
-                int address = input.Item2;
+                byte[] data = input.data;
+                int address = input.address;
 
-                ushort expected = input.Item3;
+                ushort expected = input.expectedWord;
                 ushort actual = data.GetWord(address);
                 Assert.AreEqual(expected, actual, input.ToString());
             }
@@ -70,20 +70,20 @@ namespace NegativeEddy.Leaflet.Memory.Tests
         [TestMethod()]
         public void GetDWordTest()
         {
-            var inputs = new List<Tuple<byte[], int, uint>>()
+            var inputs = new List<(byte[] data, int address, uint expectedDword)>
             {
                 // data, test index, expected result
-                new Tuple<byte[], int, uint>(new byte[] { 0x01, 0x23, 0x34, 0x56, 0x87, 0x9F }, 0, 0x01233456),
-                new Tuple<byte[], int, uint>(new byte[] { 0x01, 0x23, 0x34, 0x56, 0x87, 0x9F }, 1, 0x23345687),
-                new Tuple<byte[], int, uint>(new byte[] { 0x01, 0x23, 0x34, 0x56, 0x87, 0x9F }, 2, 0x3456879F),
+                (new byte[] { 0x01, 0x23, 0x34, 0x56, 0x87, 0x9F }, 0, 0x01233456),
+                (new byte[] { 0x01, 0x23, 0x34, 0x56, 0x87, 0x9F }, 1, 0x23345687),
+                (new byte[] { 0x01, 0x23, 0x34, 0x56, 0x87, 0x9F }, 2, 0x3456879F),
             };
 
             foreach (var input in inputs)
             {
-                byte[] data = input.Item1;
-                int address = input.Item2;
+                byte[] data = input.data;
+                int address = input.address;
 
-                uint expected = input.Item3;
+                uint expected = input.expectedDword;
                 uint actual = data.GetDWord(address);
                 Assert.AreEqual(expected, actual, input.ToString());
             }
@@ -92,12 +92,12 @@ namespace NegativeEddy.Leaflet.Memory.Tests
         [TestMethod()]
         public void SetDWordTest()
         {
-            var inputs = new List<Tuple<byte[], uint>>()
+            var inputs = new List<(byte[] data, uint dword)>
             {
                 //  expected result, test index, test value
-                new Tuple<byte[], uint>(new byte[] { 0x01, 0x23, 0x34, 0x56 }, 0x01233456),
-                new Tuple<byte[], uint>(new byte[] { 0x23, 0x34, 0x56, 0x87 },  0x23345687),
-                new Tuple<byte[], uint>(new byte[] { 0x34, 0x56, 0x87, 0x9F },  0x3456879F),
+                (new byte[] { 0x01, 0x23, 0x34, 0x56 }, 0x01233456),
+                (new byte[] { 0x23, 0x34, 0x56, 0x87 },  0x23345687),
+                (new byte[] { 0x34, 0x56, 0x87, 0x9F },  0x3456879F),
             };
 
             byte[] starterBytes = Enumerable.Range(0, 20).Select(x => (byte)0xff).ToArray();
@@ -111,11 +111,11 @@ namespace NegativeEddy.Leaflet.Memory.Tests
                 foreach (var input in inputs)
                 {
                     byte[] testData = (byte[])starterBytes.Clone();
-                    testData.SetDWord(input.Item2, i);
+                    testData.SetDWord(input.dword, i);
 
                     Console.WriteLine(ArrayToString(testData));
 
-                    byte[] expectedResults = input.Item1;
+                    byte[] expectedResults = input.data;
                     for(int testIdx = 0; testIdx < expectedResults.Length; testIdx++)
                     {
                         Assert.AreEqual(expectedResults[testIdx], testData[testIdx + i], $"i={i}, testIdx={testIdx}");
