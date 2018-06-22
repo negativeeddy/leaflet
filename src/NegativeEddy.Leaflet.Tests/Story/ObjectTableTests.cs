@@ -86,23 +86,23 @@ namespace NegativeEddy.Leaflet.Story.Tests
 
             var objTree = zm.MainMemory.ObjectTree;
 
-            var data = new Tuple<int, int, bool>[]  // Tuple<parentId, childId, result>
+            var data = new (int parentID, int childID, bool result)[]
             {
-                new Tuple<int, int,bool>(0,27,true),   // <unnamed> has no parent
-                new Tuple<int, int,bool>(27,121,true), // Thiefs lair's parent is <unnamed>
-                new Tuple<int, int,bool>(64,166,true),   // trunk of jewel's parent is Resevoir
-                new Tuple<int, int,bool>(143,122,true),  // tan label's parent is magic boat
-                new Tuple<int, int,bool>(122,143,false),     // object is child, not parent (backwards relationship)
-                new Tuple<int, int,bool>(45,21,false),    // grating's grandparent is <unnamed>, not parent
-                new Tuple<int, int,bool>(21,46,false),    // chute is not related to West of House
-                new Tuple<int, int,bool>(97,68,false),    // glass bottle is sibling of brown sack
-                new Tuple<int, int,bool>(113,113,false),    // both are nasty knife
+                (0,27,true),   // <unnamed> has no parent
+                (27,121,true), // Thiefs lair's parent is <unnamed>
+                (64,166,true),   // trunk of jewel's parent is Resevoir
+                (143,122,true),  // tan label's parent is magic boat
+                (122,143,false),     // object is child, not parent (backwards relationship)
+                (45,21,false),    // grating's grandparent is <unnamed>, not parent
+                (21,46,false),    // chute is not related to West of House
+                (97,68,false),    // glass bottle is sibling of brown sack
+                (113,113,false),    // both are nasty knife
             };
 
             foreach (var item in data)
             {
-                bool isValid = objTree.IsValidChild(item.Item1, item.Item2);
-                Assert.AreEqual(item.Item3, isValid, $"{item.Item1} is not valid parent of {item.Item2}");
+                bool isValid = objTree.IsValidChild(item.parentID, item.childID);
+                Assert.AreEqual(item.result, isValid, $"{item.parentID} is not valid parent of {item.childID}");
             }
 
         }
@@ -201,38 +201,38 @@ namespace NegativeEddy.Leaflet.Story.Tests
 
             var objTree = zm.MainMemory.ObjectTree;
 
-            var data = new Tuple<int, BitNumber, bool>[]  // Tuple<objId, attribute, result>
+            var data = new (int objId, BitNumber attribute, bool result)[]  
             {
-                new Tuple<int, BitNumber,bool>(169,BitNumber.Bit_0,false),
-                new Tuple<int, BitNumber,bool>(169,BitNumber.Bit_11,true),
-                new Tuple<int, BitNumber,bool>(169,BitNumber.Bit_10,false),
-                new Tuple<int, BitNumber,bool>(169,BitNumber.Bit_29,true),
-                new Tuple<int, BitNumber,bool>(169,BitNumber.Bit_28,true),
-                new Tuple<int, BitNumber,bool>(169,BitNumber.Bit_31,false),
+                (169,BitNumber.Bit_0,false),
+                (169,BitNumber.Bit_11,true),
+                (169,BitNumber.Bit_10,false),
+                (169,BitNumber.Bit_29,true),
+                (169,BitNumber.Bit_28,true),
+                (169,BitNumber.Bit_31,false),
 
-                new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_0,false),
-                new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_4,true),
-                new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_5,false),
-                new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_10,false),
-                new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_17,true),
-                new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_28,false),
-                new Tuple<int, BitNumber,bool>(9,BitNumber.Bit_31,false),
+                (9,BitNumber.Bit_0,false),
+                (9,BitNumber.Bit_4,true),
+                (9,BitNumber.Bit_5,false),
+                (9,BitNumber.Bit_10,false),
+                (9,BitNumber.Bit_17,true),
+                (9,BitNumber.Bit_28,false),
+                (9,BitNumber.Bit_31,false),
 
-                new Tuple<int, BitNumber,bool>(167,BitNumber.Bit_9,true),
-                new Tuple<int, BitNumber,bool>(167,BitNumber.Bit_11,true),
-                new Tuple<int, BitNumber,bool>(167,BitNumber.Bit_18,true),
-                new Tuple<int, BitNumber,bool>(167,BitNumber.Bit_10,false),
-                new Tuple<int, BitNumber,bool>(167,BitNumber.Bit_17,false),
-                new Tuple<int, BitNumber,bool>(167,BitNumber.Bit_28,false),
-                new Tuple<int, BitNumber,bool>(167,BitNumber.Bit_31,false),
+                (167,BitNumber.Bit_9,true),
+                (167,BitNumber.Bit_11,true),
+                (167,BitNumber.Bit_18,true),
+                (167,BitNumber.Bit_10,false),
+                (167,BitNumber.Bit_17,false),
+                (167,BitNumber.Bit_28,false),
+                (167,BitNumber.Bit_31,false),
             };
 
             foreach (var item in data)
             {
-                var obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
-                bool expected = item.Item3;
-                bool actual = obj.HasAttribute(item.Item2);
-                Assert.AreEqual(expected, actual, $"Error on {obj.ToString()} attribute {item.Item2}");
+                var obj = zm.MainMemory.ObjectTree.GetObject(item.objId);
+                bool expected = item.result;
+                bool actual = obj.HasAttribute(item.attribute);
+                Assert.AreEqual(expected, actual, $"Error on {obj.ToString()} attribute {item.attribute}");
             }
         }
 
@@ -266,50 +266,50 @@ namespace NegativeEddy.Leaflet.Story.Tests
 
             var objTree = zm.MainMemory.ObjectTree;
 
-            var data = new Tuple<int, BitNumber>[]  // Tuple<objId, attribute, result>
+            var data = new (int objId, BitNumber attribute)[]
             {
-                new Tuple<int, BitNumber>(169,BitNumber.Bit_0),
-                new Tuple<int, BitNumber>(169,BitNumber.Bit_11),
-                new Tuple<int, BitNumber>(169,BitNumber.Bit_10),
-                new Tuple<int, BitNumber>(169,BitNumber.Bit_29),
-                new Tuple<int, BitNumber>(169,BitNumber.Bit_28),
-                new Tuple<int, BitNumber>(169,BitNumber.Bit_31),
+                (169,BitNumber.Bit_0),
+                (169,BitNumber.Bit_11),
+                (169,BitNumber.Bit_10),
+                (169,BitNumber.Bit_29),
+                (169,BitNumber.Bit_28),
+                (169,BitNumber.Bit_31),
 
             };
 
             foreach (var item in data)
             {
                 // set the bit
-                var obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
-                obj.SetAttribute(item.Item2, true);
+                var obj = zm.MainMemory.ObjectTree.GetObject(item.objId);
+                obj.SetAttribute(item.attribute, true);
 
-                bool actual = obj.HasAttribute(item.Item2);
-                Assert.AreEqual(true, actual, $"Error setting attribute on {obj.ToString()} attribute {item.Item2}");
+                bool actual = obj.HasAttribute(item.attribute);
+                Assert.AreEqual(true, actual, $"Error setting attribute on {obj.ToString()} attribute {item.attribute}");
 
                 // clear the bit
-                obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
-                obj.SetAttribute(item.Item2, false);
+                obj = zm.MainMemory.ObjectTree.GetObject(item.objId);
+                obj.SetAttribute(item.attribute, false);
 
-                obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
-                actual = obj.HasAttribute(item.Item2);
-                Assert.AreEqual(false, actual, $"Error on {obj.ToString()} attribute {item.Item2}");
+                obj = zm.MainMemory.ObjectTree.GetObject(item.objId);
+                actual = obj.HasAttribute(item.attribute);
+                Assert.AreEqual(false, actual, $"Error on {obj.ToString()} attribute {item.attribute}");
 
                 // set the bit
-                obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
-                obj.SetAttribute(item.Item2, true);
+                obj = zm.MainMemory.ObjectTree.GetObject(item.objId);
+                obj.SetAttribute(item.attribute, true);
 
 
-                obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
-                actual = obj.HasAttribute(item.Item2);
-                Assert.AreEqual(true, actual, $"Error on {obj.ToString()} attribute {item.Item2}");
+                obj = zm.MainMemory.ObjectTree.GetObject(item.objId);
+                actual = obj.HasAttribute(item.attribute);
+                Assert.AreEqual(true, actual, $"Error on {obj.ToString()} attribute {item.attribute}");
 
                 // clear the bit
-                obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
-                obj.SetAttribute(item.Item2, false);
+                obj = zm.MainMemory.ObjectTree.GetObject(item.objId);
+                obj.SetAttribute(item.attribute, false);
 
-                obj = zm.MainMemory.ObjectTree.GetObject(item.Item1);
-                actual = obj.HasAttribute(item.Item2);
-                Assert.AreEqual(false, actual, $"Error on {obj.ToString()} attribute {item.Item2}");
+                obj = zm.MainMemory.ObjectTree.GetObject(item.objId);
+                actual = obj.HasAttribute(item.attribute);
+                Assert.AreEqual(false, actual, $"Error on {obj.ToString()} attribute {item.attribute}");
             }
         }
     }

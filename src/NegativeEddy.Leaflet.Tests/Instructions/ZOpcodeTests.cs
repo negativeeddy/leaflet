@@ -735,14 +735,14 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
 
-            Tuple<int, string>[] testData = GetOpcodeInputData();
+            var testData = GetOpcodeInputData();
 
             // test opcode output with explicit addresses
             foreach (var item in testData)
             {
-                ZOpcode oc = new ZOpcode(zm.MainMemory.Bytes, item.Item1);
+                ZOpcode oc = new ZOpcode(zm.MainMemory.Bytes, item.address);
                 Console.WriteLine(oc);
-                Assert.AreEqual(item.Item2, oc.ToString(), $"Bad decode at address 0x{item.Item1:x4}");
+                Assert.AreEqual(item.intructionText, oc.ToString(), $"Bad decode at address 0x{item.address:x4}");
             }
         }
 
@@ -752,11 +752,11 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
 
-            Tuple<int, string>[] testData = GetOpcodeInputData();
+            var testData = GetOpcodeInputData();
 
             // test opcode output & lengths
-            int firstOpcode = testData.First().Item1;
-            int lastOpcode = testData.Last().Item1;
+            int firstOpcode = testData.First().address;
+            int lastOpcode = testData.Last().address;
 
             int instructionPointer = firstOpcode;
             int instructionCount = 0;
@@ -770,26 +770,26 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
             Assert.AreEqual(testData.Length, instructionCount);
         }
 
-        private static Tuple<int, string>[] GetOpcodeInputData()
+        private static (int address, string intructionText)[] GetOpcodeInputData()
         {
             // this set of instructions in minizork are sequential in memory
-            Tuple<int, string>[] testData = new Tuple<int, string>[]
+            (int, string)[] testData = new (int, string)[]
             {
                                    // address, instruction text
-                new Tuple<int, string>(0x37d9, "37d9: call 3b36 3e88 ffff ->sp"),
-                new Tuple<int, string>(0x37e2, "37e2: storew sp 00 01"),
-                new Tuple<int, string>(0x37e7, "37e7: call 3b36 4e50 28 ->sp"),
-                new Tuple<int, string>(0x37ef, "37ef: call 3b36 4792 96 ->sp"),
-                new Tuple<int, string>(0x37f7, "37f7: store g0 2e"),
-                new Tuple<int, string>(0x37fa, "37fa: store g7a a7"),
-                new Tuple<int, string>(0x37fd, "37fd: store g26 01"),
-                new Tuple<int, string>(0x3800, "3800: store g73 1e"),
-                new Tuple<int, string>(0x3803, "3803: insert_obj g73 g0"),
-                new Tuple<int, string>(0x3806, "3806: call 5862 ->sp"),
-                new Tuple<int, string>(0x380b, "380b: new_line"),
-                new Tuple<int, string>(0x380c, "380c: call 61f4 ->sp"),
-                new Tuple<int, string>(0x3811, "3811: call 381a ->sp"),
-                new Tuple<int, string>(0x3816, "3816: jump 37d9"),
+                (0x37d9, "37d9: call 3b36 3e88 ffff ->sp"),
+                (0x37e2, "37e2: storew sp 00 01"),
+                (0x37e7, "37e7: call 3b36 4e50 28 ->sp"),
+                (0x37ef, "37ef: call 3b36 4792 96 ->sp"),
+                (0x37f7, "37f7: store g0 2e"),
+                (0x37fa, "37fa: store g7a a7"),
+                (0x37fd, "37fd: store g26 01"),
+                (0x3800, "3800: store g73 1e"),
+                (0x3803, "3803: insert_obj g73 g0"),
+                (0x3806, "3806: call 5862 ->sp"),
+                (0x380b, "380b: new_line"),
+                (0x380c, "380c: call 61f4 ->sp"),
+                (0x3811, "3811: call 381a ->sp"),
+                (0x3816, "3816: jump 37d9"),
             };
             return testData;
         }
