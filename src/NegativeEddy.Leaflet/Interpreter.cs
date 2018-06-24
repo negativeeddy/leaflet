@@ -653,7 +653,7 @@ namespace NegativeEddy.Leaflet
                         Debug.Assert(op.OperandType.Count == 1);
                         // Print (Z-encoded) string at given byte address
                         int address = GetOperandValue(opcode.Operands[0]);
-                        var obj = new ZStringBuilder(MainMemory.Bytes, address);
+                        var obj = new ZStringBuilder(MainMemory.Bytes.Slice(address));
                         _stdOut.WriteOutput(obj.ToString());
                         return UNUSED_RETURN_VALUE;
                     });
@@ -664,7 +664,7 @@ namespace NegativeEddy.Leaflet
                         Debug.Assert(op.OperandType.Count == 1);
                         // Print (Z-encoded) string at given byte address
                         int address = GetOperandValue(opcode.Operands[0]) * 2;
-                        var obj = new ZStringBuilder(MainMemory.Bytes, address);
+                        var obj = new ZStringBuilder(MainMemory.Bytes.Slice(address));
                         _stdOut.WriteOutput(obj.ToString());
                         return UNUSED_RETURN_VALUE;
                     });

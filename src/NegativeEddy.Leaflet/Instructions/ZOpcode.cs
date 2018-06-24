@@ -397,7 +397,7 @@ namespace NegativeEddy.Leaflet.Instructions
             {
                 if (_textSection == null && Definition.HasText)
                 {
-                    _textSection = new ZStringBuilder(_bytes, TextAddr);
+                    _textSection = new ZStringBuilder(_bytes.Slice(TextAddr));
 
                 }
                 return _textSection;

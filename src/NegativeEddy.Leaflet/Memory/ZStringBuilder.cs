@@ -15,9 +15,10 @@ namespace NegativeEddy.Leaflet.Memory
         /// </summary>
         /// <param name="data">the byte array</param>
         /// <param name="index">the position of the beginning of the ZString</param>
-        public ZStringBuilder(ReadOnlyMemory<byte> data, int index)
+        public ZStringBuilder(ReadOnlyMemory<byte> data)
         {
             _allBits = null;
+            int index = 0;
             do
             {
                 ushort word = data.GetWord(index);
@@ -33,9 +34,10 @@ namespace NegativeEddy.Leaflet.Memory
         /// <param name="data">the byte array</param>
         /// <param name="index">the position of the beginning of the ZString</param>
         /// <param name="count">the length of the ZString in words to read from the byte data (not length in bytes)</param>
-        public ZStringBuilder(ReadOnlyMemory<byte> data, int index, int count)
+        public ZStringBuilder(ReadOnlyMemory<byte> data, int count)
         {
             _allBits = null;
+            int index = 0;
             for (int i=0; i<count*2; i+=2)
             {
                 ushort word = data.GetWord(index+i);

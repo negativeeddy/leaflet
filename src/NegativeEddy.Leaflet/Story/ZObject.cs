@@ -21,7 +21,7 @@ namespace NegativeEddy.Leaflet.Story
 
         private readonly Memory<byte> _bytes;
 
-       // public static ZObject InvalidObject = new ZObject(null, 0, ZObject.INVALID_ID);
+        // public static ZObject InvalidObject = new ZObject(null, 0, ZObject.INVALID_ID);
 
         public static ushort[] DefaultProperties { get; set; }
 
@@ -65,7 +65,7 @@ namespace NegativeEddy.Leaflet.Story
         public string ToLongString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append($"ID:{ID} Name:{this.ShortName.Replace(' ','_')} Attributes:");
+            sb.Append($"ID:{ID} Name:{this.ShortName.Replace(' ', '_')} Attributes:");
             foreach (var bit in Attributes.GetBits())
             {
                 sb.Append((31 - (int)bit).ToString());    // TODO: Is printing wrong or are bit labels backwards?
@@ -73,7 +73,7 @@ namespace NegativeEddy.Leaflet.Story
             }
 
             // remove the last comma if attributes were added
-            if (sb[sb.Length-1] == ',')
+            if (sb[sb.Length - 1] == ',')
             {
                 sb.Remove(sb.Length - 1, 1);
             }
@@ -81,10 +81,10 @@ namespace NegativeEddy.Leaflet.Story
             sb.Append(" ");
 
             sb.Append($"Parent:{ParentID} Sibling:{SiblingID} Child:{ChildID} ");
-            sb.Append($"PropertyAddr:{PropertyTableAddress:x4} " );
+            sb.Append($"PropertyAddr:{PropertyTableAddress:x4} ");
 
             sb.Append("Properties:");
-            foreach (var prop in CustomProperties.OrderBy(x=>x.ID))
+            foreach (var prop in CustomProperties.OrderBy(x => x.ID))
             {
                 sb.Append($"[{prop.ID}],");
                 foreach (byte b in prop.Data.ToArray())
@@ -152,7 +152,7 @@ namespace NegativeEddy.Leaflet.Story
                 currentIndex++;
                 if (length > 0)
                 {
-                    var zb = new ZStringBuilder(_bytes, currentIndex, length);
+                    var zb = new ZStringBuilder(_bytes.Slice(currentIndex), length);
                     return zb;
                 }
                 else
@@ -190,7 +190,7 @@ namespace NegativeEddy.Leaflet.Story
                 // When the game attempts to read the value of property n for an object which 
                 // does not provide property n, the n-th entry in this table is the resulting 
                 // value. spec 12.2
-                ushort value = DefaultProperties[propertyID-1];
+                ushort value = DefaultProperties[propertyID - 1];
                 Debug.WriteLine($"  Default property used for prop {propertyID}. Value = {value}");
                 return value;
             }
@@ -260,7 +260,7 @@ namespace NegativeEddy.Leaflet.Story
         public bool HasAttribute(BitNumber attributeNumber)
         {
             // must flip the bit number because the Attributes are in reverse significant bit order
-            return Attributes.FetchBits((BitNumber)(31-(int)attributeNumber), 1) == 1;
+            return Attributes.FetchBits((BitNumber)(31 - (int)attributeNumber), 1) == 1;
         }
 
         /// <summary>

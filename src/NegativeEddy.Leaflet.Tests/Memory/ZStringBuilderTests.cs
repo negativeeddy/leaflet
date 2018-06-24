@@ -31,7 +31,7 @@ namespace NegativeEddy.Leaflet.Memory.Tests
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
 
-            var zb = new ZStringBuilder(zm.MainMemory.Bytes, 0xb106);
+            var zb = new ZStringBuilder(zm.MainMemory.Bytes.Slice(0xb106));
             string actual = zb.ToString();
 
             // expected isn't the entire string but just the first portion long enough to encounter an abbreviation
@@ -48,7 +48,7 @@ namespace NegativeEddy.Leaflet.Memory.Tests
             string filename = @"GameFiles\minizork.z3";
             var zm = ZMachineLoader.Load(filename);
 
-            var zb = new ZStringBuilder(zm.MainMemory.Bytes, 0xb106, 6);
+            var zb = new ZStringBuilder(zm.MainMemory.Bytes.Slice(0xb106), 6);
             string actual = zb.ToString();
 
             Assert.AreEqual(expected, actual);
@@ -62,7 +62,7 @@ namespace NegativeEddy.Leaflet.Memory.Tests
 
             string expected = "MINI-ZORK I: ";
 
-            var zb = new ZStringBuilder(zm.MainMemory.Bytes, 0x5866);
+            var zb = new ZStringBuilder(zm.MainMemory.Bytes.Slice(0x5866));
             string actual = zb.ToString();
 
             Assert.AreEqual(expected, actual);
