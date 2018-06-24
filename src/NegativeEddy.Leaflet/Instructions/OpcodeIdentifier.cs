@@ -6,10 +6,10 @@ namespace NegativeEddy.Leaflet.Instructions
     /// This class provides a unique identifier for an opcode made up
     /// of the operand count and the opcode number
     /// </summary>
-    public class OpcodeIdentifier
+    public readonly struct OpcodeIdentifier
     {
-        public OperandCountType OperandCount;
-        public ushort OpcodeNumber;
+        public readonly OperandCountType OperandCount;
+        public readonly ushort OpcodeNumber;
 
         public OpcodeIdentifier(OperandCountType operandCount, ushort opcodeNumber)
         {
