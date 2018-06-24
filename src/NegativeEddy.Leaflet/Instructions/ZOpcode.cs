@@ -315,7 +315,7 @@ namespace NegativeEddy.Leaflet.Instructions
                 }
                 else
                 {
-                    return null;
+                    throw new InvalidOperationException("instruction does not have a store variable");
                 }
             }
         }

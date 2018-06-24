@@ -5,8 +5,10 @@ namespace NegativeEddy.Leaflet.Instructions
     public enum ZVariableLocation { Stack, Local, Global }
 
     [Serializable]
-    public class ZVariable
+    public readonly struct ZVariable
     {
+        public static readonly ZVariable None;
+
         /// <summary>
         /// the original bits of the variable type of the operand
         /// </summary>
@@ -83,6 +85,26 @@ namespace NegativeEddy.Leaflet.Instructions
                 default:
                     throw new InvalidOperationException($"Unknown variable location '{Location}'");
             }
+        }
+
+        static public bool operator ==(ZVariable z1, ZVariable z2)
+        {
+            return z1.Bits == z2.Bits;
+        }
+
+        static public bool operator !=(ZVariable z1, ZVariable z2)
+        {
+            return z1.Bits != z2.Bits;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Bits.Equals(((ZVariable)obj).Bits);
+        }
+
+        public override int GetHashCode()
+        {
+            return Bits.GetHashCode();
         }
     }
 }

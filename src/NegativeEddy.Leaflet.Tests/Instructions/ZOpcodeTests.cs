@@ -677,7 +677,7 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
                 Assert.AreEqual(branchToAddress.Value, zop.BranchToAddress, "Branch address wrong");
             }
 
-            if (store == null)
+            if (store == ZVariable.None)
             {
                 Assert.IsFalse(zop.Definition.HasStore);
             }

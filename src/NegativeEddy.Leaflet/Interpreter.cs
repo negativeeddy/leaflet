@@ -36,7 +36,7 @@ namespace NegativeEddy.Leaflet
         {
             MainMemory = new ZMemory(storyStream);
             FrameStack = new Stack<Routine>();
-            LoadNewFrame(MainMemory.Header.PCStart - 1, 0, null);
+            LoadFirstFrame(MainMemory.Header.PCStart - 1, 0);
 
             IsRunning = true;
         }
@@ -1146,6 +1146,18 @@ namespace NegativeEddy.Leaflet
                     yield return word;
                 }
             }
+        }
+
+
+        private void LoadFirstFrame(int newAddress, int returnAddress, params ZOperand[] operands)
+        {
+            // initialize a new frame
+            var initLocals = operands.Select(op => (ushort)GetOperandValue(op)).ToArray();
+            Routine newRoutine = new Routine(MainMemory.Bytes, newAddress, returnAddress, ZVariable.None, initLocals);
+            FrameStack.Push(newRoutine);
+
+            // update the instruction counter
+            ProgramCounter = newRoutine.FirstInstructionAddress;
         }
 
         private void LoadNewFrame(int newAddress, int returnAddress, ZVariable returnStore, params ZOperand[] operands)

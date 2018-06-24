@@ -19,11 +19,13 @@ namespace NegativeEddy.Leaflet.Memory
             return -1;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint UnpackAddress(ushort address)
         {
             return (uint)(address * 2); // unpack for v1-3
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint GetWordUnpacked(this ReadOnlyMemory<byte> data, int address)
         {
             ushort word = GetWord(data, address);
@@ -55,6 +57,7 @@ namespace NegativeEddy.Leaflet.Memory
             return ((ReadOnlySpan<byte>)data).GetWord(address);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ushort GetWord(this ReadOnlySpan<byte> data, int address)
         {
             Debug.Assert(address <= data.Length);
@@ -72,6 +75,7 @@ namespace NegativeEddy.Leaflet.Memory
             data.Span.SetWord(word, address);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetWord(this Span<byte> data, ushort word, int address)
         {
             Debug.Assert(address + 1 < data.Length);
