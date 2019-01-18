@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NegativeEddy.Leaflet.Core.Memory;
 using NegativeEddy.Leaflet.TestHelpers;
 using System;
 using System.Collections.Generic;
@@ -11,15 +12,24 @@ namespace NegativeEddy.Leaflet.Tests.Memory
     [TestClass]
     public class ZMemoryTests
     {
+        // load a script but execute every save/load on every step
         [TestMethod()]
         public void SaveAndLoadInterpreterState()
         {
-            Stream state = new MemoryStream();
             string filename = @"GameFiles\minizork.z3";
+
+            var commands = File.ReadLines(@"GameFiles\miniZork_input_walkthrough.txt");
+
+            Stream state = new MemoryStream();
+
+            // first run initializes the machine
             state = RunInterpreter(filename, state, new string[0]);
-            state = RunInterpreter(filename, state, new string[] { "open mailbox" });
-            state = RunInterpreter(filename, state, new string[] { "get leaflet" });
-            state = RunInterpreter(filename, state, new string[] { "read leaflet" });
+
+            // feed all the scripted commands
+            foreach (string command in commands)
+            {
+                state = RunInterpreter(filename, state, new string[] { command });
+            }
         }
 
         private Stream RunInterpreter(string gameFile, Stream state, IEnumerable<string> nextInput)
@@ -28,6 +38,10 @@ namespace NegativeEddy.Leaflet.Tests.Memory
 
             zMachine.Input = new InputFeeder(nextInput);
             zMachine.DiagnosticsOutputLevel = Interpreter.DiagnosticsLevel.Off;
+
+            var randData = new ShimRandomNumberGenerator();
+            zMachine.RandomNumberGenerator = (IRandomNumberGenerator)randData;
+            randData.NextRandomNumberToGenerate = 1;
 
             if (nextInput?.Count() == 0)
             {

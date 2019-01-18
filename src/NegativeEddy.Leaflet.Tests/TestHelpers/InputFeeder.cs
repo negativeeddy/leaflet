@@ -1,6 +1,7 @@
 ﻿using NegativeEddy.Leaflet.IO;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace NegativeEddy.Leaflet.TestHelpers
 {
@@ -25,6 +26,8 @@ namespace NegativeEddy.Leaflet.TestHelpers
             string nextInput = _input.Dequeue();
             if (_writeToConsole)
             {
+                // TODO: which one or both?
+                Trace.WriteLine(nextInput);
                 Console.WriteLine(nextInput);
             }
             return nextInput;

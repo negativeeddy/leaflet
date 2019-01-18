@@ -191,7 +191,7 @@ namespace NegativeEddy.Leaflet.Story
                 // does not provide property n, the n-th entry in this table is the resulting 
                 // value. spec 12.2
                 ushort value = DefaultProperties[propertyID - 1];
-                Debug.WriteLine($"  Default property used for prop {propertyID}. Value = {value}");
+                // Debug.WriteLine($"  Default property used for prop {propertyID}. Value = {value}");
                 return value;
             }
         }
