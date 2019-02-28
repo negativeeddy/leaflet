@@ -10,7 +10,7 @@ The purpose of this project is:
 From [Wikipedia](https://en.wikipedia.org/wiki/Z-machine):
 > Z-machine is a virtual machine that was developed by Joel Berez and Marc Blank in 1979 and used by Infocom for its text adventure games. Infocom compiled game code to files containing Z-machine instructions (called story files, or Z-code files), and could therefore port all its text adventures to a new platform simply by writing a Z-machine implementation for that platform. With the large number of incompatible home computer systems in use at the time, this was an important advantage over using native code or developing a compiler for each system."
 
-Most people are most familiar with it in the form of the old text adventure game Zork, but it's actually a platform for general interactive fiction which was popular back in the 1980's and still has a community around it today.
+Most people are familiar with it in the form of the old text adventure game Zork, but it's actually a platform for general interactive fiction which was popular back in the 1980's and still has a community around it today.
 
 There are [numerous implementations](https://github.com/search?utf8=%E2%9C%93&q=zmachine) of the Z-Machine (and several in C#) but those are (1) not written by me :-) and (2) often focused on size and speed. This implementation is initially focused on implementing the spec in an object oriented fashion with current syntax and methodologies with shifts and changes arising as needed. It is purposely not optimized at this time in order to emphasize readability when comparing with the spec for correctness.
 
