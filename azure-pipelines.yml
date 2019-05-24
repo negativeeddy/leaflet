@@ -21,20 +21,9 @@ steps:
   inputs:
     version: '2.2.105' # replace this value with the version that you need for your project
 
-- task: NuGetToolInstaller@0
-
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
+  displayName: Build
   inputs:
-    restoreSolution: '$(solution)'
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    command: build
+    projects: '**/NegativeEddy.Leaflet.csproj'
+    arguments: '--configuration Release' # Update this to match your need
