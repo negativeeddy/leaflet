@@ -27,3 +27,15 @@ steps:
     command: build
     projects: '**/NegativeEddy.Leaflet.csproj'
     arguments: '--configuration Release' # Update this to match your need
+
+# do this near the end of your pipeline in most cases
+- task: PublishBuildArtifacts@1
+
+- script: dotnet pack /p:PackageVersion=$(version)  # define version variable elsewhere in your pipeline
+- task: NuGetCommand@2
+  inputs:
+    command: push
+    nuGetFeedType: external
+    publishFeedCredentials: 'Leaflet'
+    versioningScheme: byEnvVar
+    versionEnvVar: version
