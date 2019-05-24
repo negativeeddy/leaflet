@@ -35,7 +35,7 @@ steps:
 - task: NuGetCommand@2
   inputs:
     command: push
-    nuGetFeedType: external
-    publishFeedCredentials: 'Leaflet'
+    nuGetFeedType: internal
+    publishVstsFeed: 'Leaflet
     versioningScheme: byEnvVar
     versionEnvVar: version
