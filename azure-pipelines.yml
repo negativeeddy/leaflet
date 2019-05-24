@@ -36,6 +36,6 @@ steps:
   inputs:
     command: push
     nuGetFeedType: internal
-    publishVstsFeed: 'Leaflet
+    publishVstsFeed: 'Leaflet'
     versioningScheme: byEnvVar
     versionEnvVar: version
