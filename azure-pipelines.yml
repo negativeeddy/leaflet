@@ -29,13 +29,13 @@ steps:
   inputs:
     command: build
     projects: '$(project)'
-    arguments: '--configuration Release' # Update this to match your need
+    arguments: '--configuration $(BuildConfiguration)'
 
 - task: NuGetCommand@2
   inputs:
     command: pack
     packagesToPack: '$(project)'
-    configuration: 'Release'
+    configuration: '$(BuildConfiguration)'
     versioningScheme: byPrereleaseNumber
     majorVersion: '$(Major)'
     minorVersion: '$(Minor)'
