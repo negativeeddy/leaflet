@@ -35,7 +35,7 @@ steps:
   displayName: 'NuGet push'
   inputs:
     command: push
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+    packagesToPush: 'src/NegativeEddy.Leaflet/bin/Release/*.nupkg'
     publishVstsFeed: 'Leaflet'
     allowPackageConflicts: true
     nuGetFeedType: internal
