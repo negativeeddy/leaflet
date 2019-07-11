@@ -28,13 +28,13 @@ steps:
   displayName: Build
   inputs:
     command: build
-    projects: $project
+    projects: '$(project)'
     arguments: '--configuration Release' # Update this to match your need
 
 - task: NuGetCommand@2
   inputs:
     command: pack
-    packagesToPack: $project
+    packagesToPack: '$(project)'
     configuration: 'Release'
     versioningScheme: byPrereleaseNumber
     majorVersion: '$(Major)'
