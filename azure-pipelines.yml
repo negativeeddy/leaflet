@@ -19,7 +19,7 @@ steps:
 # do this before all your .NET Core tasks
 - task: DotNetCoreInstaller@0
   inputs:
-    version: '2.2.105' # replace this value with the version that you need for your project
+    version: '2.2.300' # replace this value with the version that you need for your project
 
 - task: DotNetCoreCLI@2
   displayName: Build
