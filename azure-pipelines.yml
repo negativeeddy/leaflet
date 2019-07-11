@@ -41,6 +41,7 @@ steps:
     minorVersion: '$(Minor)'
     patchVersion: '$(Patch)'
     includeSymbols: true
+    verbosityPack: Detailed
 
 - task: NuGetCommand@2
   displayName: 'NuGet push'
