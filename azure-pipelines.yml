@@ -35,11 +35,12 @@ steps:
   inputs:
     command: pack
     packagesToPack: $project
-    configuration: '--configuration Release'
+    configuration: 'Release'
     versioningScheme: byPrereleaseNumber
     majorVersion: '$(Major)'
     minorVersion: '$(Minor)'
     patchVersion: '$(Patch)'
+    includeSymbols: true
 
 - task: NuGetCommand@2
   displayName: 'NuGet push'
