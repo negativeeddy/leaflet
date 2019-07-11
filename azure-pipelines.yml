@@ -25,7 +25,7 @@ steps:
   displayName: Build
   inputs:
     command: build
-    projects: 'src/NegativeEddy.Leaflet.sln'
+    projects: 'src/NegativeEddy.Leaflet/NegativeEddy.Leaflet.csproj'
     arguments: '--configuration Release' # Update this to match your need
 
 # do this near the end of your pipeline in most cases
