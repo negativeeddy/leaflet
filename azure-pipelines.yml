@@ -32,18 +32,6 @@ steps:
     arguments: '--configuration $(BuildConfiguration)'
 
 - task: NuGetCommand@2
-  inputs:
-    command: pack
-    packagesToPack: '$(project)'
-    configuration: '$(BuildConfiguration)'
-    versioningScheme: byPrereleaseNumber
-    majorVersion: '$(Major)'
-    minorVersion: '$(Minor)'
-    patchVersion: '$(Patch)'
-    includeSymbols: true
-    verbosityPack: 'diagnostic'
-
-- task: NuGetCommand@2
   displayName: 'NuGet push'
   inputs:
     command: push
