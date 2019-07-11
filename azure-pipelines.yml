@@ -41,11 +41,13 @@ steps:
     minorVersion: '$(Minor)'
     patchVersion: '$(Patch)'
     includeSymbols: true
-    verbosityPack: Detailed
+    verbosityPack: 'diagnostic'
 
 - task: NuGetCommand@2
   displayName: 'NuGet push'
   inputs:
     command: push
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
     publishVstsFeed: 'Leaflet'
     allowPackageConflicts: true
+    nuGetFeedType: internal
