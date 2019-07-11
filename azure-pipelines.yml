@@ -28,5 +28,9 @@ steps:
     projects: 'src/NegativeEddy.Leaflet/NegativeEddy.Leaflet.csproj'
     arguments: '--configuration Release' # Update this to match your need
 
-# do this near the end of your pipeline in most cases
-- task: PublishBuildArtifacts@1
+- task: NuGetCommand@2
+  displayName: 'NuGet push'
+  inputs:
+    command: push
+    publishVstsFeed: 'Leaflet'
+    allowPackageConflicts: true
