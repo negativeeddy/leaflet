@@ -22,8 +22,21 @@ namespace NegativeEddy.Leaflet.Memory
 
         public ZMemory(Stream gameMemory)
         {
-            Bytes = new byte[gameMemory.Length];
-            gameMemory.Read(Bytes, 0, Bytes.Length);
+            if (gameMemory.CanSeek)
+            {
+                // Need Seek to check the Length property
+                Bytes = new byte[gameMemory.Length];
+                gameMemory.Read(Bytes, 0, Bytes.Length);
+            }
+            else
+            {
+                // otherwise copy into a local memory stream first
+                using (MemoryStream memStream = new MemoryStream())
+                {
+                    gameMemory.CopyTo(memStream);
+                    Bytes = memStream.ToArray();
+                }
+            }
 
             // update the global zstringbuilder table with the text abbreviations
             ZStringBuilder.AbbreviationTable = TextAbbreviations;
