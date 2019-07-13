@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.0.12-alpha</Version>
+    <Version>0.0.13-alpha</Version>
     <RepositoryUrl>https://github.com/negativeeddy/leaflet</RepositoryUrl>
     <PackageProjectUrl>https://github.com/negativeeddy/leaflet</PackageProjectUrl>
     <Copyright>2016</Copyright>
