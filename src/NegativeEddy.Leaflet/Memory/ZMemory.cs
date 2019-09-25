@@ -31,11 +31,9 @@ namespace NegativeEddy.Leaflet.Memory
             else
             {
                 // otherwise copy into a local memory stream first
-                using (MemoryStream memStream = new MemoryStream())
-                {
-                    gameMemory.CopyTo(memStream);
-                    Bytes = memStream.ToArray();
-                }
+                using MemoryStream memStream = new MemoryStream();
+                gameMemory.CopyTo(memStream);
+                Bytes = memStream.ToArray();
             }
 
             // update the global zstringbuilder table with the text abbreviations

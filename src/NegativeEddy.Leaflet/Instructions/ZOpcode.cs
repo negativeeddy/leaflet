@@ -13,7 +13,7 @@ namespace NegativeEddy.Leaflet.Instructions
 
         public OpcodeDefinition Definition { get { return OpcodeDefinition.GetKnownOpcode(Identifier); } }
 
-        byte[] _bytes;
+        readonly byte[] _bytes;
         public int BaseAddress { get; }
 
         /// <summary>
@@ -58,15 +58,12 @@ namespace NegativeEddy.Leaflet.Instructions
             {
                 // From the spec section 4.3
                 byte opcodeType = _bytes[BaseAddress].FetchBits(BitNumber.Bit_7, 2);
-                switch (opcodeType)
+                return opcodeType switch
                 {
-                    case 0x02:
-                        return _bytes[BaseAddress] == 0xBE ? OpcodeForm.Extended : OpcodeForm.Short;
-                    case 0x03:
-                        return OpcodeForm.Variable;
-                    default:
-                        return OpcodeForm.Long;
-                }
+                    0x02 => _bytes[BaseAddress] == 0xBE ? OpcodeForm.Extended : OpcodeForm.Short,
+                    0x03 => OpcodeForm.Variable,
+                    _ => OpcodeForm.Long,
+                };
             }
         }
 

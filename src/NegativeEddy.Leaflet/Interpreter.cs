@@ -16,8 +16,8 @@ namespace NegativeEddy.Leaflet
 {
     public class Interpreter
     {
-        private InterpreterOutput _stdOut = new InterpreterOutput();
-        private InterpreterOutput _dbgOut = new InterpreterOutput();
+        private readonly InterpreterOutput _stdOut = new InterpreterOutput();
+        private readonly InterpreterOutput _dbgOut = new InterpreterOutput();
 
         public IZInput Input { get; set; }
         public IObservable<string> Output { get { return _stdOut.Print; } }
@@ -74,8 +74,10 @@ namespace NegativeEddy.Leaflet
 
         public Dictionary<string, object> GetState()
         {
-            var state = new Dictionary<string, object>();
-            state["zmMain"] = MainMemory.Bytes;
+            var state = new Dictionary<string, object>
+            {
+                ["zmMain"] = MainMemory.Bytes
+            };
             foreach (var frame in FrameStack)
             {
                 // clear pointer to main memory to prevent circular references
@@ -487,8 +489,10 @@ namespace NegativeEddy.Leaflet
                         int wordIndex = GetOperandValue(op.Operands[1]);
                         ushort value = (ushort)GetOperandValue(op.Operands[2]);
 
-                        var wob = new WordOverByteArray(MainMemory.Bytes, arrayAddress);
-                        wob[wordIndex] = value;
+                        var wob = new WordOverByteArray(MainMemory.Bytes, arrayAddress)
+                        {
+                            [wordIndex] = value
+                        };
                         return UNUSED_RETURN_VALUE;
                     });
                     break;
@@ -1031,7 +1035,7 @@ namespace NegativeEddy.Leaflet
             }
         }
 
-        void Handle_Return(ZOpcode opcode, ushort returnValue)
+        private void Handle_Return(ZOpcode opcode, ushort returnValue)
         {
             // remove the current frame from the stack
             var oldFrame = FrameStack.Pop();

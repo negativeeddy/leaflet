@@ -44,7 +44,7 @@ namespace NegativeEddy.Leaflet.Memory
             }
         }
 
-        private List<ushort> _allBits = new List<ushort>();
+        private readonly List<ushort> _allBits = new List<ushort>();
 
         public int LengthInBytes
         {
