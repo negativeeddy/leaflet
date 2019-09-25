@@ -962,12 +962,12 @@ namespace NegativeEddy.Leaflet
             {
                 if (CurrentRoutineFrame != null)
                 {
-                    DebugOutput($"current_locals {CurrentRoutineFrame.Locals.ConcatToString(' ', val => $"{val:x4}")}"
-                            , DiagnosticsLevel.Verbose);
-                    DebugOutput($"current_globals {MainMemory.GlobalVariables.ConcatToString(' ', val => $"{val:x4}")}"
-                            , DiagnosticsLevel.Verbose);
-                    DebugOutput($"current_stack {CurrentRoutineFrame.EvaluationStack.ConcatToString(' ', val => $"{val:x4}")}"
-                            , DiagnosticsLevel.Verbose);
+                    var locals = string.Join(' ', CurrentRoutineFrame.Locals.Select(x => $"{x:x4}").ToArray());
+                    DebugOutput($"current_locals {locals}", DiagnosticsLevel.Verbose);
+                    var globals = string.Join(' ', MainMemory.GlobalVariables.Select(val => $"{val:x4}").ToArray());
+                    DebugOutput($"current_globals {globals}", DiagnosticsLevel.Verbose);
+                    var stack = string.Join(' ', CurrentRoutineFrame.EvaluationStack.Select(val => $"{val:x4}").ToArray());
+                    DebugOutput($"current_stack {stack}", DiagnosticsLevel.Verbose);
                 }
 
                 if (DiagnosticsOutputLevel >= DiagnosticsLevel.Diagnostic)
