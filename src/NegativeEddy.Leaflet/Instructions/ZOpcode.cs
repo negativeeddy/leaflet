@@ -213,7 +213,7 @@ namespace NegativeEddy.Leaflet.Instructions
             }
         }
 
-        private IList<ZOperand> _operands = null;
+        private IList<ZOperand>? _operands = null;
         public IList<ZOperand> Operands
         {
             get
@@ -312,7 +312,7 @@ namespace NegativeEddy.Leaflet.Instructions
                 }
                 else
                 {
-                    return null;
+                    throw new InvalidOperationException("ZOpcode does not have a store variable");
                 }
             }
         }
@@ -360,7 +360,7 @@ namespace NegativeEddy.Leaflet.Instructions
                 }
                 else
                 {
-                    return null;
+                    throw new InvalidOperationException("ZOpcode has no branch offset");
                 }
             }
         }
@@ -372,7 +372,7 @@ namespace NegativeEddy.Leaflet.Instructions
         {
             get
             {
-                if (BranchOffset == null)
+                if (!Definition.HasBranch)
                 {
                     return BranchOffsetAddr;
                 }
@@ -383,7 +383,7 @@ namespace NegativeEddy.Leaflet.Instructions
             }
         }
 
-        private ZStringBuilder _textSection;
+        private ZStringBuilder? _textSection;
 
         /// <summary>
         /// The data for the Text portion of the instruction (if any)
@@ -392,11 +392,16 @@ namespace NegativeEddy.Leaflet.Instructions
         {
             get
             {
-                if (_textSection == null && Definition.HasText)
+                if (!Definition.HasText)
+                {
+                    throw new InvalidOperationException("ZOpcode has no text section");
+                }
+
+                if (_textSection == null)
                 {
                     _textSection = new ZStringBuilder(_bytes, TextAddr);
-
                 }
+
                 return _textSection;
             }
         }
@@ -408,7 +413,7 @@ namespace NegativeEddy.Leaflet.Instructions
         {
             get
             {
-                return TextSection?.ToString();
+                return TextSection.ToString();
             }
         }
 

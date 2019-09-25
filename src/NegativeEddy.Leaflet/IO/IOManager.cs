@@ -13,7 +13,7 @@ namespace NegativeEddy.Leaflet.IO
         private Subject<string> _outputSubject = new Subject<string>();
         public IObservable<string> Print { get { return _outputSubject.AsObservable(); } }
 
-        public void WriteOutputLine(string text = null)
+        public void WriteOutputLine(string? text = null)
         {
             if (text != null)
             {

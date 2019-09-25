@@ -143,7 +143,7 @@ namespace NegativeEddy.Leaflet.Story
             }
         }
 
-        private ZStringBuilder NameBuilder
+        private ZStringBuilder? NameBuilder
         {
             get
             {
@@ -161,6 +161,7 @@ namespace NegativeEddy.Leaflet.Story
                 }
             }
         }
+
         private int NameLengthInBytes { get { return NameBuilder?.LengthInBytes ?? 0; } }
 
         public uint GetPropertyValue(int propertyID)

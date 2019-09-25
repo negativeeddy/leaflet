@@ -1189,9 +1189,9 @@ namespace NegativeEddy.Leaflet
         /// <param name="opcode"></param>
         private void BranchOrNext(ZOpcode opcode, int branchValue)
         {
-            BranchOffset branch = opcode.BranchOffset;
-            if (branch != null)
+            if (opcode.Definition.HasBranch)
             {
+                BranchOffset branch = opcode.BranchOffset;
                 // read the resulting value from the opcode store variable
                 bool branchIfIfOne = branch.WhenTrue;
 
