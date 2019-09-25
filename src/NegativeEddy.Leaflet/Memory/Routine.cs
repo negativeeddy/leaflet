@@ -1,5 +1,4 @@
 ﻿using NegativeEddy.Leaflet.Instructions;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +14,6 @@ namespace NegativeEddy.Leaflet.Memory
     [Serializable]
     public class Routine : ISerializable
     {
-        [JsonIgnore]
         public IList<byte> Bytes { get; set; }
         private readonly int _baseAddress;
 
@@ -29,7 +27,6 @@ namespace NegativeEddy.Leaflet.Memory
         public IList<ushort> Locals { get; }
         public Stack<ushort> EvaluationStack { get; } = new Stack<ushort>();
 
-        [JsonIgnore]
         public int FirstInstructionAddress
         {
             // first instruction starts after the local count, then after the local words.
