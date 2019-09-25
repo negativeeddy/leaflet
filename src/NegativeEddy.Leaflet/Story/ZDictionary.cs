@@ -9,17 +9,12 @@ namespace NegativeEddy.Leaflet.Story
     /// </summary>
     public class ZDictionary
     {
-        private char[] _separators;
         private byte _entryLength;
-        private byte[] _bytes;
-        private int _baseAddress;
+        private readonly byte[] _bytes;
+        private readonly int _baseAddress;
         private int _entryBaseAddress;
 
-        public char[] Separators
-        {
-            get { return _separators; }
-            private set { _separators = value; }
-        }
+        public char[] Separators { get; private set; }
 
         public string[] Words { get; private set; }
 

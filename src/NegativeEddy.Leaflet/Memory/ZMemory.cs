@@ -57,7 +57,7 @@ namespace NegativeEddy.Leaflet.Memory
             get { return new ArraySegment<byte>(Bytes, Header.HighMemoryAddress, Bytes.Length - Header.HighMemoryAddress); }
         }
 
-        private ZDictionary _dictionary;
+        private ZDictionary? _dictionary;
 
         public ZDictionary Dictionary
         {
@@ -71,7 +71,7 @@ namespace NegativeEddy.Leaflet.Memory
             }
         }
 
-        private ZObjectTable _objectTree;
+        private ZObjectTable? _objectTree;
         public ZObjectTable ObjectTree
         {
             get
