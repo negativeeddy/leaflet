@@ -32,8 +32,6 @@ namespace NegativeEddy.Leaflet.Story
         /// <summary>
         /// Loads the dictionary from the byte array at the specified byte address
         /// </summary>
-        /// <param name="data">an array of bytes</param>
-        /// <param name="baseAddress">the index of the beginning of the dictionary in the data array</param>
         private void Load()
         {
             int currentAddress = _baseAddress;
