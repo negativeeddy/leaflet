@@ -35,7 +35,6 @@ namespace NegativeEddy.Leaflet.Story
             ZObject first = new ZObject(data, currentAddress, 1);
             Objects.Add(first);
 
-            int firstPropList = first.PropertyTableAddress;
             int objectCount = -(currentAddress - first.PropertyTableAddress) / OBJECT_DEF_SIZE;
 
             for (int i = 1; i < objectCount; i++)
