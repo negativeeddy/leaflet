@@ -25,10 +25,6 @@ namespace NegativeEddy.Leaflet.Story
             Load();
         }
 
-        public ZDictionary() : base()
-        {
-        }
-
         /// <summary>
         /// Loads the dictionary from the byte array at the specified byte address
         /// </summary>
