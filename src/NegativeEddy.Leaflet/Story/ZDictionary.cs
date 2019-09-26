@@ -22,19 +22,14 @@ namespace NegativeEddy.Leaflet.Story
         {
             _baseAddress = address;
             _bytes = bytes;
-            Load();
-        }
 
-        /// <summary>
-        /// Loads the dictionary from the byte array at the specified byte address
-        /// </summary>
-        private void Load()
-        {
+            // Load the dictionary from the byte array at the specified byte address
             int currentAddress = _baseAddress;
+
             byte numberOfSeparators = _bytes[currentAddress];
             currentAddress++;
 
-            LoadWordSeparators(_bytes, numberOfSeparators, currentAddress);
+            Separators = LoadWordSeparators(_bytes, numberOfSeparators, currentAddress);
             currentAddress += numberOfSeparators;
 
             _entryLength = _bytes[currentAddress];
@@ -45,44 +40,53 @@ namespace NegativeEddy.Leaflet.Story
 
             _entryBaseAddress = currentAddress;
             ArraySegment<byte> entryBytes = new ArraySegment<byte>(_bytes, _entryBaseAddress, _entryLength * _entryCount);
-            LoadEntries(entryBytes, _entryCount, _entryLength);
-        }
+            Words = LoadEntries(entryBytes, _entryCount, _entryLength);
 
-        private void LoadEntries(IList<byte> bytes, int count, int length)
-        {
-            Words = new string[count];
-
-            for(int i=0; i<count; i++)
+            static char[] LoadWordSeparators(IList<byte> data, int count, int address)
             {
-                ZStringBuilder zb = new ZStringBuilder();
-                zb.AddWord(bytes.GetWord(i*length));
-                zb.AddWord(bytes.GetWord((i*length)+2));
-                Words[i] = zb.ToString();
+                var separators = new char[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    separators[i] = (char)data[address + i];
+                }
+                return separators;
+            }
+
+            static string[] LoadEntries(IList<byte> bytes, int count, int length)
+            {
+                var words = new string[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    ZStringBuilder zb = new ZStringBuilder();
+                    zb.AddWord(bytes.GetWord(i * length));
+                    zb.AddWord(bytes.GetWord((i * length) + 2));
+                    words[i] = zb.ToString();
+                }
+                return words;
             }
         }
 
-        private void LoadWordSeparators(IList<byte> data, int count, int address)
-        {
-            Separators = new char[count];
-
-            for (int i = 0; i < count; i++)
-            {
-                Separators[i] = (char)data[address + i];
-            }
-        }
-
-        internal int IndexOf(string word)
+        private int IndexOf(string word)
         {
             if (word.Length > 6)
             {
                 word = word.Substring(0, 6);
             }
-            return Words.IndexOf(word);
+
+            int idx = Words.IndexOf(word);
+            if (idx == -1)
+            {
+                throw new InvalidOperationException($"Word '{word}' not found in dictionary");
+            }
+            return idx;
         }
 
         internal int AddressOf(string word)
         {
-            return IndexOf(word) * _entryLength + _entryBaseAddress;
+            int idx = IndexOf(word);
+            return idx * _entryLength + _entryBaseAddress;
         }
     }
 }

@@ -29,7 +29,7 @@ namespace NegativeEddy.Leaflet.Tests.Memory
             zMachine.Input = new InputFeeder(nextInput);
             zMachine.DiagnosticsOutputLevel = Interpreter.DiagnosticsLevel.Off;
 
-            if (nextInput?.Count() == 0)
+            if (nextInput.Count() == 0)
             {
                 // reset the state of the vm
                 using (var stream = System.IO.File.OpenRead(gameFile))
