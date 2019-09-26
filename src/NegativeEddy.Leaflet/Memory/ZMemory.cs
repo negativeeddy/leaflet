@@ -111,12 +111,12 @@ namespace NegativeEddy.Leaflet.Memory
             {
                 if (_textAbbreviations == null)
                 {
-                    _textAbbreviations = AbbreviationTable().Select(addr => ReadString(addr, false)).ToArray();
+                    _textAbbreviations = AbbreviationTable().Select(addr => ReadString(addr)).ToArray();
                 }
                 return _textAbbreviations;
             }
         }
-        public string ReadString(int address, bool useAbbreviations = true)
+        public string ReadString(int address)
         {
             // load all the fragments until reaching the end of the string
             ZStringBuilder fragment = new ZStringBuilder();

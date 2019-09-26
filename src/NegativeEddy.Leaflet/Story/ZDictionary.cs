@@ -9,10 +9,10 @@ namespace NegativeEddy.Leaflet.Story
     /// </summary>
     public class ZDictionary
     {
-        private byte _entryLength;
+        private readonly byte _entryLength;
         private readonly byte[] _bytes;
         private readonly int _baseAddress;
-        private int _entryBaseAddress;
+        private readonly int _entryBaseAddress;
 
         public char[] Separators { get; private set; }
 

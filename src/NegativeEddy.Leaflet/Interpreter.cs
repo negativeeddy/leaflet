@@ -352,24 +352,24 @@ namespace NegativeEddy.Leaflet
                     Debug.Assert(opcode.OperandType.Count == 1);
                     // return value is the first opcode
                     ushort retVal = (ushort)GetOperandValue(opcode.Operands[0]);
-                    Handle_Return(opcode, retVal);
+                    Handle_Return(retVal);
                     break;
                 case "ret_popped": // ret_popped
                     Debug.Assert(opcode.OperandType.Count == 0);
                     // Pops top of stack and returns that. (This is equivalent 
                     // to ret sp, but is one byte cheaper.) 
                     retVal = CurrentRoutineFrame.EvaluationStack.Pop();
-                    Handle_Return(opcode, retVal);
+                    Handle_Return(retVal);
                     break;
                 case "rtrue":   // rtrue
                     Debug.Assert(opcode.OperandType.Count == 0);
                     // Return true (i.e., 1) from the current routine.
-                    Handle_Return(opcode, 1);
+                    Handle_Return(1);
                     break;
                 case "rfalse":  // rfalse
                     Debug.Assert(opcode.OperandType.Count == 0);
                     // Return false (i.e., 0) from the current routine.
-                    Handle_Return(opcode, 0);
+                    Handle_Return(0);
                     break;
                 case "add":
                     Handle_Opcode(opcode, op =>
@@ -669,7 +669,7 @@ namespace NegativeEddy.Leaflet
                     // Print the quoted (literal) Z-encoded string, then print
                     // a new-line and then return true (i.e., 1). 
                     _stdOut.WriteOutputLine(opcode.Text);
-                    Handle_Return(opcode, 1);
+                    Handle_Return(1);
                     break;
                 case "print_num":  // print_num value
                     Handle_Opcode(opcode, op =>
@@ -1025,7 +1025,7 @@ namespace NegativeEddy.Leaflet
             }
         }
 
-        private void Handle_Return(ZOpcode opcode, ushort returnValue)
+        private void Handle_Return(ushort returnValue)
         {
             // remove the current frame from the stack
             var oldFrame = FrameStack.Pop();
@@ -1203,7 +1203,7 @@ namespace NegativeEddy.Leaflet
                         // An offset of 0 means "return false from the current routine", and 1 means "return true from the current routine" (spec 4.7.1)
                         case 0:
                         case 1:
-                            Handle_Return(opcode, (ushort)opcode.BranchToAddress);
+                            Handle_Return((ushort)opcode.BranchToAddress);
                             break;
                         default:
                             DebugOutput($"  jump to 0x{opcode.BranchToAddress:x}");
