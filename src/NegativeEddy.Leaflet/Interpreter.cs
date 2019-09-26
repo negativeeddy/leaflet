@@ -1040,6 +1040,11 @@ namespace NegativeEddy.Leaflet
             // remove the current frame from the stack
             var oldFrame = FrameStack.Pop();
 
+            if (oldFrame.Store == null)
+            {
+                throw new InvalidOperationException("Cannot return from frame. Frame has no Store value");
+            }
+
             // put the return value wherever the oldFrame required
             SetVariable(oldFrame.Store, (ushort)returnValue);
 
