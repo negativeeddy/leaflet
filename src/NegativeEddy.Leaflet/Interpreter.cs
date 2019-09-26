@@ -1152,7 +1152,7 @@ namespace NegativeEddy.Leaflet
             }
         }
 
-        private void LoadNewFrame(int newAddress, int returnAddress, ZVariable returnStore, params ZOperand[] operands)
+        private void LoadNewFrame(int newAddress, int returnAddress, ZVariable? returnStore, params ZOperand[] operands)
         {
             // initialize a new frame
             var initLocals = operands.Select(op => (ushort)GetOperandValue(op)).ToArray();

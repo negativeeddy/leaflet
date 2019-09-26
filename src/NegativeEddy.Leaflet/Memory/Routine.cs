@@ -21,9 +21,10 @@ namespace NegativeEddy.Leaflet.Memory
 
         /// <summary>
         /// The Store of the call instruction. The Routine will put its return value
-        /// in this location
+        /// in this location. Store should only be null if it is the first Routine 
+        /// on the stack
         /// </summary>
-        public ZVariable Store { get; }
+        public ZVariable? Store { get; }
         public IList<ushort> Locals { get; }
         public Stack<ushort> EvaluationStack { get; } = new Stack<ushort>();
 
@@ -44,7 +45,7 @@ namespace NegativeEddy.Leaflet.Memory
         /// </summary>
         /// <param name="bytes">bytes representing memory</param>
         /// <param name="routineAddress">the beginning of the Routine's frame in memory</param>
-        public Routine(IList<byte> bytes, int routineAddress, int returnAddress, ZVariable returnStore, IList<ushort> localInitValues)
+        public Routine(IList<byte> bytes, int routineAddress, int returnAddress, ZVariable? returnStore, IList<ushort> localInitValues)
         {
             Debug.Assert(routineAddress % 2 == 0, "A routine is required to begin at an address in memory which can be represented by a packed address (spec 5.1)");
             Bytes = bytes;
