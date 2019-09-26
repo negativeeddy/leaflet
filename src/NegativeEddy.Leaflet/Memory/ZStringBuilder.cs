@@ -7,7 +7,7 @@ namespace NegativeEddy.Leaflet.Memory
 {
     public class ZStringBuilder
     {
-        public static IEnumerable<string> AbbreviationTable;
+        public static IEnumerable<string>? AbbreviationTable;
 
         public ZStringBuilder()
         {

@@ -106,7 +106,7 @@ namespace NegativeEddy.Leaflet
         public int ProgramCounter { get; set; }
         public ZMemory MainMemory { get; set; }
 
-        public Stack<Routine> FrameStack { get; set; }
+        public Stack<Routine> FrameStack { get; set; } = new Stack<Routine>();
 
         public string ToInfoDumpFormat(ZOpcode zop)
         {
