@@ -91,15 +91,6 @@ namespace NegativeEddy.Leaflet.Memory
             return sb.ToString();
         }
 
-        public Routine(SerializationInfo info, StreamingContext context)
-        {
-            _baseAddress = info.GetInt32(nameof(_baseAddress));
-            ReturnAddress = info.GetInt32(nameof(ReturnAddress));
-            Store = (ZVariable)info.GetValue(nameof(Store), typeof(ZVariable));
-            Locals = (List<ushort>)info.GetValue(nameof(Locals), typeof(List<ushort>));
-            EvaluationStack = (Stack<ushort>)info.GetValue(nameof(EvaluationStack), typeof(Stack<ushort>));
-        }
-
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue(nameof(_baseAddress), _baseAddress);
