@@ -10,12 +10,20 @@ namespace NegativeEddy.Leaflet.Instructions
     {
         public OperandTypes Type { get; }
 
-        ZVariable _variable;
+        ZVariable? _variable;
         public ZVariable Variable
         {
             get
             {
                 Debug.Assert(Type == OperandTypes.Variable);
+                if(Type != OperandTypes.Variable)
+                {
+                    throw new InvalidOperationException("Operand is not a variable");
+                }
+                if (_variable == null)
+                {
+                    throw new InvalidOperationException("Operand's Variable property has not been initialized");
+                }
                 return _variable;
             }
             set
