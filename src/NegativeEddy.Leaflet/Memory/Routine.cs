@@ -14,7 +14,6 @@ namespace NegativeEddy.Leaflet.Memory
     [Serializable]
     public class Routine : ISerializable
     {
-        public IList<byte> Bytes { get; set; }
         private readonly int _baseAddress;
 
         public int ReturnAddress { get; } = -1;
@@ -55,7 +54,6 @@ namespace NegativeEddy.Leaflet.Memory
         public Routine(IList<byte> bytes, int routineAddress, int returnAddress, ZVariable? returnStore, IList<ushort> localInitValues)
         {
             Debug.Assert(routineAddress % 2 == 0, "A routine is required to begin at an address in memory which can be represented by a packed address (spec 5.1)");
-            Bytes = bytes;
             _baseAddress = routineAddress;
             this.ReturnAddress = returnAddress;
             Store = returnStore;

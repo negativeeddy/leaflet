@@ -47,11 +47,6 @@ namespace NegativeEddy.Leaflet
             MainMemory = new ZMemory(bytes);
             ZStringBuilder.AbbreviationTable = MainMemory.TextAbbreviations;
             FrameStack = (Stack<Routine>)state["zmStack"];
-            foreach (var frame in FrameStack)
-            {
-                // fix up the frame pointers to main memory
-                frame.Bytes = bytes;
-            }
             ProgramCounter = (int)state["zmPC"];
 
             IsRunning = true;
@@ -78,11 +73,6 @@ namespace NegativeEddy.Leaflet
             {
                 ["zmMain"] = MainMemory.Bytes
             };
-            foreach (var frame in FrameStack)
-            {
-                // clear pointer to main memory to prevent circular references
-                frame.Bytes = Array.Empty<byte>();
-            }
             state["zmStack"] = FrameStack;
             state["zmPC"] = ProgramCounter;
             return state;
