@@ -140,30 +140,39 @@ namespace NegativeEddy.Leaflet.Story
         /// <returns>an object, null if the ID is 0</returns>
         public ZObject GetObject(int objectID)
         {
-            if (objectID == 0)
-            {
-                return null;
-            }
+            Debug.Assert(Objects.Any(o => o.ID == objectID), $"Object not found with ID {objectID}");
             return Objects.First(o => o.ID == objectID);
         }
 
+        /// <summary>
+        /// Reparents an object in the object tree
+        /// </summary>
+        /// <param name="objectID">the ID of the object to reparent</param>
+        /// <param name="newParentID">the ID of the new parent object</param>
         public void ReparentObject(int objectID, int newParentID)
         {
             Debug.Assert(objectID != 0, "Invalid object ID");
             Debug.Assert(objectID != newParentID, "objectID and newParentID must be different");
 
             ZObject movingObject = GetObject(objectID);
-            ZObject oldParent = GetObject(movingObject.ParentID);
             int oldNextSiblingId = GetSiblingId(objectID);
 
-            if (oldParent?.ChildID == objectID)
+            bool parentFixed = false;
+            if (movingObject.ParentID != 0)
             {
-                // if the old item was the first child, fix the parent
-                oldParent.ChildID = oldNextSiblingId;
+                ZObject oldParent = GetObject(movingObject.ParentID);
+                if (oldParent.ChildID == objectID)
+                {
+                    // if the old item was the first child, fix the parent because
+                    // the sibling chain starts with the parent's child ID
+                    oldParent.ChildID = oldNextSiblingId;
+                    parentFixed = true;
+                }
             }
-            else
-            {
-                // fix the gap in the old sibling chain
+
+            if (!parentFixed)
+            { 
+                // the old item was not the first child so fix the gap in the old sibling chain
                 ZObject oldPrevSibling = Objects.FirstOrDefault(o => o.SiblingID == objectID);
                 if (oldPrevSibling != null)
                 {
@@ -187,7 +196,7 @@ namespace NegativeEddy.Leaflet.Story
 
         public IEnumerator<ZObject> GetEnumerator()
         {
-            foreach(var obj in Objects)
+            foreach (var obj in Objects)
             {
                 yield return obj;
             }
