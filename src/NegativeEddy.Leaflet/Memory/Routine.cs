@@ -34,11 +34,6 @@ namespace NegativeEddy.Leaflet.Memory
             get { return _baseAddress + 1 + Locals.Count * 2; }
         }
 
-        public Routine()
-        {
-
-        }
-
         /// <summary>
         /// Constructs a new Routine object from the address in
         /// a byte array
