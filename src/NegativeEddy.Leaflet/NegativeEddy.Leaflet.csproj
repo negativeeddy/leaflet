@@ -10,7 +10,8 @@
     <IncludeSymbols>True</IncludeSymbols>
     <Description>An experimental implementation of the Infocom Z-Machine spec - aka "a Zork interpreter" - aka "30 year old tech built with modern tools"</Description>
     <Nullable>enable</Nullable>
-    <LangVersion>8.0</LangVersion> </PropertyGroup>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Reactive.Linq" Version="3.1.1" />
