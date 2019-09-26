@@ -35,6 +35,18 @@ namespace NegativeEddy.Leaflet.Memory
         }
 
         /// <summary>
+        /// Serialization constructor for Routine. This is only used by the serializer
+        /// </summary>
+        protected Routine(SerializationInfo info, StreamingContext context)
+        {
+            _baseAddress = info.GetInt32(nameof(_baseAddress));
+            ReturnAddress = info.GetInt32(nameof(ReturnAddress));
+            Store = (ZVariable)info.GetValue(nameof(Store), typeof(ZVariable));
+            Locals = (List<ushort>)info.GetValue(nameof(Locals), typeof(List<ushort>));
+            EvaluationStack = (Stack<ushort>)info.GetValue(nameof(EvaluationStack), typeof(Stack<ushort>));
+        }
+
+        /// <summary>
         /// Constructs a new Routine object from the address in
         /// a byte array
         /// </summary>
