@@ -71,7 +71,7 @@ namespace NegativeEddy.Leaflet
                 throw;
             }
         }
-
+        
         public Dictionary<string, object> GetState()
         {
             var state = new Dictionary<string, object>
@@ -81,7 +81,7 @@ namespace NegativeEddy.Leaflet
             foreach (var frame in FrameStack)
             {
                 // clear pointer to main memory to prevent circular references
-                frame.Bytes = null;
+                frame.Bytes = Array.Empty<byte>();
             }
             state["zmStack"] = FrameStack;
             state["zmPC"] = ProgramCounter;
