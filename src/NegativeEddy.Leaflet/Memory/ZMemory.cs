@@ -104,7 +104,7 @@ namespace NegativeEddy.Leaflet.Memory
             return ReadString(address);
         }
 
-        string[] _textAbbreviations = null;
+        string[]? _textAbbreviations = null;
         public string[] TextAbbreviations
         {
             get
