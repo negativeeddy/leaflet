@@ -19,7 +19,7 @@ namespace NegativeEddy.Leaflet
         private readonly InterpreterOutput _stdOut = new InterpreterOutput();
         private readonly InterpreterOutput _dbgOut = new InterpreterOutput();
 
-        public IZInput Input { get; set; }
+        public IZInput? Input { get; set; }
         public IObservable<string> Output { get { return _stdOut.Print; } }
         public IObservable<string> Diagnostics { get { return _dbgOut.Print; } }
 
@@ -1046,6 +1046,13 @@ namespace NegativeEddy.Leaflet
         private int HandleRead(ZOpcode op)
         {
             Debug.Assert(op.OperandType.Count == 2);
+            Debug.Assert(Input != null);
+
+            if (Input == null)
+            {
+                throw new InvalidOperationException("Attempting to read user input when Input has not been initialized");
+            }
+
             int textBufferIdx = GetOperandValue(op.Operands[0]);
             int parseBufferIdx = GetOperandValue(op.Operands[1]);
 
