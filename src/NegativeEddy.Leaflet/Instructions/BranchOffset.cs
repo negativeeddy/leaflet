@@ -4,9 +4,9 @@ using NegativeEddy.Leaflet.Memory;
 
 namespace NegativeEddy.Leaflet.Instructions
 {
-    public class BranchOffset
+    public struct BranchOffset
     {
-        private IList<byte> _bytes;
+        private readonly IList<byte> _bytes;
 
         public BranchOffset(IList<byte> bytes)
         {

@@ -16,10 +16,10 @@ namespace NegativeEddy.Leaflet
 {
     public class Interpreter
     {
-        private InterpreterOutput _stdOut = new InterpreterOutput();
-        private InterpreterOutput _dbgOut = new InterpreterOutput();
+        private readonly InterpreterOutput _stdOut = new InterpreterOutput();
+        private readonly InterpreterOutput _dbgOut = new InterpreterOutput();
 
-        public IZInput Input { get; set; }
+        public IZInput? Input { get; set; }
         public IObservable<string> Output { get { return _stdOut.Print; } }
         public IObservable<string> Diagnostics { get { return _dbgOut.Print; } }
 
@@ -47,11 +47,6 @@ namespace NegativeEddy.Leaflet
             MainMemory = new ZMemory(bytes);
             ZStringBuilder.AbbreviationTable = MainMemory.TextAbbreviations;
             FrameStack = (Stack<Routine>)state["zmStack"];
-            foreach (var frame in FrameStack)
-            {
-                // fix up the frame pointers to main memory
-                frame.Bytes = bytes;
-            }
             ProgramCounter = (int)state["zmPC"];
 
             IsRunning = true;
@@ -71,16 +66,13 @@ namespace NegativeEddy.Leaflet
                 throw;
             }
         }
-
+        
         public Dictionary<string, object> GetState()
         {
-            var state = new Dictionary<string, object>();
-            state["zmMain"] = MainMemory.Bytes;
-            foreach (var frame in FrameStack)
+            var state = new Dictionary<string, object>
             {
-                // clear pointer to main memory to prevent circular references
-                frame.Bytes = null;
-            }
+                ["zmMain"] = MainMemory.Bytes
+            };
             state["zmStack"] = FrameStack;
             state["zmPC"] = ProgramCounter;
             return state;
@@ -104,7 +96,7 @@ namespace NegativeEddy.Leaflet
         public int ProgramCounter { get; set; }
         public ZMemory MainMemory { get; set; }
 
-        public Stack<Routine> FrameStack { get; set; }
+        public Stack<Routine> FrameStack { get; set; } = new Stack<Routine>();
 
         public string ToInfoDumpFormat(ZOpcode zop)
         {
@@ -360,24 +352,24 @@ namespace NegativeEddy.Leaflet
                     Debug.Assert(opcode.OperandType.Count == 1);
                     // return value is the first opcode
                     ushort retVal = (ushort)GetOperandValue(opcode.Operands[0]);
-                    Handle_Return(opcode, retVal);
+                    Handle_Return(retVal);
                     break;
                 case "ret_popped": // ret_popped
                     Debug.Assert(opcode.OperandType.Count == 0);
                     // Pops top of stack and returns that. (This is equivalent 
                     // to ret sp, but is one byte cheaper.) 
                     retVal = CurrentRoutineFrame.EvaluationStack.Pop();
-                    Handle_Return(opcode, retVal);
+                    Handle_Return(retVal);
                     break;
                 case "rtrue":   // rtrue
                     Debug.Assert(opcode.OperandType.Count == 0);
                     // Return true (i.e., 1) from the current routine.
-                    Handle_Return(opcode, 1);
+                    Handle_Return(1);
                     break;
                 case "rfalse":  // rfalse
                     Debug.Assert(opcode.OperandType.Count == 0);
                     // Return false (i.e., 0) from the current routine.
-                    Handle_Return(opcode, 0);
+                    Handle_Return(0);
                     break;
                 case "add":
                     Handle_Opcode(opcode, op =>
@@ -487,8 +479,10 @@ namespace NegativeEddy.Leaflet
                         int wordIndex = GetOperandValue(op.Operands[1]);
                         ushort value = (ushort)GetOperandValue(op.Operands[2]);
 
-                        var wob = new WordOverByteArray(MainMemory.Bytes, arrayAddress);
-                        wob[wordIndex] = value;
+                        var wob = new WordOverByteArray(MainMemory.Bytes, arrayAddress)
+                        {
+                            [wordIndex] = value
+                        };
                         return UNUSED_RETURN_VALUE;
                     });
                     break;
@@ -675,7 +669,7 @@ namespace NegativeEddy.Leaflet
                     // Print the quoted (literal) Z-encoded string, then print
                     // a new-line and then return true (i.e., 1). 
                     _stdOut.WriteOutputLine(opcode.Text);
-                    Handle_Return(opcode, 1);
+                    Handle_Return(1);
                     break;
                 case "print_num":  // print_num value
                     Handle_Opcode(opcode, op =>
@@ -958,12 +952,12 @@ namespace NegativeEddy.Leaflet
             {
                 if (CurrentRoutineFrame != null)
                 {
-                    DebugOutput($"current_locals {CurrentRoutineFrame.Locals.ConcatToString(' ', val => $"{val:x4}")}"
-                            , DiagnosticsLevel.Verbose);
-                    DebugOutput($"current_globals {MainMemory.GlobalVariables.ConcatToString(' ', val => $"{val:x4}")}"
-                            , DiagnosticsLevel.Verbose);
-                    DebugOutput($"current_stack {CurrentRoutineFrame.EvaluationStack.ConcatToString(' ', val => $"{val:x4}")}"
-                            , DiagnosticsLevel.Verbose);
+                    var locals = string.Join(' ', CurrentRoutineFrame.Locals.Select(x => $"{x:x4}").ToArray());
+                    DebugOutput($"current_locals {locals}", DiagnosticsLevel.Verbose);
+                    var globals = string.Join(' ', MainMemory.GlobalVariables.Select(val => $"{val:x4}").ToArray());
+                    DebugOutput($"current_globals {globals}", DiagnosticsLevel.Verbose);
+                    var stack = string.Join(' ', CurrentRoutineFrame.EvaluationStack.Select(val => $"{val:x4}").ToArray());
+                    DebugOutput($"current_stack {stack}", DiagnosticsLevel.Verbose);
                 }
 
                 if (DiagnosticsOutputLevel >= DiagnosticsLevel.Diagnostic)
@@ -1031,10 +1025,15 @@ namespace NegativeEddy.Leaflet
             }
         }
 
-        void Handle_Return(ZOpcode opcode, ushort returnValue)
+        private void Handle_Return(ushort returnValue)
         {
             // remove the current frame from the stack
             var oldFrame = FrameStack.Pop();
+
+            if (oldFrame.Store == null)
+            {
+                throw new InvalidOperationException("Cannot return from frame. Frame has no Store value");
+            }
 
             // put the return value wherever the oldFrame required
             SetVariable(oldFrame.Store, (ushort)returnValue);
@@ -1047,6 +1046,13 @@ namespace NegativeEddy.Leaflet
         private int HandleRead(ZOpcode op)
         {
             Debug.Assert(op.OperandType.Count == 2);
+            Debug.Assert(Input != null);
+
+            if (Input == null)
+            {
+                throw new InvalidOperationException("Attempting to read user input when Input has not been initialized");
+            }
+
             int textBufferIdx = GetOperandValue(op.Operands[0]);
             int parseBufferIdx = GetOperandValue(op.Operands[1]);
 
@@ -1148,7 +1154,7 @@ namespace NegativeEddy.Leaflet
             }
         }
 
-        private void LoadNewFrame(int newAddress, int returnAddress, ZVariable returnStore, params ZOperand[] operands)
+        private void LoadNewFrame(int newAddress, int returnAddress, ZVariable? returnStore, params ZOperand[] operands)
         {
             // initialize a new frame
             var initLocals = operands.Select(op => (ushort)GetOperandValue(op)).ToArray();
@@ -1189,9 +1195,9 @@ namespace NegativeEddy.Leaflet
         /// <param name="opcode"></param>
         private void BranchOrNext(ZOpcode opcode, int branchValue)
         {
-            BranchOffset branch = opcode.BranchOffset;
-            if (branch != null)
+            if (opcode.Definition.HasBranch)
             {
+                BranchOffset branch = opcode.BranchOffset;
                 // read the resulting value from the opcode store variable
                 bool branchIfIfOne = branch.WhenTrue;
 
@@ -1204,7 +1210,7 @@ namespace NegativeEddy.Leaflet
                         // An offset of 0 means "return false from the current routine", and 1 means "return true from the current routine" (spec 4.7.1)
                         case 0:
                         case 1:
-                            Handle_Return(opcode, (ushort)opcode.BranchToAddress);
+                            Handle_Return((ushort)opcode.BranchToAddress);
                             break;
                         default:
                             DebugOutput($"  jump to 0x{opcode.BranchToAddress:x}");

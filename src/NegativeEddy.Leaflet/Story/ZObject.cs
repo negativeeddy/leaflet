@@ -21,7 +21,7 @@ namespace NegativeEddy.Leaflet.Story
 
         private readonly byte[] _bytes;
 
-        public static ZObject InvalidObject = new ZObject(null, 0, ZObject.INVALID_ID);
+        public static ZObject InvalidObject = new ZObject(new byte[0], 0, ZObject.INVALID_ID);
 
         public static ushort[] DefaultProperties { get; set; }
 
@@ -143,7 +143,7 @@ namespace NegativeEddy.Leaflet.Story
             }
         }
 
-        private ZStringBuilder NameBuilder
+        private ZStringBuilder? NameBuilder
         {
             get
             {
@@ -161,6 +161,7 @@ namespace NegativeEddy.Leaflet.Story
                 }
             }
         }
+
         private int NameLengthInBytes { get { return NameBuilder?.LengthInBytes ?? 0; } }
 
         public uint GetPropertyValue(int propertyID)

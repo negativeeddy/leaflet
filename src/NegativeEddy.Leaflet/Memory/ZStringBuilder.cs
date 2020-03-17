@@ -7,7 +7,7 @@ namespace NegativeEddy.Leaflet.Memory
 {
     public class ZStringBuilder
     {
-        public static IEnumerable<string> AbbreviationTable;
+        public static IEnumerable<string>? AbbreviationTable;
 
         public ZStringBuilder()
         {
@@ -44,7 +44,7 @@ namespace NegativeEddy.Leaflet.Memory
             }
         }
 
-        private List<ushort> _allBits;
+        private readonly List<ushort> _allBits = new List<ushort>();
 
         public int LengthInBytes
         {
@@ -53,10 +53,6 @@ namespace NegativeEddy.Leaflet.Memory
 
         public void AddWord(ushort bits)
         {
-            if (_allBits == null)
-            {
-                _allBits = new List<ushort>();
-            }
             _allBits.Add(bits);
         }
 

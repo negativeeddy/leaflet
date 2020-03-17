@@ -31,11 +31,9 @@ namespace NegativeEddy.Leaflet.Memory
             else
             {
                 // otherwise copy into a local memory stream first
-                using (MemoryStream memStream = new MemoryStream())
-                {
-                    gameMemory.CopyTo(memStream);
-                    Bytes = memStream.ToArray();
-                }
+                using MemoryStream memStream = new MemoryStream();
+                gameMemory.CopyTo(memStream);
+                Bytes = memStream.ToArray();
             }
 
             // update the global zstringbuilder table with the text abbreviations
@@ -59,7 +57,7 @@ namespace NegativeEddy.Leaflet.Memory
             get { return new ArraySegment<byte>(Bytes, Header.HighMemoryAddress, Bytes.Length - Header.HighMemoryAddress); }
         }
 
-        private ZDictionary _dictionary;
+        private ZDictionary? _dictionary;
 
         public ZDictionary Dictionary
         {
@@ -73,7 +71,7 @@ namespace NegativeEddy.Leaflet.Memory
             }
         }
 
-        private ZObjectTable _objectTree;
+        private ZObjectTable? _objectTree;
         public ZObjectTable ObjectTree
         {
             get
@@ -106,19 +104,19 @@ namespace NegativeEddy.Leaflet.Memory
             return ReadString(address);
         }
 
-        string[] _textAbbreviations = null;
+        string[]? _textAbbreviations = null;
         public string[] TextAbbreviations
         {
             get
             {
                 if (_textAbbreviations == null)
                 {
-                    _textAbbreviations = AbbreviationTable().Select(addr => ReadString(addr, false)).ToArray();
+                    _textAbbreviations = AbbreviationTable().Select(addr => ReadString(addr)).ToArray();
                 }
                 return _textAbbreviations;
             }
         }
-        public string ReadString(int address, bool useAbbreviations = true)
+        public string ReadString(int address)
         {
             // load all the fragments until reaching the end of the string
             ZStringBuilder fragment = new ZStringBuilder();

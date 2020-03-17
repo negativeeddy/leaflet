@@ -8,11 +8,14 @@ namespace NegativeEddy.Leaflet.CoreConsoleHost
     {
         public static void Main(string[] args)
         {
-            var zm = new Interpreter();
-            zm.Input = new ConsoleInput();
+            var zm = new Interpreter
+            {
+                Input = new ConsoleInput(),
+                DiagnosticsOutputLevel = Interpreter.DiagnosticsLevel.Verbose,
+            };
+
             zm.Output.Subscribe(x => Console.Write(x));
             zm.Diagnostics.Subscribe(x => Debug.Write(x));
-            zm.DiagnosticsOutputLevel = Interpreter.DiagnosticsLevel.Verbose;
 
             string filename = Path.Combine("GameFiles", "minizork.z3");
             using (var stream = File.OpenRead(filename))

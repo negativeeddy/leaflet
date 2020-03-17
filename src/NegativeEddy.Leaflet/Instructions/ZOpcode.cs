@@ -13,7 +13,7 @@ namespace NegativeEddy.Leaflet.Instructions
 
         public OpcodeDefinition Definition { get { return OpcodeDefinition.GetKnownOpcode(Identifier); } }
 
-        byte[] _bytes;
+        readonly byte[] _bytes;
         public int BaseAddress { get; }
 
         /// <summary>
@@ -58,15 +58,12 @@ namespace NegativeEddy.Leaflet.Instructions
             {
                 // From the spec section 4.3
                 byte opcodeType = _bytes[BaseAddress].FetchBits(BitNumber.Bit_7, 2);
-                switch (opcodeType)
+                return opcodeType switch
                 {
-                    case 0x02:
-                        return _bytes[BaseAddress] == 0xBE ? OpcodeForm.Extended : OpcodeForm.Short;
-                    case 0x03:
-                        return OpcodeForm.Variable;
-                    default:
-                        return OpcodeForm.Long;
-                }
+                    0x02 => _bytes[BaseAddress] == 0xBE ? OpcodeForm.Extended : OpcodeForm.Short,
+                    0x03 => OpcodeForm.Variable,
+                    _ => OpcodeForm.Long,
+                };
             }
         }
 
@@ -213,7 +210,7 @@ namespace NegativeEddy.Leaflet.Instructions
             }
         }
 
-        private IList<ZOperand> _operands = null;
+        private IList<ZOperand>? _operands = null;
         public IList<ZOperand> Operands
         {
             get
@@ -312,7 +309,7 @@ namespace NegativeEddy.Leaflet.Instructions
                 }
                 else
                 {
-                    return null;
+                    throw new InvalidOperationException("ZOpcode does not have a store variable");
                 }
             }
         }
@@ -360,7 +357,7 @@ namespace NegativeEddy.Leaflet.Instructions
                 }
                 else
                 {
-                    return null;
+                    throw new InvalidOperationException("ZOpcode has no branch offset");
                 }
             }
         }
@@ -372,7 +369,7 @@ namespace NegativeEddy.Leaflet.Instructions
         {
             get
             {
-                if (BranchOffset == null)
+                if (!Definition.HasBranch)
                 {
                     return BranchOffsetAddr;
                 }
@@ -383,7 +380,7 @@ namespace NegativeEddy.Leaflet.Instructions
             }
         }
 
-        private ZStringBuilder _textSection;
+        private ZStringBuilder? _textSection;
 
         /// <summary>
         /// The data for the Text portion of the instruction (if any)
@@ -392,11 +389,16 @@ namespace NegativeEddy.Leaflet.Instructions
         {
             get
             {
-                if (_textSection == null && Definition.HasText)
+                if (!Definition.HasText)
+                {
+                    throw new InvalidOperationException("ZOpcode has no text section");
+                }
+
+                if (_textSection == null)
                 {
                     _textSection = new ZStringBuilder(_bytes, TextAddr);
-
                 }
+
                 return _textSection;
             }
         }
@@ -408,7 +410,7 @@ namespace NegativeEddy.Leaflet.Instructions
         {
             get
             {
-                return TextSection?.ToString();
+                return TextSection.ToString();
             }
         }
 
