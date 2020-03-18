@@ -1,6 +1,7 @@
 ﻿using NegativeEddy.Leaflet.IO;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NegativeEddy.Leaflet.TestHelpers
 {
@@ -8,6 +9,7 @@ namespace NegativeEddy.Leaflet.TestHelpers
     {
         private Queue<string> _input;
         private bool _writeToConsole;
+        public bool InputAvailable => _input.TryPeek(out string _);
 
         public InputFeeder(IEnumerable<string> input, bool writeToConsole = true)
         {
