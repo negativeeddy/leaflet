@@ -40,7 +40,7 @@ public class ZHeader
     private const int HeaderOffset_Alphabettableaddress = 0x34;
     private const int HeaderOffset_Headerextensiontableaddress = 0x36;
 
-    private byte[] _data;
+    private readonly byte[] _data;
 
     public ZHeader(byte[] _data)
     {

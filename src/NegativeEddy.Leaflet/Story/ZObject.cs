@@ -17,7 +17,7 @@ public class ZObject
 
     private readonly byte[] _bytes;
 
-    public static ZObject InvalidObject = new ZObject(new byte[0], 0, ZObject.INVALID_ID);
+    public static ZObject InvalidObject { get; } = new(Array.Empty<byte>(), 0, INVALID_ID);
 
     public static ushort[] DefaultProperties { get; set; }
 
@@ -60,21 +60,21 @@ public class ZObject
 
     public string ToLongString()
     {
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
         sb.Append($"ID:{ID} Name:{this.ShortName.Replace(' ', '_')} Attributes:");
         foreach (var bit in Attributes.GetBits())
         {
-            sb.Append((31 - (int)bit).ToString());    // TODO: Is printing wrong or are bit labels backwards?
+            sb.Append(31 - (int)bit);    // TODO: Is printing wrong or are bit labels backwards?
             sb.Append(',');
         }
 
         // remove the last comma if attributes were added
-        if (sb[sb.Length - 1] == ',')
+        if (sb[^1] == ',')
         {
             sb.Remove(sb.Length - 1, 1);
         }
 
-        sb.Append(" ");
+        sb.Append(' ');
 
         sb.Append($"Parent:{ParentID} Sibling:{SiblingID} Child:{ChildID} ");
         sb.Append($"PropertyAddr:{PropertyTableAddress:x4} ");
@@ -90,7 +90,7 @@ public class ZObject
         }
 
         // remove the last comma if custom properties were added
-        if (sb[sb.Length - 1] == ',')
+        if (sb[^1] == ',')
         {
             sb.Remove(sb.Length - 1, 1);
         }
@@ -100,11 +100,11 @@ public class ZObject
 
     public string ToFullString()
     {
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
         sb.Append($"{ID}. Attributes: ");
         foreach (var bit in Attributes.GetBits())
         {
-            sb.Append((31 - (int)bit).ToString());    // TODO: Is printing wrong or is bit labels backwards?
+            sb.Append(31 - (int)bit);    // TODO: Is printing wrong or is bit labels backwards?
             sb.Append(',');
         }
         sb.AppendLine();

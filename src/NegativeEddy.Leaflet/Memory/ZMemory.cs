@@ -27,7 +27,7 @@ public class ZMemory
         else
         {
             // otherwise copy into a local memory stream first
-            using MemoryStream memStream = new MemoryStream();
+            using var memStream = new MemoryStream();
             gameMemory.CopyTo(memStream);
             Bytes = memStream.ToArray();
         }
@@ -36,7 +36,7 @@ public class ZMemory
         ZStringBuilder.AbbreviationTable = TextAbbreviations;
     }
 
-    public ZHeader Header => new ZHeader(Bytes);
+    public ZHeader Header => new (Bytes);
 
     public ArraySegment<byte> StaticMemory
     {
@@ -115,7 +115,7 @@ public class ZMemory
     public string ReadString(int address)
     {
         // load all the fragments until reaching the end of the string
-        ZStringBuilder fragment = new ZStringBuilder();
+        var fragment = new ZStringBuilder();
         do
         {
             ushort data = Bytes.GetWord(address);

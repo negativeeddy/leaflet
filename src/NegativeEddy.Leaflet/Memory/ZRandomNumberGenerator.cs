@@ -2,7 +2,7 @@
 
 class ZRandomNumberGenerator : IRandomNumberGenerator
 {
-    private Random _rand = new Random();
+    private Random _rand = new ();
 
     public int GetNext(int range)
     {

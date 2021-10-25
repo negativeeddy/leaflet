@@ -42,7 +42,7 @@ public class ZStringBuilder
         }
     }
 
-    private readonly List<ushort> _allBits = new List<ushort>();
+    private readonly List<ushort> _allBits = new ();
 
     public int LengthInBytes
     {
@@ -96,13 +96,13 @@ public class ZStringBuilder
 
     public override string ToString()
     {
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
         int currentAlphabet = 0;
         int? abbrevAddrZ = null;
-        int? abbrevAddrX = null;
+        int? abbrevAddrX;
         bool nextIsZscii = false;
         byte? firstZscii = null;
-        byte? secondZscii = null;
+        byte? secondZscii;
         foreach (byte b in BytesFromBits())
         {
             if (abbrevAddrZ != null)
@@ -176,7 +176,7 @@ public class ZStringBuilder
         return sb.ToString();
     }
 
-    private string GetAbbreviation(int abbrevAddr)
+    private static string GetAbbreviation(int abbrevAddr)
     {
         Debug.Assert(abbrevAddr < 96);
 

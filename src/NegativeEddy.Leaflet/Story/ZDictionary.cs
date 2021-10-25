@@ -37,7 +37,7 @@ public class ZDictionary
         currentAddress += 2;
 
         _entryBaseAddress = currentAddress;
-        ArraySegment<byte> entryBytes = new ArraySegment<byte>(_bytes, _entryBaseAddress, _entryLength * _entryCount);
+        var entryBytes = new ArraySegment<byte>(_bytes, _entryBaseAddress, _entryLength * _entryCount);
         Words = LoadEntries(entryBytes, _entryCount, _entryLength);
 
         static char[] LoadWordSeparators(IList<byte> data, int count, int address)
@@ -57,7 +57,7 @@ public class ZDictionary
 
             for (int i = 0; i < count; i++)
             {
-                ZStringBuilder zb = new ZStringBuilder();
+                var zb = new ZStringBuilder();
                 zb.AddWord(bytes.GetWord(i * length));
                 zb.AddWord(bytes.GetWord((i * length) + 2));
                 words[i] = zb.ToString();
@@ -70,7 +70,7 @@ public class ZDictionary
     {
         if (word.Length > 6)
         {
-            word = word.Substring(0, 6);
+            word = word[0..6];
         }
 
         int idx = Words.IndexOf(word);

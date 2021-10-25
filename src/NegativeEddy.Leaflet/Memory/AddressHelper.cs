@@ -77,7 +77,7 @@ public static class AddressHelper
 
     public static BitNumber[] GetBits(this uint dword)
     {
-        List<BitNumber> bits = new List<BitNumber>();
+        var bits = new List<BitNumber>();
         for (int i = 31; i >= 0; i--)
         {
             BitNumber num = (BitNumber)i;

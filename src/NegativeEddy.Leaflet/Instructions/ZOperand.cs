@@ -43,18 +43,13 @@ public class ZOperand
     {
         get
         {
-            switch (Type)
+            return Type switch
             {
-                case OperandTypes.LargeConstant:
-                    return 2;
-                case OperandTypes.SmallConstant:
-                case OperandTypes.Variable:
-                    return 1;
-                case OperandTypes.Omitted:
-                    return 0;
-                default:
-                    throw new InvalidOperationException("Unknown Operand Type");
-            }
+                OperandTypes.LargeConstant => 2,
+                OperandTypes.SmallConstant or OperandTypes.Variable => 1,
+                OperandTypes.Omitted => 0,
+                _ => throw new InvalidOperationException("Unknown Operand Type"),
+            };
         }
     }
 }

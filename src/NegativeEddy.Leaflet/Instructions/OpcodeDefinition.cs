@@ -24,7 +24,7 @@ public struct OpcodeDefinition
     {
         try
         {
-            return _knownOpcodes.Where(x => x.ID.Equals(id)).First();
+            return KnownOpcodes.Where(x => x.ID.Equals(id)).First();
         }
         catch
         {
@@ -37,12 +37,12 @@ public struct OpcodeDefinition
         return Name + " " + ID.ToString();
     }
 
-    public static readonly OpcodeDefinition InvalidOpcode = new OpcodeDefinition() { Name = "Invalid" };
+    public static readonly OpcodeDefinition InvalidOpcode = new () { Name = "Invalid" };
 
     /// <summary>
     /// All opcodes defined in the spec 14.1
     /// </summary>
-    private static OpcodeDefinition[] _knownOpcodes { get; } = new OpcodeDefinition[]
+    private static OpcodeDefinition[] KnownOpcodes { get; } = new OpcodeDefinition[]
     {
             /////////////////////////
             // Double operand opcodes 

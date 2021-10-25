@@ -55,31 +55,23 @@ public class ZVariable
 
     public override string ToString()
     {
-        switch (Location)
+        return Location switch
         {
-            case ZVariableLocation.Global:
-                return "g" + Value.ToString("x");
-            case ZVariableLocation.Local:
-                return "local" + Value.ToString("x");
-            case ZVariableLocation.Stack:
-                return "sp";
-            default:
-                throw new InvalidOperationException($"Unknown variable location '{Location}'");
-        }
+            ZVariableLocation.Global => "g" + Value.ToString("x"),
+            ZVariableLocation.Local => "local" + Value.ToString("x"),
+            ZVariableLocation.Stack => "sp",
+            _ => throw new InvalidOperationException($"Unknown variable location '{Location}'"),
+        };
     }
 
     public string ToInfoDumpFormat(bool popIfStack = true)
     {
-        switch (Location)
+        return Location switch
         {
-            case ZVariableLocation.Global:
-                return "G" + Value.ToString("x2");
-            case ZVariableLocation.Local:
-                return "L" + Value.ToString("x2");
-            case ZVariableLocation.Stack:
-                return (popIfStack ? '-' : '+') + "(SP)";
-            default:
-                throw new InvalidOperationException($"Unknown variable location '{Location}'");
-        }
+            ZVariableLocation.Global => "G" + Value.ToString("x2"),
+            ZVariableLocation.Local => "L" + Value.ToString("x2"),
+            ZVariableLocation.Stack => (popIfStack ? '-' : '+') + "(SP)",
+            _ => throw new InvalidOperationException($"Unknown variable location '{Location}'"),
+        };
     }
 }

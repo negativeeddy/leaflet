@@ -5,7 +5,7 @@ namespace NegativeEddy.Leaflet.Story;
 
 public class ZObjectProperty
 {
-    private IList<byte> _bytes;
+    private readonly IList<byte> _bytes;
     public int BaseAddress { get; }
     public int LengthInBytes { get { return Data.Count + 1; } }
     public ZObjectProperty(IList<byte> bytes, int baseAddress)

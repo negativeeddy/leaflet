@@ -9,13 +9,13 @@ namespace NegativeEddy.Leaflet.Memory;
 /// </summary>
 public class WordOverByteArray : IList<ushort>
 {
-    private IList<byte> _bytes;
-    private int _baseAddress;
+    private readonly IList<byte> _bytes;
+    private readonly int _baseAddress;
 
     /// <summary>
     /// Number of words in the array
     /// </summary>
-    private int _count;
+    private readonly int _count;
 
     public int Count
     {
