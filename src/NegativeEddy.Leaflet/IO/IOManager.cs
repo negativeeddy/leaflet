@@ -10,7 +10,7 @@ namespace NegativeEddy.Leaflet.IO
         {
         }
 
-        private readonly Subject<string> _outputSubject = new Subject<string>();
+        private readonly Subject<string> _outputSubject = new ();
         public IObservable<string> Print { get { return _outputSubject.AsObservable(); } }
 
         public void WriteOutputLine(string? text = null)
@@ -38,7 +38,7 @@ namespace NegativeEddy.Leaflet.IO
 
         public void WriteOutput(object text)
         {
-            _outputSubject.OnNext(text.ToString());
+            _outputSubject.OnNext(text.ToString() ?? String.Empty);
         }
     }
 }

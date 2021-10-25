@@ -2,7 +2,7 @@
 {
     public interface IZInput
     {
-        string ReadLine();
+        string? ReadLine();
         char ReadChar();
     }
 }

@@ -20,10 +20,10 @@ namespace NegativeEddy.Leaflet.Instructions
         public OpcodeIdentifier(string specIdentifier)
         {
             int underscoreIdx = specIdentifier.IndexOf('_');
-            string operandCount = specIdentifier.Substring(0, underscoreIdx);
+            string operandCount = specIdentifier[0..underscoreIdx];
             OperandCount = (OperandCountType)Enum.Parse(typeof(OperandCountType), operandCount);
 
-            OpcodeNumber = ushort.Parse(specIdentifier.Substring(underscoreIdx + 1));
+            OpcodeNumber = ushort.Parse(specIdentifier[(underscoreIdx + 1)..]);
             OpcodeNumber -= NameToOpcodeDifference();
         }
 
@@ -37,7 +37,7 @@ namespace NegativeEddy.Leaflet.Instructions
             return ID.GetHashCode();
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return ((OpcodeIdentifier)obj).ID == ID;
         }
@@ -52,23 +52,14 @@ namespace NegativeEddy.Leaflet.Instructions
         /// and the actual opcode value. e.g. VAR_226 is opcode 0x02, 226-2 = 224. 
         /// </summary>
         /// <returns></returns>
-        private ushort NameToOpcodeDifference()
+        private ushort NameToOpcodeDifference() => OperandCount switch
         {
-            switch (OperandCount)
-            {
-                case OperandCountType.OP2:
-                case OperandCountType.EXT:
-                    return 0;
-                case OperandCountType.OP1:
-                    return 128;
-                case OperandCountType.OP0:
-                    return 176;
-                case OperandCountType.VAR:
-                    return 224;
-                default:
-                    throw new InvalidOperationException();
-            }
-        }
+            OperandCountType.OP2 or OperandCountType.EXT => 0,
+            OperandCountType.OP1 => 128,
+            OperandCountType.OP0 => 176,
+            OperandCountType.VAR => 224,
+            _ => throw new InvalidOperationException(),
+        };
 
         static public int GetOpcodeIdentifier(OperandCountType operandCount, ushort opcodeNumber)
         {

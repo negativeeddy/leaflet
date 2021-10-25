@@ -18,47 +18,47 @@ namespace NegativeEddy.Leaflet.Tests.Story
 
             string input = "fred, go fishing";
             string[] expectedOutput = new string[] { "fred", ",", "go", "fishing" };
-            string[] actualOutput = interpreter.SplitInput(input).ToArray();
+            string[] actualOutput = Interpreter.SplitInput(input).ToArray();
             CompareStringArrays(expectedOutput, actualOutput);
 
             input = "open mailbox";
             expectedOutput = new string[] { "open", "mailbox" };
-            actualOutput = interpreter.SplitInput(input).ToArray();
+            actualOutput = Interpreter.SplitInput(input).ToArray();
             CompareStringArrays(expectedOutput, actualOutput);
 
             input = "open   mailbox";
             expectedOutput = new string[] { "open", "mailbox" };
-            actualOutput = interpreter.SplitInput(input).ToArray();
+            actualOutput = Interpreter.SplitInput(input).ToArray();
             CompareStringArrays(expectedOutput, actualOutput);
 
             input = "onething";
             expectedOutput = new string[] { "onething" };
-            actualOutput = interpreter.SplitInput(input).ToArray();
+            actualOutput = Interpreter.SplitInput(input).ToArray();
             CompareStringArrays(expectedOutput, actualOutput);
 
             input = "light\r\n";
             expectedOutput = new string[] { "light" };
-            actualOutput = interpreter.SplitInput(input).ToArray();
+            actualOutput = Interpreter.SplitInput(input).ToArray();
             CompareStringArrays(expectedOutput, actualOutput);
 
             input = " light\r\n";
             expectedOutput = new string[] { "light" };
-            actualOutput = interpreter.SplitInput(input).ToArray();
+            actualOutput = Interpreter.SplitInput(input).ToArray();
             CompareStringArrays(expectedOutput, actualOutput);
 
             input = "light ";
             expectedOutput = new string[] { "light" };
-            actualOutput = interpreter.SplitInput(input).ToArray();
+            actualOutput = Interpreter.SplitInput(input).ToArray();
             CompareStringArrays(expectedOutput, actualOutput);
 
             input = " light ";
             expectedOutput = new string[] { "light" };
-            actualOutput = interpreter.SplitInput(input).ToArray();
+            actualOutput = Interpreter.SplitInput(input).ToArray();
             CompareStringArrays(expectedOutput, actualOutput);
 
             input = "this has six words in it";
             expectedOutput = new string[] { "this", "has", "six", "words", "in", "it" };
-            actualOutput = interpreter.SplitInput(input).ToArray();
+            actualOutput = Interpreter.SplitInput(input).ToArray();
             CompareStringArrays(expectedOutput, actualOutput);
         }
 

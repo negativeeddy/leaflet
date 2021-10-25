@@ -6,5 +6,5 @@ class ConsoleInput : IZInput
 {
     public char ReadChar() => Console.ReadKey().KeyChar;
 
-    public string ReadLine() => Console.ReadLine();
+    public string? ReadLine() => Console.ReadLine();
 }

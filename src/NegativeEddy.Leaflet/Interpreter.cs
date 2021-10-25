@@ -16,8 +16,8 @@ namespace NegativeEddy.Leaflet
 {
     public class Interpreter
     {
-        private readonly InterpreterOutput _stdOut = new InterpreterOutput();
-        private readonly InterpreterOutput _dbgOut = new InterpreterOutput();
+        private readonly InterpreterOutput _stdOut = new();
+        private readonly InterpreterOutput _dbgOut = new();
 
         public IZInput? Input { get; set; }
         public IObservable<string> Output { get { return _stdOut.Print; } }
@@ -54,7 +54,7 @@ namespace NegativeEddy.Leaflet
 
         public void ReadState(Stream stream)
         {
-            BinaryFormatter formatter = new BinaryFormatter();
+            var formatter = new BinaryFormatter();
             try
             {
                 Dictionary<string, object> state = (Dictionary<string, object>)formatter.Deserialize(stream);
@@ -81,7 +81,7 @@ namespace NegativeEddy.Leaflet
         public void WriteState(MemoryStream stream)
         {
             var state = GetState();
-            BinaryFormatter formatter = new BinaryFormatter();
+            var formatter = new BinaryFormatter();
             try
             {
                 formatter.Serialize(stream, state);
@@ -100,7 +100,7 @@ namespace NegativeEddy.Leaflet
 
         public string ToInfoDumpFormat(ZOpcode zop)
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append($"{zop.BaseAddress:x4}:  ");
             for (int i = 0; i < zop.LengthInBytes; i++)
             {
@@ -297,21 +297,17 @@ namespace NegativeEddy.Leaflet
 
         public int GetOperandValue(ZOperand operand)
         {
-            switch (operand.Type)
+            return operand.Type switch
             {
-                case OperandTypes.LargeConstant:
-                case OperandTypes.SmallConstant:
-                    return (int)operand.Constant;
-                case OperandTypes.Variable:
-                    return ReadVariable(operand.Variable);
-                default:
-                    throw new NotImplementedException($"Reading from {operand.Type} not implemented");
-            }
+                OperandTypes.LargeConstant or OperandTypes.SmallConstant => (int)operand.Constant,
+                OperandTypes.Variable => ReadVariable(operand.Variable),
+                _ => throw new NotImplementedException($"Reading from {operand.Type} not implemented"),
+            };
         }
 
         public string Print(bool printFrames = false)
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             if (printFrames)
             {
                 sb.AppendLine("---------------------");
@@ -329,7 +325,7 @@ namespace NegativeEddy.Leaflet
                 }
 
             }
-            ZOpcode opcode = new ZOpcode(MainMemory.Bytes, ProgramCounter);
+            var opcode = new ZOpcode(MainMemory.Bytes, ProgramCounter);
             sb.Append(opcode.ToString());
             return sb.ToString();
         }
@@ -822,7 +818,7 @@ namespace NegativeEddy.Leaflet
                         // Get length of property data (in bytes) for the given object's property.
                         int propAddr = GetOperandValue(opcode.Operands[0]);
 
-                        ZObjectProperty prop = new ZObjectProperty(MainMemory.Bytes, propAddr - 1);
+                        var prop = new ZObjectProperty(MainMemory.Bytes, propAddr - 1);
                         return prop.DataLength;
                     });
                     break;
@@ -987,7 +983,7 @@ namespace NegativeEddy.Leaflet
 
             // first instruction is a dereferenced ZVar
             byte zVarValue = (byte)GetOperandValue(opcode.Operands[0]);
-            ZVariable zvarRef = new ZVariable(zVarValue);
+            var zvarRef = new ZVariable(zVarValue);
             return zvarRef;
         }
 
@@ -1064,11 +1060,11 @@ namespace NegativeEddy.Leaflet
             }
             IList<byte> textBuffer = new ArraySegment<byte>(MainMemory.Bytes, textBufferIdx + 1, txtBufferSize + 1);
 
-            string input = Input.ReadLine();
+            string? input = Input.ReadLine();
             if (input.Length > txtBufferSize)
             {
                 // trim the input down to the buffer size
-                input = input.Substring(0, txtBufferSize);
+                input = input[0..txtBufferSize];
             }
             input = input.ToLower();
 
@@ -1129,12 +1125,12 @@ namespace NegativeEddy.Leaflet
         /// </summary>
         /// <param name="input">the string to split</param>
         /// <returns>an array of words</returns>
-        public IEnumerable<string> SplitInput(string input)
+        public static IEnumerable<string> SplitInput(string input)
         {
             var spaceSplit = input.Split(' ').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x));
             foreach (var word in spaceSplit)
             {
-                if (word.Contains(","))
+                if (word.Contains(','))
                 {
                     int startIndex = 0;
                     int idx = word.IndexOf(',');
@@ -1158,7 +1154,7 @@ namespace NegativeEddy.Leaflet
         {
             // initialize a new frame
             var initLocals = operands.Select(op => (ushort)GetOperandValue(op)).ToArray();
-            Routine newRoutine = new Routine(MainMemory.Bytes, newAddress, returnAddress, returnStore, initLocals);
+            var newRoutine = new Routine(MainMemory.Bytes, newAddress, returnAddress, returnStore, initLocals);
             FrameStack.Push(newRoutine);
 
             // update the instruction counter

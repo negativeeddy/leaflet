@@ -33,24 +33,13 @@ namespace NegativeEddy.Leaflet.Instructions
             this.BaseAddress = baseAddress;
         }
 
-        public ushort Opcode
-        {
-            get
-            {
-                switch (Form)
+        public ushort Opcode => Form switch
                 {
-                    case OpcodeForm.Short:
-                        return _bytes[BaseAddress].FetchBits(BitNumber.Bit_3, 4);
-                    case OpcodeForm.Long:
-                    case OpcodeForm.Variable:
-                        return _bytes[BaseAddress].FetchBits(BitNumber.Bit_4, 5);
-                    case OpcodeForm.Extended:
-                        return _bytes[BaseAddress + 1];
-                    default:
-                        throw new InvalidOperationException();
-                }
-            }
-        }
+                    OpcodeForm.Short => _bytes[BaseAddress].FetchBits(BitNumber.Bit_3, 4),
+                    OpcodeForm.Long or OpcodeForm.Variable => _bytes[BaseAddress].FetchBits(BitNumber.Bit_4, 5),
+                    OpcodeForm.Extended => _bytes[BaseAddress + 1],
+                    _ => throw new InvalidOperationException(),
+                };
 
         public OpcodeForm Form
         {
@@ -107,7 +96,7 @@ namespace NegativeEddy.Leaflet.Instructions
                 switch (OperandCount)
                 {
                     case OperandCountType.OP0:
-                        types = new OperandTypes[] { };
+                        types = Array.Empty<OperandTypes>();
                         break;
                     case OperandCountType.OP1:
                         Debug.Assert(Form == OpcodeForm.Short, "Is OP1 only in short form?");
@@ -143,7 +132,7 @@ namespace NegativeEddy.Leaflet.Instructions
                         break;
                     case OperandCountType.VAR:
                     case OperandCountType.EXT:
-                        List<OperandTypes> list = new List<OperandTypes>(4);
+                        var list = new List<OperandTypes>(4);
 
                         OperandTypes oprType = (OperandTypes)_bytes[OperandTypeAddress].FetchBits(BitNumber.Bit_7, 2);
                         if (oprType != OperandTypes.Omitted)
@@ -416,7 +405,7 @@ namespace NegativeEddy.Leaflet.Instructions
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             // print the address & operand name
             sb.Append($"{BaseAddress:x4}: {Definition.Name}");
 
@@ -482,7 +471,7 @@ namespace NegativeEddy.Leaflet.Instructions
 
             if (this.Definition.HasText)
             {
-                sb.Append(" ");
+                sb.Append(' ');
                 sb.Append(Text);
             }
 
