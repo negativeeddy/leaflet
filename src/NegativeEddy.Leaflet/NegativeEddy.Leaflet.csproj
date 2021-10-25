@@ -10,7 +10,6 @@
     <IncludeSymbols>True</IncludeSymbols>
     <Description>An experimental implementation of the Infocom Z-Machine spec - aka "a Zork interpreter" - aka "30 year old tech built with modern tools"</Description>
     <Nullable>enable</Nullable>
-    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
