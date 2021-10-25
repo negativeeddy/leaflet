@@ -75,7 +75,7 @@ namespace NegativeEddy.Leaflet.Memory
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.AppendLine($"Frame start at: {FirstInstructionAddress:x4}");
             sb.Append("Locals ");
             for (int i = 0; i < Locals.Count; i++)
@@ -91,7 +91,7 @@ namespace NegativeEddy.Leaflet.Memory
             sb.Append("Stack");
             foreach (var item in EvaluationStack)
             {
-                sb.Append(item.ToString());
+                sb.Append(item);
                 sb.Append(' ');
             }
             sb.AppendLine();

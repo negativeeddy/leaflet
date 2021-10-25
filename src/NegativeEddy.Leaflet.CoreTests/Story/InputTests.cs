@@ -14,8 +14,6 @@ namespace NegativeEddy.Leaflet.Tests.Story
         [TestMethod]
         public void InputSplitterTest()
         {
-            Interpreter interpreter = new Interpreter();
-
             string input = "fred, go fishing";
             string[] expectedOutput = new string[] { "fred", ",", "go", "fishing" };
             string[] actualOutput = Interpreter.SplitInput(input).ToArray();
@@ -62,7 +60,7 @@ namespace NegativeEddy.Leaflet.Tests.Story
             CompareStringArrays(expectedOutput, actualOutput);
         }
 
-        private void CompareStringArrays(string[] expectedOutput, string[] actualOutput)
+        private static void CompareStringArrays(string[] expectedOutput, string[] actualOutput)
         {
             Assert.AreEqual(expectedOutput.Length, actualOutput.Length, "Counts don't match");
             for (int i = 0; i < expectedOutput.Length; i++)

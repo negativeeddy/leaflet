@@ -110,7 +110,7 @@ namespace NegativeEddy.Leaflet.Story
         /// <returns>the Id of the child, 0 if there is no child</returns>
         public int GetChild(int objectID)
         {
-            return Objects.FirstOrDefault(o => o.ID == objectID).ChildID;
+            return Objects.First(o => o.ID == objectID).ChildID;
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace NegativeEddy.Leaflet.Story
         /// <returns>the Id of the child, 0 if there is no child</returns>
         public int GetSiblingId(int objectID)
         {
-            return Objects.FirstOrDefault(o => o.ID == objectID).SiblingID;
+            return Objects.First(o => o.ID == objectID).SiblingID;
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace NegativeEddy.Leaflet.Story
         /// <returns>the Id of the child, 0 if there is no child</returns>
         public int GetParent(int objectID)
         {
-            return Objects.FirstOrDefault(o => o.ID == objectID).ParentID;
+            return Objects.First(o => o.ID == objectID).ParentID;
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace NegativeEddy.Leaflet.Story
             if (!parentFixed)
             { 
                 // the old item was not the first child so fix the gap in the old sibling chain
-                ZObject oldPrevSibling = Objects.FirstOrDefault(o => o.SiblingID == objectID);
+                ZObject? oldPrevSibling = Objects.FirstOrDefault(o => o.SiblingID == objectID);
                 if (oldPrevSibling != null)
                 {
                     oldPrevSibling.SiblingID = oldNextSiblingId;
