@@ -39,6 +39,11 @@ namespace NegativeEddy.Leaflet.Instructions
 
         public override bool Equals(object? obj)
         {
+            if (obj == null)
+            {
+                return false;
+            }
+
             return ((OpcodeIdentifier)obj).ID == ID;
         }
 

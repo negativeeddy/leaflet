@@ -32,14 +32,14 @@ namespace NegativeEddy.Leaflet.Story
             }
             currentAddress += 2 * 31;
             // load the first object in order to determine how many objects there are
-            ZObject first = new ZObject(data, currentAddress, 1);
+            var first = new ZObject(data, currentAddress, 1);
             Objects.Add(first);
 
             int objectCount = -(currentAddress - first.PropertyTableAddress) / OBJECT_DEF_SIZE;
 
             for (int i = 1; i < objectCount; i++)
             {
-                ZObject tmp = new ZObject(data, currentAddress + i * OBJECT_DEF_SIZE, i + 1);
+                var tmp = new ZObject(data, currentAddress + i * OBJECT_DEF_SIZE, i + 1);
 
                 Objects.Add(tmp);
             }
@@ -61,7 +61,7 @@ namespace NegativeEddy.Leaflet.Story
         /// <returns>a string representing the object tree</returns>
         public string DumpObjectTree()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             foreach (var obj in Objects.Where(zo => zo.ParentID == 0))
             {
                 PrintObject(obj, 0, sb);

@@ -1060,7 +1060,7 @@ namespace NegativeEddy.Leaflet
             }
             IList<byte> textBuffer = new ArraySegment<byte>(MainMemory.Bytes, textBufferIdx + 1, txtBufferSize + 1);
 
-            string? input = Input.ReadLine();
+            string input = Input.ReadLine() ?? string.Empty;
             if (input.Length > txtBufferSize)
             {
                 // trim the input down to the buffer size
