@@ -39,17 +39,11 @@ public class ZOperand
         Type = type;
     }
 
-    public int LengthInBytes
+    public int LengthInBytes => Type switch
     {
-        get
-        {
-            return Type switch
-            {
-                OperandTypes.LargeConstant => 2,
-                OperandTypes.SmallConstant or OperandTypes.Variable => 1,
-                OperandTypes.Omitted => 0,
-                _ => throw new InvalidOperationException("Unknown Operand Type"),
-            };
-        }
-    }
+        OperandTypes.LargeConstant => 2,
+        OperandTypes.SmallConstant or OperandTypes.Variable => 1,
+        OperandTypes.Omitted => 0,
+        _ => throw new InvalidOperationException("Unknown Operand Type"),
+    };
 }
