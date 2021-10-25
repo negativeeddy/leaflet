@@ -22,18 +22,21 @@ namespace NegativeEddy.Leaflet.Performance.Tests
     [TestClass()]
     public class MeasureStories
     {
+        [Ignore]
         [TestMethod()]
         public void MeasureMiniZork_Mailbox()
         {
             BenchmarkRunner.Run<ZorkMailboxStory>();
         }
 
+        [Ignore]
         [TestMethod()]
         public void MeasureMiniZork_Walkthrough()
         {
             BenchmarkRunner.Run<ZorkWalkthrough>();
         }
 
+        [Ignore]
         [TestMethod()]
         public void TmpMeasureMiniZork_Walkthrough()
         {
