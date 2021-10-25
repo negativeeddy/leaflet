@@ -41,7 +41,7 @@ namespace NegativeEddy.Leaflet.Performance.Tests
         public void TmpMeasureMiniZork_Walkthrough()
         {
             var z = new ZorkWalkthrough();
-            Stopwatch sw = new Stopwatch();
+            var sw = new Stopwatch();
             sw.Start();
             z.RunGame();
             sw.Stop();
