@@ -16,11 +16,11 @@ public class ZOpcode
     /// <summary>
     /// The raw bytes that make up the instruction.
     /// </summary>
-    public IList<byte> Bytes
+    public Span<byte> Bytes
     {
         get
         {
-            return new ArraySegment<byte>(_bytes, BaseAddress, LengthInBytes);
+            return new Span<byte>(_bytes, BaseAddress, LengthInBytes);
         }
     }
 
@@ -338,7 +338,7 @@ public class ZOpcode
         {
             if (Definition.HasBranch)
             {
-                IList<byte> branchData = new ArraySegment<byte>(_bytes, BranchOffsetAddr, 2);
+                var branchData = new Span<byte>(_bytes, BranchOffsetAddr, 2);
                 return new BranchOffset(branchData);
             }
             else

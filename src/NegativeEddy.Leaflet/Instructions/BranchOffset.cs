@@ -3,16 +3,16 @@ using NegativeEddy.Leaflet.Memory;
 
 namespace NegativeEddy.Leaflet.Instructions;
 
-public struct BranchOffset
+public ref struct BranchOffset
 {
-    private readonly IList<byte> _bytes;
+    private readonly Span<byte> _bytes;
 
-    public BranchOffset(IList<byte> bytes)
+    public BranchOffset(Span<byte> bytes)
     {
         _bytes = bytes;
         // implements spec 4.7
 
-        Debug.Assert(_bytes.Count == 2);
+        Debug.Assert(_bytes.Length == 2);
 
         if (_bytes[0].FetchBits(BitNumber.Bit_7, 1) == 0)
         {

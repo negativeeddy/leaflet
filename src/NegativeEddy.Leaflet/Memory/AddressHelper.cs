@@ -38,6 +38,17 @@ public static class AddressHelper
         return (ushort)(uppershort + lowershort);
     }
 
+    public static ushort GetWord(this Span<byte> data, int address)
+    {
+        Debug.Assert(address <= data.Length);
+
+        int upper = data[address] << 8;
+        int lower = data[address + 1];
+        uint uppershort = (uint)upper;
+        uint lowershort = (uint)lower;
+        return (ushort)(uppershort + lowershort);
+    }
+
     public static void SetWord(this IList<byte> data, ushort word, int address)
     {
         Debug.Assert(address + 1 < data.Count);
