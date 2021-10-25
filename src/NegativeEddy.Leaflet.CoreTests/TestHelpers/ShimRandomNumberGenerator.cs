@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using NegativeEddy.Leaflet.Core.Memory;
+using NegativeEddy.Leaflet.Memory;
 
 namespace NegativeEddy.Leaflet.TestHelpers
 {

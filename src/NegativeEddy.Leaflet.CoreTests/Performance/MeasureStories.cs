@@ -1,6 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
-using NegativeEddy.Leaflet.Memory;
 using BenchmarkDotNet.Running;
 using System.Diagnostics;
 

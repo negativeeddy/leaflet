@@ -1,10 +1,9 @@
-﻿namespace NegativeEddy.Leaflet.Instructions
+﻿namespace NegativeEddy.Leaflet.Instructions;
+
+public enum OperandTypes
 {
-    public enum OperandTypes
-    {
-        LargeConstant,
-        SmallConstant,
-        Variable,
-        Omitted
-    };
-}
+    LargeConstant,
+    SmallConstant,
+    Variable,
+    Omitted
+};

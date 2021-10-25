@@ -1,5 +1,4 @@
-﻿using NegativeEddy.Leaflet;
-using System;
+﻿using System;
 using System.IO;
 
 namespace NegativeEddy.Leaflet.TestHelpers

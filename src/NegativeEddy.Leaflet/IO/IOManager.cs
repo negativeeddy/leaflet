@@ -1,44 +1,42 @@
-﻿using System;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 using System.Reactive.Subjects;
 
-namespace NegativeEddy.Leaflet.IO
+namespace NegativeEddy.Leaflet.IO;
+
+public class InterpreterOutput : IZOutput
 {
-    public class InterpreterOutput : IZOutput
+    public InterpreterOutput()
     {
-        public InterpreterOutput()
-        {
-        }
+    }
 
-        private readonly Subject<string> _outputSubject = new ();
-        public IObservable<string> Print { get { return _outputSubject.AsObservable(); } }
+    private readonly Subject<string> _outputSubject = new();
+    public IObservable<string> Print { get { return _outputSubject.AsObservable(); } }
 
-        public void WriteOutputLine(string? text = null)
+    public void WriteOutputLine(string? text = null)
+    {
+        if (text != null)
         {
-            if (text != null)
-            {
-                WriteOutput(text);
-            }
-            WriteOutput(Environment.NewLine);
+            WriteOutput(text);
         }
+        WriteOutput(Environment.NewLine);
+    }
 
-        public void WriteOutput(string text)
-        {
-            _outputSubject.OnNext(text);
-        }
+    public void WriteOutput(string text)
+    {
+        _outputSubject.OnNext(text);
+    }
 
-        public void WriteOutputLine(object text)
+    public void WriteOutputLine(object text)
+    {
+        if (text != null)
         {
-            if (text != null)
-            {
-                WriteOutput(text);
-            }
-            WriteOutput(Environment.NewLine);
+            WriteOutput(text);
         }
+        WriteOutput(Environment.NewLine);
+    }
 
-        public void WriteOutput(object text)
-        {
-            _outputSubject.OnNext(text.ToString() ?? String.Empty);
-        }
+    public void WriteOutput(object text)
+    {
+        _outputSubject.OnNext(text.ToString() ?? String.Empty);
     }
 }

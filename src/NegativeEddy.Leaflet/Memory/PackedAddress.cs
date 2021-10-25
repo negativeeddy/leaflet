@@ -1,17 +1,16 @@
-﻿namespace NegativeEddy.Leaflet.Memory
+﻿namespace NegativeEddy.Leaflet.Memory;
+
+public class PackedAddress
 {
-    public class PackedAddress
+    public ushort Bits { get; }
+
+    public PackedAddress(ushort bits)
     {
-        public ushort Bits { get; }
+        Bits = bits;
+    }
 
-        public PackedAddress(ushort bits)
-        {
-            Bits = bits;
-        }
-
-        int Address
-        {
-            get { return Bits * 2; }
-        }
+    int Address
+    {
+        get { return Bits * 2; }
     }
 }

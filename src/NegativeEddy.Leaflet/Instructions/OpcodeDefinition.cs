@@ -1,51 +1,49 @@
-﻿using System.Linq;
+﻿namespace NegativeEddy.Leaflet.Instructions;
 
-namespace NegativeEddy.Leaflet.Instructions
+public struct OpcodeDefinition
 {
-    public struct OpcodeDefinition
+    /// <summary>
+    /// Whether the opcode takes indirect variable references - spec 6.3.4
+    /// </summary>
+    public bool UsesIndirection;
+    public bool IsCall;
+    public string Name;
+    public OpcodeIdentifier ID;
+    public bool HasStore;
+    public bool HasBranch;
+    public bool HasText
     {
-        /// <summary>
-        /// Whether the opcode takes indirect variable references - spec 6.3.4
-        /// </summary>
-        public bool UsesIndirection;
-        public bool IsCall;
-        public string Name;
-        public OpcodeIdentifier ID;
-        public bool HasStore;
-        public bool HasBranch;
-        public bool HasText
+        get
         {
-            get
-            {
-                return (ID.OperandCount == OperandCountType.OP0) &&
-                        (ID.OpcodeNumber == 2 || ID.OpcodeNumber == 3);
-            }
+            return (ID.OperandCount == OperandCountType.OP0) &&
+                    (ID.OpcodeNumber == 2 || ID.OpcodeNumber == 3);
         }
+    }
 
-        public static OpcodeDefinition GetKnownOpcode(OpcodeIdentifier id)
+    public static OpcodeDefinition GetKnownOpcode(OpcodeIdentifier id)
+    {
+        try
         {
-            try
-            {
-                return _knownOpcodes.Where(x => x.ID.Equals(id)).First();
-            }
-            catch
-            {
-                return OpcodeDefinition.InvalidOpcode;
-            }
+            return _knownOpcodes.Where(x => x.ID.Equals(id)).First();
         }
-
-        public override string ToString()
+        catch
         {
-            return Name + " " + ID.ToString();
+            return OpcodeDefinition.InvalidOpcode;
         }
+    }
 
-        public static readonly OpcodeDefinition InvalidOpcode = new OpcodeDefinition() { Name = "Invalid" };
+    public override string ToString()
+    {
+        return Name + " " + ID.ToString();
+    }
 
-        /// <summary>
-        /// All opcodes defined in the spec 14.1
-        /// </summary>
-        private static OpcodeDefinition[] _knownOpcodes { get; } = new OpcodeDefinition[]
-        {
+    public static readonly OpcodeDefinition InvalidOpcode = new OpcodeDefinition() { Name = "Invalid" };
+
+    /// <summary>
+    /// All opcodes defined in the spec 14.1
+    /// </summary>
+    private static OpcodeDefinition[] _knownOpcodes { get; } = new OpcodeDefinition[]
+    {
             /////////////////////////
             // Double operand opcodes 
             /////////////////////////
@@ -175,10 +173,9 @@ namespace NegativeEddy.Leaflet.Instructions
             new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_244"), HasStore = false, HasBranch = false, Name ="input_stream" ,} , // v3
             new OpcodeDefinition{ ID = new OpcodeIdentifier("VAR_245"), HasStore = false, HasBranch = false, Name ="sound_effect" ,} , // v5/3
 
-            /////////////////////////////////////////////
-            // Extended opcodes currently omitted because
-            // they are only valid for v5-6
-            /////////////////////////////////////////////
-        };
-    }
+        /////////////////////////////////////////////
+        // Extended opcodes currently omitted because
+        // they are only valid for v5-6
+        /////////////////////////////////////////////
+    };
 }

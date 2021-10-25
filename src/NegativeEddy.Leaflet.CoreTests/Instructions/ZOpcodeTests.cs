@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using NegativeEddy.Leaflet.Core.Memory;
 using NegativeEddy.Leaflet.Story;
 using NegativeEddy.Leaflet.TestHelpers;
 using NegativeEddy.Leaflet.Memory;
