@@ -34,7 +34,7 @@ public struct OpcodeDefinition
 
     public override string ToString()
     {
-        return Name + " " + ID.ToString();
+        return $"{Name} {ID}";
     }
 
     public static readonly OpcodeDefinition InvalidOpcode = new () { Name = "Invalid" };
