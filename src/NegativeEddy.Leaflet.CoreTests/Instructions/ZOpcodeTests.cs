@@ -56,7 +56,7 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
             var randData = new ShimRandomNumberGenerator();
             zm.RandomNumberGenerator = (IRandomNumberGenerator)randData;
 
-            ConcurrentQueue<string> diagQueue = new ConcurrentQueue<string>();
+            ConcurrentQueue<string> diagQueue = new();
 
             try
             {
@@ -127,7 +127,7 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
                                 int id = int.Parse(parts[1].Split(':')[1]);
                                 ZObject obj = zm.MainMemory.ObjectTree.GetObject(id);
                                 string expectedObj = obj.ToLongString();
-                                string actualObj = validation.Substring(7);
+                                string actualObj = validation[7..];
                                 Assert.AreEqual(expectedObj, actualObj, $"object {id} is invalid after instruction 0x{index:x4}");
                                 break;
                             case "memory_dump":
@@ -165,15 +165,15 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
 
         public OpcodeData ParseInfoDump(string opcodeLine, ZMemory memory)
         {
-            OpcodeData opcodeData = new OpcodeData();
+            OpcodeData opcodeData = new();
 
             string tmp = opcodeLine.Substring(1, 4);
             opcodeData.Address = Convert.ToInt32(tmp, 16);
-            tmp = opcodeLine.Substring(32, 48 - 32).TrimEnd().ToLower();
+            tmp = opcodeLine[32..48].TrimEnd().ToLower();
             opcodeData.Name = tmp;
 
-            var operandParts = opcodeLine.Substring(48).Split(' ', ',');
-            List<ZOperand> operandList = new List<ZOperand>();
+            var operandParts = opcodeLine[48..].Split(' ', ',');
+            List<ZOperand> operandList = new();
             for (int i = 0; i < operandParts.Length; i++)
             {
                 ZOperand zopr = OperandFromString(operandParts[i]);
@@ -186,13 +186,13 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
                 {
                     if (operandParts[i][0] == '"')
                     {
-                        string name = operandParts[i].Substring(1, operandParts[i].Length - 1);
+                        string name = operandParts[i][1..];
                         while (operandParts[i].Last() != '"')
                         {
                             i++;
                             name += " " + operandParts[i];
                         }
-                        name = name.Substring(0, name.Length - 1);
+                        name = name[0..^1];
                         var obj = memory.ObjectTree.Objects.First(o => o.ShortName == name);
                         int objId = obj.ID;
                         operandList.Add(new ZOperand(OperandTypes.SmallConstant) { Constant = (byte)objId });
@@ -229,17 +229,17 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
         {
             if (zOperand[0] == 'L')
             {
-                int lVal = int.Parse(zOperand.Substring(1));
+                int lVal = int.Parse(zOperand[1..]);
                 return new ZOperand(OperandTypes.Variable) { Variable = new ZVariable((byte)(1 + lVal)) };
             }
             else if (zOperand[0] == 'G')
             {
-                int gVal = int.Parse(zOperand.Substring(1));
+                int gVal = int.Parse(zOperand[1..]);
                 return new ZOperand(OperandTypes.Variable) { Variable = new ZVariable((byte)(0x3a + gVal)) };
             }
             else if (zOperand[0] == '#')
             {
-                uint constant = uint.Parse(zOperand.Substring(1));
+                uint constant = uint.Parse(zOperand[1..]);
                 if (constant > 0xff)
                 {
                     return new ZOperand(OperandTypes.LargeConstant) { Constant = constant };
@@ -261,7 +261,7 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
         {
             byte b = Convert.ToByte("00101111", 2);
 
-            ZOperand operand = new ZOperand(OperandTypes.Variable);
+            ZOperand operand = new(OperandTypes.Variable);
         }
 
         [TestMethod()]
@@ -271,7 +271,7 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
             var zm = ZMachineLoader.Load(filename);
 
             int address = 0x3803; // "3803: insert_obj g73 g00
-            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+            ZOpcode zop = new(zm.MainMemory.Bytes, address);
 
             //byte[] bytes = new byte[] { 0x6e, 0x83, 0x10, 0xe0, 0x3f, 0x2c };
             // 0110 1110    Form Long, 2OP
@@ -324,11 +324,11 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
 
             int expectedOpcode = 0x02;
             OpcodeForm expectedForm = OpcodeForm.Short;
-            ZOperand[] expectedOperands = new ZOperand[] { };
+            ZOperand[] expectedOperands = Array.Empty<ZOperand>();
             int expectedOperandCount = expectedOperands.Length;
             int expectedLengthInBytes = 17;
 
-            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+            ZOpcode zop = new(zm.MainMemory.Bytes, address);
 
             CompareOpcodeWithExpectedValues(
                 zop,
@@ -364,7 +364,7 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
             int expectedOperandCount = expectedOperands.Length;
             int expectedLengthInBytes = 6;
 
-            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+            ZOpcode zop = new(zm.MainMemory.Bytes, address);
 
             var tmp = zop.OperandType;
             CompareOpcodeWithExpectedValues(
@@ -406,7 +406,7 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
             int expectedOperandCount = expectedOperands.Length;
             int expectedLengthInBytes = 6;
 
-            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+            ZOpcode zop = new(zm.MainMemory.Bytes, address);
 
             CompareOpcodeWithExpectedValues(
                 zop,
@@ -444,7 +444,7 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
             int expectedOperandCount = expectedOperands.Length;
             int expectedLengthInBytes = 5;
 
-            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+            ZOpcode zop = new(zm.MainMemory.Bytes, address);
 
             CompareOpcodeWithExpectedValues(
                 zop,
@@ -488,7 +488,7 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
             int expectedOperandCount = expectedOperands.Length;
             int expectedLengthInBytes = 4;
 
-            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+            ZOpcode zop = new(zm.MainMemory.Bytes, address);
 
             CompareOpcodeWithExpectedValues(
                 zop,
@@ -522,7 +522,7 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
             int expectedOperandCount = expectedOperands.Length;
             int expectedLengthInBytes = 3;
 
-            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+            ZOpcode zop = new(zm.MainMemory.Bytes, address);
 
             CompareOpcodeWithExpectedValues(
                 zop,
@@ -542,7 +542,7 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
             var zm = ZMachineLoader.Load(filename);
 
             int address = 0x3b3d; // "3b3d: call 3b4a local0 ->local2
-            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+            ZOpcode zop = new(zm.MainMemory.Bytes, address);
 
             int expectedOpcode = 0x00;
             OpcodeForm expectedForm = OpcodeForm.Variable;
@@ -570,7 +570,7 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
             var zm = ZMachineLoader.Load(filename);
 
             int address = 0x3816; // "3816: jump ffc2
-            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+            ZOpcode zop = new(zm.MainMemory.Bytes, address);
 
             //byte[] bytes = new byte[] { 0x8c, 0xff, 0xc2};
             // 1000 1010    Form SHORT, 1OP
@@ -603,7 +603,7 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
             var zm = ZMachineLoader.Load(filename);
 
             int address = 0x3816; // 37f7: store 10 2e
-            ZOpcode zop = new ZOpcode(zm.MainMemory.Bytes, address);
+            ZOpcode zop = new(zm.MainMemory.Bytes, address);
             string expectedStringConversion = "37f7: store 10 2e";
 
             //byte[] bytes = new byte[] { 0x8c, 0xff, 0xc2};
@@ -737,11 +737,11 @@ namespace NegativeEddy.Leaflet.Instructions.Tests
             var testData = GetOpcodeInputData();
 
             // test opcode output with explicit addresses
-            foreach (var item in testData)
+            foreach (var (address, intructionText) in testData)
             {
-                ZOpcode oc = new ZOpcode(zm.MainMemory.Bytes, item.address);
+                ZOpcode oc = new(zm.MainMemory.Bytes, address);
                 Console.WriteLine(oc);
-                Assert.AreEqual(item.intructionText, oc.ToString(), $"Bad decode at address 0x{item.address:x4}");
+                Assert.AreEqual(intructionText, oc.ToString(), $"Bad decode at address 0x{address:x4}");
             }
         }
 
