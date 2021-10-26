@@ -131,32 +131,13 @@ public class Interpreter
                 }
                 else
                 {
-                    switch (opr.Type)
+                    sb.Append(opr.Type switch
                     {
-
-                        case OperandTypes.Variable:
-                            switch (opr.Variable.Location)
-                            {
-                                case ZVariableLocation.Global:
-                                    sb.Append(opr.Variable.ToInfoDumpFormat());
-                                    break;
-                                case ZVariableLocation.Local:
-                                    sb.Append(opr.Variable.ToInfoDumpFormat());
-                                    break;
-                                case ZVariableLocation.Stack:
-                                    sb.Append(sb.Append(opr.Variable.ToInfoDumpFormat()));
-                                    break;
-                            }
-                            break;
-                        case OperandTypes.LargeConstant:
-                            sb.Append($"#{opr.Constant:x4}");
-                            break;
-                        case OperandTypes.SmallConstant:
-                            sb.Append($"#{opr.Constant:x2}");
-                            break;
-                        default:
-                            throw new InvalidOperationException();
-                    }
+                        OperandTypes.Variable => opr.Variable.ToInfoDumpFormat(),
+                        OperandTypes.LargeConstant => $"#{opr.Constant:x4}",
+                        OperandTypes.SmallConstant => $"#{opr.Constant:x2}",
+                        _ => throw new InvalidOperationException()
+                    });
                     sb.Append(' ');
                 }
             }
@@ -405,11 +386,11 @@ public class Interpreter
             case "je":
                 Handle_Opcode(opcode, op =>
                 {
-                        // je a b c d ? (label)
-                        Debug.Assert(opcode.OperandType.Count > 1);
+                    // je a b c d ? (label)
+                    Debug.Assert(opcode.OperandType.Count > 1);
 
-                        // force evalution of all operands in case there is a stack pop
-                        short[] operands = op.Operands.Select(o => (short)GetOperandValue(o)).ToArray();
+                    // force evalution of all operands in case there is a stack pop
+                    short[] operands = op.Operands.Select(o => (short)GetOperandValue(o)).ToArray();
 
                     bool match = operands.Skip(1).Any(x => x == operands[0]);
                     return match ? 1 : 0;
@@ -500,8 +481,8 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(true, "Implementation of 'pull' is unclear. Check this when it gets executed");
-                        // pull stack -> (result)
-                        Debug.Assert(op.OperandType.Count == 1);
+                    // pull stack -> (result)
+                    Debug.Assert(op.OperandType.Count == 1);
                     var actualZVar = GetDereferencedFirstZVar(op);
                     int value = ReadVariable(actualZVar, true);
                     return value;
@@ -532,34 +513,34 @@ public class Interpreter
             case "inc_chk":    // inc_chk (variable) value ?(label)
                 Handle_Opcode(opcode, op =>
                 {
-                        // Increment variable, and branch if now greater than value
-                        Debug.Assert(op.OperandType.Count == 2);
+                    // Increment variable, and branch if now greater than value
+                    Debug.Assert(op.OperandType.Count == 2);
 
-                        // do the increment
-                        var actualZVar = GetDereferencedFirstZVar(op);
+                    // do the increment
+                    var actualZVar = GetDereferencedFirstZVar(op);
                     ushort variableValue = ReadVariable(actualZVar, true);
                     variableValue++;
                     SetVariable(actualZVar, variableValue, true);
 
-                        // do the compare
-                        short value = (short)GetOperandValue(op.Operands[1]);
+                    // do the compare
+                    short value = (short)GetOperandValue(op.Operands[1]);
                     return variableValue > value ? 1 : 0;
                 });
                 break;
             case "dec_chk":    // dec_chk (variable) value ?(label)
                 Handle_Opcode(opcode, op =>
                 {
-                        // Decrement variable, and branch if it is now less than the given value
-                        Debug.Assert(op.OperandType.Count == 2);
+                    // Decrement variable, and branch if it is now less than the given value
+                    Debug.Assert(op.OperandType.Count == 2);
 
-                        // do the decrement
-                        var actualZVar = GetDereferencedFirstZVar(op);
+                    // do the decrement
+                    var actualZVar = GetDereferencedFirstZVar(op);
                     short value = (short)ReadVariable(actualZVar, true);
                     value--;
                     SetVariable(actualZVar, (ushort)value, true);
 
-                        // do the compare
-                        short compareVal = (short)GetOperandValue(op.Operands[1]);
+                    // do the compare
+                    short compareVal = (short)GetOperandValue(op.Operands[1]);
                     return value < compareVal ? 1 : 0;
                 });
                 break;
@@ -616,8 +597,8 @@ public class Interpreter
                 {
                     Debug.Assert(op.OperandType.Count == 0);
                     Debug.Assert(op.Definition.HasText == true);
-                        // Print the quoted (literal) Z-encoded string.
-                        _stdOut.WriteOutput(opcode.Text);
+                    // Print the quoted (literal) Z-encoded string.
+                    _stdOut.WriteOutput(opcode.Text);
                     return UNUSED_RETURN_VALUE;
                 });
                 break;
@@ -625,8 +606,8 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 1);
-                        // takes an object number and prints its short name
-                        int objID = GetOperandValue(opcode.Operands[0]);
+                    // takes an object number and prints its short name
+                    int objID = GetOperandValue(opcode.Operands[0]);
                     var obj = MainMemory.ObjectTree.GetObject(objID);
                     _stdOut.WriteOutput(obj.ShortName);
                     return UNUSED_RETURN_VALUE;
@@ -636,8 +617,8 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 1);
-                        // Print (Z-encoded) string at given byte address
-                        int address = GetOperandValue(opcode.Operands[0]);
+                    // Print (Z-encoded) string at given byte address
+                    int address = GetOperandValue(opcode.Operands[0]);
                     var obj = new ZStringBuilder(MainMemory.Bytes, address);
                     _stdOut.WriteOutput(obj.ToString());
                     return UNUSED_RETURN_VALUE;
@@ -647,8 +628,8 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 1);
-                        // Print (Z-encoded) string at given byte address
-                        int address = GetOperandValue(opcode.Operands[0]) * 2;
+                    // Print (Z-encoded) string at given byte address
+                    int address = GetOperandValue(opcode.Operands[0]) * 2;
                     var obj = new ZStringBuilder(MainMemory.Bytes, address);
                     _stdOut.WriteOutput(obj.ToString());
                     return UNUSED_RETURN_VALUE;
@@ -666,8 +647,8 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 1);
-                        // Print(signed) number in decimal.
-                        int val = GetOperandValue(opcode.Operands[0]);
+                    // Print(signed) number in decimal.
+                    int val = GetOperandValue(opcode.Operands[0]);
                     _stdOut.WriteOutput(val);
                     return UNUSED_RETURN_VALUE;
                 });
@@ -676,8 +657,8 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 1);
-                        // Print a ZSCII character
-                        int val = GetOperandValue(opcode.Operands[0]);
+                    // Print a ZSCII character
+                    int val = GetOperandValue(opcode.Operands[0]);
                     Debug.Assert(val >= 0 && val < 1023, "print_char out of range");
                     _stdOut.WriteOutput(ZStringBuilder.GetChar((ushort)val));
                     return UNUSED_RETURN_VALUE;
@@ -695,8 +676,8 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 2);
-                        // Jump if all of the flags in bitmap are set(i.e. if bitmap & flags == flags).
-                        int bitmap = GetOperandValue(opcode.Operands[0]);
+                    // Jump if all of the flags in bitmap are set(i.e. if bitmap & flags == flags).
+                    int bitmap = GetOperandValue(opcode.Operands[0]);
                     int flags = GetOperandValue(opcode.Operands[1]);
                     int result = (bitmap & flags) == flags ? 1 : 0;
                     return result;
@@ -706,8 +687,8 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 2);
-                        // Jump if object has attribute.
-                        int objectID = GetOperandValue(opcode.Operands[0]);
+                    // Jump if object has attribute.
+                    int objectID = GetOperandValue(opcode.Operands[0]);
                     BitNumber attribute = (BitNumber)GetOperandValue(opcode.Operands[1]);
                     ZObject obj = MainMemory.ObjectTree.GetObject(objectID);
                     int result = obj.HasAttribute(attribute) ? 1 : 0;
@@ -718,8 +699,8 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 2);
-                        // Make object have the attribute numbered attribute.
-                        int objectID = GetOperandValue(opcode.Operands[0]);
+                    // Make object have the attribute numbered attribute.
+                    int objectID = GetOperandValue(opcode.Operands[0]);
                     BitNumber attribute = (BitNumber)GetOperandValue(opcode.Operands[1]);
 
                     ZObject obj = MainMemory.ObjectTree.GetObject(objectID);
@@ -731,8 +712,8 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 2);
-                        // Make object not have the attribute numbered attribute.
-                        int objectID = GetOperandValue(opcode.Operands[0]);
+                    // Make object not have the attribute numbered attribute.
+                    int objectID = GetOperandValue(opcode.Operands[0]);
                     BitNumber attribute = (BitNumber)GetOperandValue(opcode.Operands[1]);
 
                     ZObject obj = MainMemory.ObjectTree.GetObject(objectID);
@@ -744,8 +725,8 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 2);
-                        // Bitwise AND
-                        int a = GetOperandValue(opcode.Operands[0]);
+                    // Bitwise AND
+                    int a = GetOperandValue(opcode.Operands[0]);
                     int b = GetOperandValue(opcode.Operands[1]);
                     return a & b;
                 });
@@ -754,8 +735,8 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 2);
-                        // Bitwise OR
-                        int a = GetOperandValue(opcode.Operands[0]);
+                    // Bitwise OR
+                    int a = GetOperandValue(opcode.Operands[0]);
                     int b = GetOperandValue(opcode.Operands[1]);
                     return a | b;
                 });
@@ -764,9 +745,9 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 0);
-                        // Throws away the top item on the stack. (This was useful 
-                        // to lose unwanted routine call results in early Versions.)
-                        CurrentRoutineFrame.EvaluationStack.Pop();
+                    // Throws away the top item on the stack. (This was useful 
+                    // to lose unwanted routine call results in early Versions.)
+                    CurrentRoutineFrame.EvaluationStack.Pop();
                     return UNUSED_RETURN_VALUE;
                 });
                 break;
@@ -776,9 +757,9 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 2);
-                        // Read property from object (resulting in the default value if it had no such
-                        // declared property). 
-                        int objID = GetOperandValue(opcode.Operands[0]);
+                    // Read property from object (resulting in the default value if it had no such
+                    // declared property). 
+                    int objID = GetOperandValue(opcode.Operands[0]);
                     int propertyID = GetOperandValue(opcode.Operands[1]);
 
                     var obj = MainMemory.ObjectTree.GetObject(objID);
@@ -793,9 +774,9 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 3);
-                        // Writes the given value to the given property of the given object. 
-                        // If the property does not exist for that object, the interpreter should halt with a suitable error message.
-                        int objID = GetOperandValue(opcode.Operands[0]);
+                    // Writes the given value to the given property of the given object. 
+                    // If the property does not exist for that object, the interpreter should halt with a suitable error message.
+                    int objID = GetOperandValue(opcode.Operands[0]);
                     int propertyID = GetOperandValue(opcode.Operands[1]);
                     int value = GetOperandValue(opcode.Operands[2]);
 
@@ -810,8 +791,8 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 1);
-                        // Get length of property data (in bytes) for the given object's property.
-                        int propAddr = GetOperandValue(opcode.Operands[0]);
+                    // Get length of property data (in bytes) for the given object's property.
+                    int propAddr = GetOperandValue(opcode.Operands[0]);
 
                     var prop = new ZObjectProperty(MainMemory.Bytes, propAddr - 1);
                     return prop.DataLength;
@@ -821,9 +802,9 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 2);
-                        // Get the byte address (in dynamic memory) of the property data for the 
-                        // given object's property. 
-                        int objID = GetOperandValue(opcode.Operands[0]);
+                    // Get the byte address (in dynamic memory) of the property data for the 
+                    // given object's property. 
+                    int objID = GetOperandValue(opcode.Operands[0]);
                     int propertyID = GetOperandValue(opcode.Operands[1]);
 
                     var obj = MainMemory.ObjectTree.GetObject(objID);
@@ -839,13 +820,13 @@ public class Interpreter
                     int objID = GetOperandValue(opcode.Operands[0]);
                     int propertyID = GetOperandValue(opcode.Operands[1]);
 
-                        // Gives the number of the next property provided by the quoted object. 
-                        // This may be zero, indicating the end of the property list; if called 
-                        // with zero, it gives the first property number present. It is illegal 
-                        // to try to find the next property of a property which does not exist, 
-                        // and an interpreter should halt with an error message (if it can efficiently 
-                        // check this condition). 
-                        var obj = MainMemory.ObjectTree.GetObject(objID);
+                    // Gives the number of the next property provided by the quoted object. 
+                    // This may be zero, indicating the end of the property list; if called 
+                    // with zero, it gives the first property number present. It is illegal 
+                    // to try to find the next property of a property which does not exist, 
+                    // and an interpreter should halt with an error message (if it can efficiently 
+                    // check this condition). 
+                    var obj = MainMemory.ObjectTree.GetObject(objID);
 
                     if (propertyID == 0) return obj.CustomProperties[0].ID;
 
@@ -873,8 +854,8 @@ public class Interpreter
             case "push":  // push value
                 Handle_Opcode(opcode, op =>
                 {
-                        // Pushes value onto the game stack.
-                        Debug.Assert(op.OperandType.Count == 1);
+                    // Pushes value onto the game stack.
+                    Debug.Assert(op.OperandType.Count == 1);
 
                     ushort value = (ushort)GetOperandValue(op.Operands[0]);
                     CurrentRoutineFrame.EvaluationStack.Push(value);
@@ -885,8 +866,8 @@ public class Interpreter
                 Handle_Opcode(opcode, op =>
                 {
                     Debug.Assert(op.OperandType.Count == 1);
-                        // Returns a uniformly random number between 1 and range.                 Debug.Assert(op.OperandType.Count == 1);
-                        ushort range = (ushort)GetOperandValue(op.Operands[0]);
+                    // Returns a uniformly random number between 1 and range.                 Debug.Assert(op.OperandType.Count == 1);
+                    ushort range = (ushort)GetOperandValue(op.Operands[0]);
                     return RandomNumberGenerator.GetNext(range);
                 });
                 break;
