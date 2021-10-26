@@ -5,7 +5,7 @@ namespace NegativeEddy.Leaflet.Instructions;
 /// <summary>
 /// Operands reference either a Constant value or a Variable
 /// </summary>
-public class ZOperand
+public record ZOperand
 {
     public OperandTypes Type { get; }
 
