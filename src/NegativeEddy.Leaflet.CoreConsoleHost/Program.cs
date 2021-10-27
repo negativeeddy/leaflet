@@ -1,39 +1,28 @@
-﻿using System;
+﻿using NegativeEddy.Leaflet;
+using NegativeEddy.Leaflet.CoreConsoleHost;
 using System.Diagnostics;
-using System.IO;
 
-namespace NegativeEddy.Leaflet.CoreConsoleHost
+var zm = new Interpreter
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var zm = new Interpreter();
-            zm.Input = new ConsoleInput();
-            zm.Output.Subscribe(x => Console.Write(x));
-            zm.Diagnostics.Subscribe(x => Debug.Write(x));
-            zm.DiagnosticsOutputLevel = Interpreter.DiagnosticsLevel.Verbose;
+    Input = new ConsoleInput(),
+    DiagnosticsOutputLevel = Interpreter.DiagnosticsLevel.Verbose,
+};
 
-            string filename = Path.Combine("GameFiles", "minizork.z3");
-            using (var stream = File.OpenRead(filename))
-            {
-                zm.LoadStory(stream);
-            }
-            Console.WriteLine($"Gamefile Version {zm.MainMemory.Header.Version}");
+zm.Output.Subscribe(x => Console.Write(x));
+zm.Diagnostics.Subscribe(x => Debug.Write(x));
 
-            //DumpObjectTree(zm);
+string filename = Path.Combine("GameFiles", "minizork.z3");
+using (var stream = File.OpenRead(filename))
+{
+    zm.LoadStory(stream);
+}
+Console.WriteLine($"Gamefile Version {zm.MainMemory.Header.Version}");
 
-            //DumpObjects(zm);
+//DumpObjectTree(zm);
 
-            RunGame(zm);
-        }
+//DumpObjects(zm);
 
-        private static void RunGame(Interpreter zm)
-        {
-            while (zm.IsRunning)
-            {
-                zm.ExecuteCurrentInstruction();
-            }
-        }
-    }
+while (zm.IsRunning)
+{
+    zm.ExecuteCurrentInstruction();
 }

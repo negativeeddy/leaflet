@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="GameFiles\minizork.z3" />
+    <None Remove="GameFiles\miniZork_input_mailbox.txt" />
+    <None Remove="GameFiles\minizork_input_walkthrough.txt" />
+    <None Remove="GameFiles\minizork_input_walkthrough2.txt" />
+    <None Remove="GameFiles\miniZork_opcodes_mailbox.dasm" />
+    <None Remove="GameFiles\miniZork_opcodes_walkthrough.dasm" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="GameFiles\minizork.z3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GameFiles\miniZork_input_mailbox.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GameFiles\minizork_input_walkthrough2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GameFiles\minizork_input_walkthrough.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GameFiles\miniZork_opcodes_mailbox.dasm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GameFiles\miniZork_opcodes_walkthrough.dasm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.12.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
+    <PackageReference Include="coverlet.collector" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NegativeEddy.Leaflet\NegativeEddy.Leaflet.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Infrastructure\" />
+  </ItemGroup>
+
+</Project>

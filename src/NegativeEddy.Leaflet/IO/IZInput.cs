@@ -1,8 +1,7 @@
-﻿namespace NegativeEddy.Leaflet.IO
+﻿namespace NegativeEddy.Leaflet.IO;
+
+public interface IZInput
 {
-    public interface IZInput
-    {
-        string ReadLine();
-        char ReadChar();
-    }
+    string? ReadLine();
+    char ReadChar();
 }

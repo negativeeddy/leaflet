@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>NegativeEddy.Leaflet.CoreConsoleHost</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>NegativeEddy.Leaflet.CoreConsoleHost</PackageId>
@@ -9,12 +9,14 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup> 
+  <ItemGroup>
     <ProjectReference Include="..\NegativeEddy.Leaflet\NegativeEddy.Leaflet.csproj" />
   </ItemGroup>
-    
+
   <ItemGroup>
     <None Update="GameFiles\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

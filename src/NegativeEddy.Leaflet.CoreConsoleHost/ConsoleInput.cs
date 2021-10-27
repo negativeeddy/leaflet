@@ -1,18 +1,10 @@
-﻿using System;
-using NegativeEddy.Leaflet.IO;
+﻿using NegativeEddy.Leaflet.IO;
 
-namespace NegativeEddy.Leaflet.CoreConsoleHost
+namespace NegativeEddy.Leaflet.CoreConsoleHost;
+
+class ConsoleInput : IZInput
 {
-    class ConsoleInput : IZInput
-    {
-        public char ReadChar()
-        {
-            return Console.ReadKey().KeyChar;
-        }
+    public char ReadChar() => Console.ReadKey().KeyChar;
 
-        public string ReadLine()
-        {
-            return Console.ReadLine();
-        }
-    }
+    public string? ReadLine() => Console.ReadLine();
 }

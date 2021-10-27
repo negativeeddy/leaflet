@@ -1,10 +1,10 @@
-﻿namespace NegativeEddy.Leaflet.Instructions
+﻿namespace NegativeEddy.Leaflet.Instructions;
+
+public enum OperandCountType
 {
-    public enum OperandCountType {
-        OP0,
-        OP1,
-        OP2,
-        VAR,
-        EXT
-    };
-}
+    OP0,
+    OP1,
+    OP2,
+    VAR,
+    EXT
+};

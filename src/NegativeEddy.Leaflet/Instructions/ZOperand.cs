@@ -1,54 +1,49 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
-namespace NegativeEddy.Leaflet.Instructions
+namespace NegativeEddy.Leaflet.Instructions;
+
+/// <summary>
+/// Operands reference either a Constant value or a Variable
+/// </summary>
+public record ZOperand
 {
-    /// <summary>
-    /// Operands reference either a Constant value or a Variable
-    /// </summary>
-    public class ZOperand
+    public OperandTypes Type { get; }
+
+    ZVariable? _variable;
+    public ZVariable Variable
     {
-        public OperandTypes Type { get; }
-
-        ZVariable _variable;
-        public ZVariable Variable
+        get
         {
-            get
+            Debug.Assert(Type == OperandTypes.Variable);
+            if (Type != OperandTypes.Variable)
             {
-                Debug.Assert(Type == OperandTypes.Variable);
-                return _variable;
+                throw new InvalidOperationException("Operand is not a variable");
             }
-            set
+            if (_variable == null)
             {
-                Debug.Assert(Type == OperandTypes.Variable);
-                 _variable = value;
+                throw new InvalidOperationException("Operand's Variable property has not been initialized");
             }
+            return _variable;
         }
-
-        public uint Constant { get; set; }
-
-        public ZOperand(OperandTypes type)
+        set
         {
-            Type = type;
-        }
-
-        public int LengthInBytes
-        {
-            get
-            {
-                switch (Type)
-                {
-                    case OperandTypes.LargeConstant:
-                        return 2;
-                    case OperandTypes.SmallConstant:
-                    case OperandTypes.Variable:
-                        return 1;
-                    case OperandTypes.Omitted:
-                        return 0;
-                    default:
-                        throw new InvalidOperationException("Unknown Operand Type");
-                }
-            }
+            Debug.Assert(Type == OperandTypes.Variable);
+            _variable = value;
         }
     }
+
+    public uint Constant { get; set; }
+
+    public ZOperand(OperandTypes type)
+    {
+        Type = type;
+    }
+
+    public int LengthInBytes => Type switch
+    {
+        OperandTypes.LargeConstant => 2,
+        OperandTypes.SmallConstant or OperandTypes.Variable => 1,
+        OperandTypes.Omitted => 0,
+        _ => throw new InvalidOperationException("Unknown Operand Type"),
+    };
 }

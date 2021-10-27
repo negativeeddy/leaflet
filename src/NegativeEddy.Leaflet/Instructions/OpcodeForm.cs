@@ -1,10 +1,9 @@
-﻿namespace NegativeEddy.Leaflet.Instructions
+﻿namespace NegativeEddy.Leaflet.Instructions;
+
+public enum OpcodeForm
 {
-    public enum OpcodeForm
-    {
-        Long,
-        Short,
-        Variable,
-        Extended
-    };
-}
+    Long,
+    Short,
+    Variable,
+    Extended
+};

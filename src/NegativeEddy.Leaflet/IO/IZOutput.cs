@@ -1,9 +1,6 @@
-﻿using System;
+﻿namespace NegativeEddy.Leaflet.IO;
 
-namespace NegativeEddy.Leaflet.IO
+public interface IZOutput
 {
-    public interface IZOutput
-    {
-        IObservable<string> Print { get; }
-    }
+    IObservable<string?> Print { get; }
 }
