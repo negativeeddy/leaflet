@@ -146,12 +146,14 @@ namespace NegativeEddy.Leaflet.Story.Tests
         private void ValidateProperty(ZObjectProperty property, int ID, byte[] Data)
         {
             Assert.AreEqual(ID, property.ID);
-            Assert.AreEqual(Data.Length, property.Data.Count);
+            Assert.AreEqual(Data.Length, property.Data.Length);
 
-            var compares = Data.Zip(property.Data, (expected, actual) => new { expected, actual });
-            foreach (var item in compares)
+            var actuals = property.Data.Span;
+            for(int i=0; i<Data.Length; i++)
             {
-                Assert.AreEqual(item.expected, item.actual);
+                byte expected = Data[i];
+                byte actual = actuals[i];
+                Assert.AreEqual(expected, actual);
             }
         }
 

@@ -83,7 +83,7 @@ public class ZObject
         foreach (var prop in CustomProperties.OrderBy(x => x.ID))
         {
             sb.Append($"[{prop.ID}],");
-            foreach (byte b in prop.Data)
+            foreach (byte b in prop.Data.Span)
             {
                 sb.Append($"{b:x2},");
             }
@@ -117,7 +117,7 @@ public class ZObject
         foreach (var prop in CustomProperties)
         {
             sb.Append($"        [{prop.ID}] ");
-            foreach (byte b in prop.Data)
+            foreach (byte b in prop.Data.Span)
             {
                 sb.Append($"{b:x2}  ");
             }
@@ -169,18 +169,12 @@ public class ZObject
         {
             var data = prop.Data;
 
-            if (data.Count == 1)
+            return data.Length switch
             {
-                return data[0];
-            }
-            else if (data.Count == 2)
-            {
-                return data.GetWord(0);
-            }
-            else
-            {
-                throw new InvalidOperationException($"Cannot get property value. It has {data.Count} bytes");
-            }
+                1 => data.Span[0],
+                2=> data.Span.GetWord(0),
+                _ => throw new InvalidOperationException($"Cannot get property value. It has {data.Length} bytes")
+            };
         }
         else
         {
@@ -200,17 +194,17 @@ public class ZObject
         {
             var data = prop.Data;
 
-            if (data.Count == 1)
+            if (data.Length == 1)
             {
-                data[0] = (byte)value;
+                data.Span[0] = (byte)value;
             }
-            else if (data.Count == 2)
+            else if (data.Length== 2)
             {
-                data.SetWord((ushort)value, 0);
+                data.Span.SetWord((ushort)value, 0);
             }
             else
             {
-                throw new InvalidOperationException($"Cannot set property value. It has {data.Count} bytes");
+                throw new InvalidOperationException($"Cannot set property value. It has {data.Length} bytes");
             }
         }
         else
@@ -231,7 +225,6 @@ public class ZObject
                 properties.Add(prop);
                 propertyAddress += prop.LengthInBytes;
                 prop = new ZObjectProperty(_bytes, propertyAddress);
-
             }
             return properties.ToArray();
         }

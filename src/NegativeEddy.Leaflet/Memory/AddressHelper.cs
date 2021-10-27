@@ -51,7 +51,12 @@ public static class AddressHelper
 
     public static void SetWord(this IList<byte> data, ushort word, int address)
     {
-        Debug.Assert(address + 1 < data.Count);
+        data.SetWord(word, address);
+    }
+
+    public static void SetWord(this Span<byte> data, ushort word, int address)
+    {
+        Debug.Assert(address + 1 < data.Length);
         byte upper = (byte)(word >> 8);
         byte lower = (byte)word;
         data[address] = upper;
